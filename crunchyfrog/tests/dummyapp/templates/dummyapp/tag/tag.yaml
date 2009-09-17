@@ -1,0 +1,6 @@
+title: Testing the template tag YAML loader
+body: dummyapp/tag/tag.html
+
+css:
+    - static: dummyapp/tag/media/css/screen.css
+      process: clevercss

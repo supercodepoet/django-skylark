@@ -1,0 +1,13 @@
+body: dummyapp/page/sample.html
+
+js:
+    - static: dummyapp/page/media/js/sample.js
+    - url: http://localhost:8000/media/files.js
+
+css:
+    - url: http://cdn.google.com/site.com/handheld.css
+      media: screen
+    - static: dummyapp/page/media/css/sample.css
+      media: screen
+    - render: dummyapp/page/media/css/dynamic.css
+      media: screen

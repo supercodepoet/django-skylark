@@ -1,0 +1,6 @@
+title: Test Tag Page
+body: dummyapp/page/tag.html
+
+css:
+    - static: dummyapp/page/media/css/sample.css
+      media: screen

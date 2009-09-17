@@ -1,0 +1,5 @@
+uses:
+    - file: dummyapp/page/sample.yaml
+
+js:
+    - static: dummyapp/page/media/js/sampleafter.js

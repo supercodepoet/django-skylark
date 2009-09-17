@@ -1,0 +1,10 @@
+body: dummyapp/page/sample.html
+title: Test
+
+uses:
+    - file: dummyapp/page/sample.yaml
+
+js:
+    - static: dummyapp/page/media/js/sample.js
+    - static: dummyapp/page/media/js/sample.js
+    - url: http://localhost:8000/media/files.js

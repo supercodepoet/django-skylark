@@ -1,0 +1,7 @@
+body: dummyapp/page/sample.html
+title: Test Meta
+
+meta:
+    - key: http-equiv
+      name: test
+      content: test-content

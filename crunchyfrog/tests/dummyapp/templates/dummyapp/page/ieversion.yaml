@@ -1,0 +1,7 @@
+body: dummyapp/page/sample.html
+title: Test
+
+css:
+    - static: dummyapp/page/media/css/sample.css
+      media: screen
+      ieversion: gte IE 6
