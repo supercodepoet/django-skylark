@@ -119,7 +119,7 @@ def test_provides_page_instructions():
     py.test.raises(ParserError, "pa.get_http_response()")
 
 def test_missing_crunchyfrog_settings():
-    from djangocrunchyfrog.conf import settings
+    from crunchyfrog.conf import settings
 
     assert settings.MEDIA_URL
     assert settings.MEDIA_ROOT
