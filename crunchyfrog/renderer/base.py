@@ -6,6 +6,7 @@ from django.template import Template
 from django.template import TemplateDoesNotExist
 from django.template import loader
 from urlparse import urljoin
+from crunchyfrog import media_cache
 from crunchyfrog.conf import settings
 from crunchyfrog.processor import clevercss
 
@@ -155,9 +156,12 @@ class Renderer(object):
             if process_func:
                 source = process_func(source)
 
-            f = open(fullpath, 'w')
-            f.write(source)
-            f.close()
+            if not is_static: 
+                return media_cache.add(template_name, context, source), filename
+            else:
+                f = open(fullpath, 'w')
+                f.write(source)
+                f.close()
 
         return urljoin(self.cache_url, template_name), filename
 

@@ -10,4 +10,5 @@ parts/*
 django_crunchyfrog.egg-info/*
 docs/_build
 dist/*
+crunchyfrog/tests/media
 *.coverage
