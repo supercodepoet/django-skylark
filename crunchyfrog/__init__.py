@@ -24,7 +24,7 @@ class MediaCache(object):
         self.timeout_seconds = 60 * 5
 
     def _get_token(self, context):
-        return id(context)
+        return str(id(context))
 
     def add(self, template_name, context, template_rendered):
         token = self._get_token(context)
@@ -38,7 +38,7 @@ class MediaCache(object):
         return reverse('crunchyfrog:media-by-token', kwargs={'template_name': template_name, 'token': token})
 
     def get(self, token, template_name):
-        rendered_list = self._tokens.get(int(token))
+        rendered_list = self._tokens.get(str(token))
 
         if not rendered_list or not template_name in rendered_list:
             raise SuspiciousOperation('The rendered media for token %s and template name %s was not found.' % (token, template_name,))
