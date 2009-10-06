@@ -40,5 +40,5 @@ def media_by_token(request, token, template_name):
             return HttpResponsePermanentRedirect(url)
 
         return HttpResponse(media_cache.get(token, template_name), mimetype=mimetype)
-    except SuspiciousOperation as so:
+    except SuspiciousOperation, so:
         return HttpResponseNotFound(so)
