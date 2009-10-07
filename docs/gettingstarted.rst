@@ -83,17 +83,6 @@ Now add this to the installed apps.  Edit ``settings.py`` again. ::
         'goodies',
     )
 
-Edit ``urls.py`` and add an import for ``crunchyfrog``. ::
-
-    from django.conf.urls.defaults import *
-    import crunchyfrog
-
-And add a url pattern. ::
-
-    urlpatterns = patterns('',
-        (r'^cfmedia/', crunchyfrog.urls),
-    )
-
 Now we're gonna use CrunchyFrog's command line interface to get us going. ::
 
     python manage.py crunchypage -a goodies -p list
@@ -162,15 +151,12 @@ Edit ``goodies/urls.py`` ::
 Edit ``urls.py`` for the main project ::
 
     from django.conf.urls.defaults import *
-    import crunchyfrog
 
     # Uncomment the next two lines to enable the admin:
     # from django.contrib import admin
     # admin.autodiscover()
 
     urlpatterns = patterns('',
-        (r'^cfmedia/', crunchyfrog.urls),
-
         # Example:
         # (r'^whizzochocolates/', include('whizzochocolates.foo.urls')),
 
