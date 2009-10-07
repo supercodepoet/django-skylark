@@ -11,3 +11,4 @@ django_crunchyfrog.egg-info/*
 docs/_build
 dist/*
 *.coverage
+.noseids

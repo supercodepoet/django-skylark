@@ -24,6 +24,8 @@ except ImportError:
 
 setup_environ(settings)
     
+settings.DEBUG = False
+
 cachedir = os.path.join(os.path.dirname(__file__), 'media/cfcache')
 
 def get_one_file_in(path):
@@ -116,7 +118,7 @@ def test_provides_page_instructions():
     c = RequestContext(request, { 'foo': 'bar' })
     pa = PageAssembly('dummyapp/page/invalid.yaml', c)
 
-    py.test.raises(ParserError, "pa.get_http_response()")
+    py.test.raises(ParserError, pa.get_http_response)
 
 def test_missing_crunchyfrog_settings():
     from crunchyfrog.conf import settings
@@ -154,13 +156,20 @@ def test_creates_a_file_in_cache_with_key():
 def test_can_render_an_asset():
     request = get_request_fixture()
     c = RequestContext(request, { 'color': 'gray' })
-    pa = PageAssembly('dummyapp/page/renderasset.yaml', c)
+    pa = PageAssembly('dummyapp/page/renderasset.yaml', c, 'renderasset')
 
-    pa.dumps()
+    content = pa.dumps()
 
-    css = get_contents(get_one_file_in(cachedir))
+    assert 'my_favorite_color = "gray"' in content
+    assert 'body { background-color: gray }' in content
 
-    assert css == 'body { background-color: gray }\n'
+@with_setup(setup, teardown)
+def test_can_detect_bad_processor():
+    request = get_request_fixture()
+    c = RequestContext(request, { 'foo': 'bar' })
+    pa = PageAssembly('dummyapp/page/badprocessor.yaml', c)
+
+    py.test.raises(AttributeError, pa.get_http_response)
 
 @with_setup(setup, teardown)
 def test_can_render_clevercss():
@@ -180,13 +189,13 @@ def test_missing_yaml_attributes():
     c = RequestContext(request, { 'foo': 'bar' })
     pa = PageAssembly('dummyapp/page/missingbody.yaml', c)
 
-    py.test.raises(AssertionError, "pa.get_http_response()")
+    py.test.raises(AssertionError, pa.get_http_response)
 
     request = get_request_fixture()
     c = RequestContext(request, { 'foo': 'bar' })
     pa = PageAssembly('dummyapp/page/missingtitle.yaml', c)
 
-    py.test.raises(AssertionError, "pa.get_http_response()")
+    py.test.raises(AssertionError, pa.get_http_response)
 
     # Combining them should fix our issue
     request = get_request_fixture()
@@ -254,13 +263,14 @@ def test_uses_the_page_instructions_cache_if_enabled():
 @with_setup(setup, teardown)
 def test_references_other_yaml_files():
     request = get_request_fixture()
-    c = RequestContext(request, { 'foo': 'bar' })
+    c = RequestContext(request, { 'background_color': 'red' })
     pa = PageAssembly('dummyapp/page/uses.yaml', c)
 
     content = pa.dumps()
 
-    assert len(re.findall('.*\.css', content)) == 3, 'There should be 3 css files from the sample.yaml in here'
+    assert len(re.findall('.*\.css', content)) == 2, 'There should be 2 css files from the sample.yaml in here'
     assert content.find('sample.js') < content.find('sampleafter.js'), 'The sample.js should come before the sampleafter.js'
+    assert "body {\n    background-color: red\n}" in content, 'Looking for the rendered css inline, it wasn\'t there'
 
 @with_setup(setup, teardown)
 def test_renders_meta_section():

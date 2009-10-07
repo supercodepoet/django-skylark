@@ -123,7 +123,25 @@ class Renderer(object):
         if not os.path.exists(self.cache_root):
             os.makedirs(self.cache_root)
 
-    def copy_to_media(self, template_name, context=None, process_func=None, is_static=True):
+    def get_media_source(self, template_name, process_func=None, context=None):
+        """
+        Responsible for taking a template and generating the contents.
+
+            * Renders the template with the given context if applicable
+            * Passes it through the process function if provided
+        """
+        source, origin = self.find_template_source(template_name)
+
+        if context:
+            template = Template(source)
+            source   = template.render(context)
+
+        if process_func:
+            source = process_func(source)
+
+        return source
+
+    def copy_to_media(self, template_name, process_func=None):
         """
         Part of our goal here is to make the placement of media a transparent deal.
         Django does not currently make this easy, you typically have to handle your
@@ -134,26 +152,18 @@ class Renderer(object):
         to the cache.  It ends up having the same directory structure, so in the
         end gets copied to MEDIA_ROOT/cfcache/blog/media/css/screen.css.
 
-        In the process, if we are supposed to treat this file as a template we
-        will render it, or if it has some special processing (like a CleverCSS
-        file) we will do that to.
         """
         dirpath  = os.path.join(self.cache_root, os.path.dirname(template_name))
         filename = os.path.basename(template_name)
         fullpath = os.path.join(dirpath, filename)
 
-        if settings.DEBUG or not is_static or (is_static and os.path.exists(fullpath)):
+        if settings.DEBUG:
             if not os.path.exists(dirpath):
                 os.makedirs(dirpath)
 
             source, origin = self.find_template_source(template_name)
 
-            if context:
-                template = Template(source)
-                source   = template.render(context)
-
-            if process_func:
-                source = process_func(source)
+            source = self.get_media_source(template_name, process_func)
 
             f = open(fullpath, 'w')
             f.write(source)
@@ -183,27 +193,27 @@ class Renderer(object):
             if instruction.has_key('url'):
                 self.prepared_instructions[item_name].append({ 'location': instruction['url'] })
             else:
-                template_name = None
-                context = None
-                process_func = None
-                is_static = True
-
-                if instruction.has_key('static'):
-                    template_name = instruction['static']
-                elif instruction.has_key('render'):
-                    template_name = instruction['render']
-                    context = self.context
-                    is_static = False
+                template_name = context = process_func = None
 
                 if instruction.has_key('process') and Renderer.processing_funcs.has_key(instruction['process']):
                     process_func = Renderer.processing_funcs[instruction['process']]
-
-                assert template_name, 'You must provide either "static" or "render" properties that point to a file, provided object was %r' % instruction
-
-                location, filename = self.copy_to_media(template_name, context, process_func, is_static)
+                elif instruction.has_key('process'):
+                    raise AttributeError('Could not find a process function matching %s, available ones are: %s' % 
+                        (instruction['process'], ', '.join(Renderer.processing_funcs.keys()),))
 
                 item = copy.copy(instruction)
-                item['location'] = location
+
+                if instruction.has_key('static'):
+                    template_name = instruction['static']
+                    location, filename = self.copy_to_media(template_name, process_func)
+                    item['location'] = location
+                elif instruction.has_key('inline'):
+                    template_name = instruction['inline']
+                    context = self.context
+                    source = self.get_media_source(template_name, process_func, context)
+                    item['source'] = source
+
+                assert template_name, 'You must provide either "static" or "inline" properties that point to a file, provided object was %r' % instruction
 
                 if instruction.has_key('include') and not instruction['include']:
                     continue

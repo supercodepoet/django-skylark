@@ -227,7 +227,7 @@ class PageInstructions(object):
         Since the parts can have a variety of keys (url, render, static) this method
         is used to get whichever of the keys is set
         """
-        for attr in ('url', 'render', 'static'):
+        for attr in ('url', 'inline', 'static'):
             if attr in part:
                 return part[attr]
 

@@ -2,5 +2,9 @@ body: dummyapp/page/sample.html
 title: Test
 
 css:
-    - render: dummyapp/page/media/css/renderasset.css
-      media: screen
+    - inline: dummyapp/page/media/css/inlineasset.css
+      media: all
+
+js:
+    - inline: dummyapp/page/media/js/inlineasset.js
+
