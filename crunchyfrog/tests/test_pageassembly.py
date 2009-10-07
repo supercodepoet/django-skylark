@@ -9,14 +9,11 @@ from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
 from crunchyfrog.page import PageAssembly, RequestContext
 from crunchyfrog.page import settings as page_settings
-from django.core.exceptions import SuspiciousOperation
-from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
+from django.http import HttpRequest, HttpResponse
 from django.template import TemplateDoesNotExist
 from django.template import Context, loader
 from django.core.management import setup_environ
-from django.test.client import Client
 from yaml.parser import ParserError
-from crunchyfrog import media_cache
 
 try:
     import settings # Assumed to be in the same directory.
@@ -155,43 +152,15 @@ def test_creates_a_file_in_cache_with_key():
 
 @with_setup(setup, teardown)
 def test_can_render_an_asset():
-    client  = Client()
     request = get_request_fixture()
-
-    expected_gray = "body { background-color: gray }\n"
-    template_name = 'dummyapp/page/media/css/renderasset.css'
-    token_pattern = re.compile('/cfmedia/(?P<token>[0-9]+)/')
-
     c = RequestContext(request, { 'color': 'gray' })
     pa = PageAssembly('dummyapp/page/renderasset.yaml', c)
-    content = pa.dumps()
 
-    # Grab the token out of the content
-    token = token_pattern.search(content).groupdict()['token']
+    pa.dumps()
 
-    assert media_cache.get(token, template_name) == expected_gray 
-    assert client.get('/cfmedia/%s/%s' % (token, template_name,)).content == expected_gray
+    css = get_contents(get_one_file_in(cachedir))
 
-    # This is a new context object, the token generated from it should be different
-    c = RequestContext(request, { 'color': 'gray' })
-    pa = PageAssembly('dummyapp/page/renderasset.yaml', c)
-    content = pa.dumps()
-
-    old_token = token
-    token = token_pattern.search(content).groupdict()['token']
-
-    assert token != old_token
-
-    assert media_cache.get(token, template_name) == expected_gray
-
-    # Change the context and re-render
-    c['color'] = 'blue'
-    pa = PageAssembly('dummyapp/page/renderasset.yaml', c)
-    content = pa.dumps()
-
-    assert media_cache.get(token, template_name) == expected_gray.replace('gray', 'blue')
-
-    assert isinstance(client.get('/cfmedia/0000/not/here'), HttpResponseNotFound)
+    assert css == 'body { background-color: gray }\n'
 
 @with_setup(setup, teardown)
 def test_can_render_clevercss():
