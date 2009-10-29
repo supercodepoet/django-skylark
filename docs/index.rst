@@ -18,6 +18,7 @@ Contents:
    ieversion
    uses
    meta
+   snippets
    cfjsbridge
    settings
    CleverCSS syntax reference <clevercssref>

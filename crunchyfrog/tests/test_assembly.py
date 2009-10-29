@@ -7,8 +7,10 @@ from nose.tools import with_setup
 from nose.result import log
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
-from crunchyfrog.page import PageAssembly, RequestContext
-from crunchyfrog.page import settings as page_settings
+from crunchyfrog import RequestContext
+from crunchyfrog.page import PageAssembly
+from crunchyfrog.snippet import SnippetAssembly
+from crunchyfrog import settings as page_settings
 from django.http import HttpRequest, HttpResponse
 from django.template import TemplateDoesNotExist
 from django.template import Context, loader
@@ -318,3 +320,20 @@ def test_add_yaml_decorator():
 
     assert content.find('<div class="test">This is my tag test</div>') >= 0, 'Template tag did not render its contents'
     assert content.find('/media/cfcache/dummyapp/tag/media/css/screen.css" media="screen">') >= 0, 'Template tag style sheet was not included'
+
+@with_setup(setup, teardown)
+@attr('focus')
+def test_snippet_render():
+    request = get_request_fixture()
+    c = RequestContext(request, {})
+    sa = SnippetAssembly('dummyapp/page/sample.yaml', c, 'snippetrender')
+
+    content = sa.dumps()
+
+    assert not '<html' in content
+    assert not '<head' in content
+    assert not '<body' in content
+    assert '<script' in content
+    assert '<link' in content
+    assert '<ul>' in content
+    assert '<li>' in content

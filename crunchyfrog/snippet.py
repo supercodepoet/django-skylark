@@ -1,4 +1,4 @@
 from crunchyfrog import HttpResponse, RequestContext, BaseAssembly
 
-class PageAssembly(BaseAssembly):
-    render_full_page = True
+class SnippetAssembly(BaseAssembly):
+    render_full_page = False

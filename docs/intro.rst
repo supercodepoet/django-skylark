@@ -114,9 +114,11 @@ script tag.  So now our HTML looks like this.::
             <script type="text/javascript" src="http://localhost:8000/site_media/js/jquery.js"></script>
         </head>
 
-        <h1>Whizzo Chocolates</h1>
+        <body>
+            <h1>Whizzo Chocolates</h1>
 
-        <p>My favorite is Ram&#39;s bladder cup</p>
+            <p>My favorite is Ram&#39;s bladder cup</p>
+        </body>
     </html>
 
 Great.  We have jQuery now.  And we didn't have to dance with the Django
@@ -176,9 +178,11 @@ Now before you object to static files being served outside of the
             <script type="text/javascript" src="http://localhost:8000/site_media/cfcache/goodies/list/media/js/animate.js"></script>
         </head>
 
-        <h1>Whizzo Chocolates</h1>
+        <body>
+            <h1>Whizzo Chocolates</h1>
 
-        <p>My favorite is Ram&#39;s bladder cup</p>
+            <p>My favorite is Ram&#39;s bladder cup</p>
+        </body>
     </html>
 
 Note that even though we had ``animate.js`` inside our templates directory, it's
@@ -222,9 +226,11 @@ The resulting HTML looks like this::
             <script type="text/javascript" src="http://localhost:8000/site_media/cfcache/goodies/list/media/js/animate.js"></script>
         </head>
 
-        <h1>Whizzo Chocolates</h1>
+        <body>
+            <h1>Whizzo Chocolates</h1>
 
-        <p>My favorite is Ram&#39;s bladder cup</p>
+            <p>My favorite is Ram&#39;s bladder cup</p>
+        </body>
     </html>
 
 Changing the DOCTYPE declaration
@@ -257,9 +263,11 @@ The resulting HTML looks like this::
             <script type="text/javascript" src="http://localhost:8000/site_media/cfcache/goodies/list/media/js/animate.js"></script>
         </head>
 
-        <h1>Whizzo Chocolates</h1>
+        <body>
+            <h1>Whizzo Chocolates</h1>
 
-        <p>My favorite is Ram&#39;s bladder cup</p>
+            <p>My favorite is Ram&#39;s bladder cup</p>
+        </body>
     </html>
 
 Adding some assets for template tags

@@ -11,5 +11,5 @@ renderers = {
     'XHTML 1.0 Frameset':     Xhtml1Frameset,
 }
     
-def get(doctype, instructions, context):
-    return renderers[doctype](instructions, context)
+def get(doctype, instructions, context, render_full_page):
+    return renderers[doctype](instructions, context, render_full_page)

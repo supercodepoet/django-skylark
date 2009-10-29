@@ -2,9 +2,7 @@ import copy
 import os
 import shutil
 import yaml
-from django.template import Template
-from django.template import TemplateDoesNotExist
-from django.template import loader
+from django.template import Template, TemplateDoesNotExist, loader
 from urlparse import urljoin
 from crunchyfrog.conf import settings
 from crunchyfrog.processor import clevercss
@@ -76,6 +74,18 @@ class Renderer(object):
         'clevercss': process_clevercss
     }
 
+    """
+    Used to place a doctype at the beginning of a rendered page.  This only
+    applies to html and xhtml pages that are rendered with a PageAssembly.
+    """
+    doctype = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">'
+
+    """
+    What template do we use to render?
+    """
+    template_name = 'crunchyfrog/html401.html'
+    snippet_template_name = 'crunchyfrog/htmlsnippet.html'
+
     def find_template_source(self, name, dirs=None):
         """
         This is a copy paste job from django.template.loader.
@@ -103,7 +113,7 @@ class Renderer(object):
 
         raise TemplateDoesNotExist, name
 
-    def __init__(self, page_instructions, context):
+    def __init__(self, page_instructions, context, render_full_page=True):
         """
         cache_root is normally MEDIA_ROOT/cfcache but can be changed in
         your settings.py file
@@ -113,6 +123,9 @@ class Renderer(object):
         self.cache_url         = settings.CRUNCHYFROG_CACHE_URL
         self.page_instructions = page_instructions
         self.context           = context
+
+        t = self.template_name if render_full_page else self.snippet_template_name
+        self.template = loader.get_template(t)
 
         """
         As we process the page instructions, we gather the output we need to
@@ -333,10 +346,9 @@ class Renderer(object):
         self.prepare_css(self.page_instructions)
         self.prepare_meta(self.page_instructions)
 
-        template = Template(self.template_str)
-
         render_context = copy.copy(self.context)
         render_context['cache_url'] = settings.CRUNCHYFROG_CACHE_URL
+        render_context['doctype'] = self.doctype
         render_context['prepared_instructions'] = self.prepared_instructions
 
-        return template.render(render_context)
+        return self.template.render(render_context)
