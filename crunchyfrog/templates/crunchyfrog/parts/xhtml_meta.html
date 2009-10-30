@@ -1,0 +1,3 @@
+{% for meta in prepared_instructions.meta %}
+    <meta {{ meta.key|default:"name" }}="{{ meta.name }}" content="{{ meta.content }}" />
+{% endfor %}

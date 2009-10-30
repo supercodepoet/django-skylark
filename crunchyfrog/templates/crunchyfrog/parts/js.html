@@ -1,0 +1,32 @@
+{% if prepared_instructions.dojo %}
+    <!-- SnippetAssembly output -->
+    <script>
+    //<![CDATA[
+    {% for dojo in prepared_instructions.dojo %}
+        dojo.registerModuleUrl('{{ dojo.namespace }}', '{{ cache_url }}{{ dojo.location }}');
+        {% for requirement in dojo.require %}
+            dojo.require('{{ requirement }}');
+        {% endfor %}
+    {% endfor %}
+    //]]>
+    </script>
+{% endif %}
+{% if prepared_instructions.js and prepared_instructions.render_full_page %}
+    {% for js in prepared_instructions.js %}
+        {% if js.ieversion %}
+        <!--[if {{ js.ieversion }}]>
+        {% endif %}
+        {% if js.location %}
+            <script type="text/javascript" src="{{ js.location }}"></script>
+        {% else %}
+            <script type="text/javascript">
+            //<![CDATA[
+            {{ js.source }}
+            //]]>
+            </script>
+        {% endif %}
+        {% if js.ieversion %}
+        <![endif]-->
+        {% endif %}
+    {% endfor %}
+{% endif %}

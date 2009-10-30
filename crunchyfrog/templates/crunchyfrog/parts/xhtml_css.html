@@ -1,0 +1,15 @@
+{% for css in prepared_instructions.css %}
+    {% if css.ieversion %}
+    <!--[if {{ css.ieversion }}]>
+    {% endif %}
+    {% if css.location %}
+        <link rel="stylesheet" type="text/css" href="{{ css.location }}" media="{{ css.media|default:"screen" }}" />
+    {% else %}
+        <style type="text/css" media="{{ css.media|default:"screen" }}">
+            {{ css.source }}
+        </style>
+    {% endif %}
+    {% if css.ieversion %}
+    <![endif]-->
+    {% endif %}
+{% endfor %}
