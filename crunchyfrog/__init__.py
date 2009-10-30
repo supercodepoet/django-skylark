@@ -119,7 +119,7 @@ class BaseAssembly(object):
         """
         Combines all the files and instructions into one object
         """
-        page_instructions = PageInstructions()
+        page_instructions = PageInstructions(render_full_page=self.render_full_page)
 
         tried = []
 

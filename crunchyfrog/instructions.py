@@ -4,7 +4,10 @@ class PageInstructions(object):
     """
     Object to contain the page instructions that come from our YAML files
     """
-    def __init__(self, instructions = None):
+    def __init__(self, instructions = None, **kwargs):
+        self.render_full_page = kwargs.get('render_full_page', True)
+        self.yaml = []
+
         """
         These are the ones we expect, these are all the possible kinds of
         instructions that can be handled
@@ -16,7 +19,7 @@ class PageInstructions(object):
         self.body    = None
         self.title   = None
         self.meta    = []
-        self.yaml    = []
+        self.dojo    = []
 
         if instructions:
             self.add(instructions)
@@ -62,14 +65,15 @@ class PageInstructions(object):
         self.yaml.append(sourcefile)
 
         for instruction in instructions:
-            for attr in ('doctype', 'js', 'css', 'body', 'title', 'meta', 'uses',):
+            for attr in ('doctype', 'js', 'css', 'body', 'title', 'meta',
+                         'uses', 'dojo'):
                 if instruction.has_key(attr):
                     pi_object = getattr(self, attr)
                     i_object  = instruction[attr]
 
                     if isinstance(pi_object, list):
                         for part in i_object:
-                            if attr in ('js', 'css', 'meta', ):
+                            if attr in ('js', 'css', 'meta', 'dojo',):
                                 if self._part_exists(part):
                                     continue
 

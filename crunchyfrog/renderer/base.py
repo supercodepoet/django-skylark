@@ -123,6 +123,7 @@ class Renderer(object):
         self.cache_url         = settings.CRUNCHYFROG_CACHE_URL
         self.page_instructions = page_instructions
         self.context           = context
+        self.render_full_page  = render_full_page
 
         t = self.template_name if render_full_page else self.snippet_template_name
         self.template = loader.get_template(t)
@@ -233,7 +234,7 @@ class Renderer(object):
 
                 self.prepared_instructions[item_name].append(item)
 
-    def prepare_assets(self, page_instructions):
+    def prepare_assets(self, page_instructions, assets=None):
         """
         There are some special cases when working with css and javascript that
         we make allowances for.
@@ -256,23 +257,35 @@ class Renderer(object):
         You can put HTML files in media/js/templates and the entire templates directory
         will be copied into the MEDIA_ROOT in the appropriate spot.  This way your
         javascript files can utilize them without having to worry about where they are.
+
+        This method will work with directories that are relative to the YAML
+        file or the app's templates directory.  The following will essentially
+        copy the same directory to the cache:
+
+            self.prepare_assets(pi, ('media/js',))
+            self.prepare_assets(pi, ('blog/list/media/js',))
+
         """
+        assert type(assets) == tuple or type(assets) == list
+
         for yaml in page_instructions.yaml:
             # yaml = app/page/page.yaml
             source, origin = self.find_template_source(yaml)
             del source # we don't need it
+            origin = str(origin)
 
-            basedir   = os.path.dirname(yaml) # should give us app/page
-            jstdir    = 'media/js/templates'
-            imgdir    = 'media/img'
+            yaml_basedir = os.path.dirname(yaml) # should give us app/page
+            template_basedir = origin[:origin.find(yaml)]
 
-            for directory in (jstdir, imgdir, ):
-                sourcedirectory = os.path.join(os.path.dirname(str(origin)), directory)
+            for directory in assets:
+                if not yaml_basedir in directory:
+                    directory = os.path.join(yaml_basedir, directory)
 
-                if not os.path.isdir(sourcedirectory):
-                    continue
+                sourcedirectory = os.path.join(template_basedir, directory)
 
-                cachedirectory = os.path.join(self.cache_root, basedir, directory)
+                if not os.path.isdir(sourcedirectory): continue
+
+                cachedirectory = os.path.join(self.cache_root, directory)
 
                 if os.path.isdir(cachedirectory):
                     if self.assets_are_stale(sourcedirectory, cachedirectory):
@@ -300,12 +313,18 @@ class Renderer(object):
         """
         Processes the js section of the page instructions
         """
+        if hasattr(page_instructions, 'js'):
+            self.prepare_assets(page_instructions, ('media/js/templates',))
+
         self.prepare_file('js', page_instructions)
 
     def prepare_css(self, page_instructions):
         """
         Processes the css section
         """
+        if hasattr(page_instructions, 'css'):
+            self.prepare_assets(page_instructions, ('media/img',))
+
         self.prepare_file('css', page_instructions)
 
     def prepare_title(self, page_instructions):
@@ -329,6 +348,32 @@ class Renderer(object):
         """
         self.prepared_instructions['meta'] = page_instructions.meta
 
+    def prepare_dojo(self, page_instructions):
+        dojo = page_instructions.dojo
+
+        self.prepared_instructions['dojo'] = dojo
+
+        for dojo_module in dojo:
+            assert 'namespace' in dojo_module, ('You are missing the '
+                'namespace attribute for this item')
+            assert 'location' in dojo_module, ('You are missing the '
+                 'location attribute for this item')
+            assert 'require' in dojo_module, ('You are missing the '
+                 'require list for this item')
+
+            namespace = dojo_module['namespace']
+            location = dojo_module['location']
+            require = dojo_module['require']
+
+            """
+            We're going to copy all the files that are in this directory to the
+            cache.  This is not ideal, as not all the files may be used but the
+            alternative is we ask the user specifically which ones they need.
+            Since this is within the context of Dojo, that may not make the most
+            sense.
+            """
+            self.prepare_assets(page_instructions, (location,))
+
     def render(self):
         """
         Takes a chunk of page instructions and renders a page according to the rules
@@ -337,18 +382,25 @@ class Renderer(object):
         This return a string representing the HTML or similar output
         """
         assert self.page_instructions.body, 'The body has not been specified in the page instructions (body: in your yaml file)'
-        assert self.page_instructions.title, 'The title has not been specified in the page instructions (title: in your yaml file)'
 
-        self.prepare_title(self.page_instructions)
-        self.prepare_body(self.page_instructions)
-        self.prepare_assets(self.page_instructions)
-        self.prepare_js(self.page_instructions)
-        self.prepare_css(self.page_instructions)
-        self.prepare_meta(self.page_instructions)
+        if self.render_full_page:
+            assert self.page_instructions.title, 'The title has not been specified in the page instructions (title: in your yaml file)'
+
+        prep_pi = self.prepared_instructions
+        raw_pi = self.page_instructions
+
+        prep_pi['render_full_page'] = raw_pi.render_full_page
+
+        self.prepare_title(raw_pi)
+        self.prepare_body(raw_pi)
+        self.prepare_js(raw_pi)
+        self.prepare_css(raw_pi)
+        self.prepare_meta(raw_pi)
+        self.prepare_dojo(raw_pi)
 
         render_context = copy.copy(self.context)
         render_context['cache_url'] = settings.CRUNCHYFROG_CACHE_URL
         render_context['doctype'] = self.doctype
-        render_context['prepared_instructions'] = self.prepared_instructions
+        render_context['prepared_instructions'] = prep_pi
 
         return self.template.render(render_context)

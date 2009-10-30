@@ -3,6 +3,7 @@ import os
 import shutil
 import re
 
+from time import time
 from nose.tools import with_setup
 from nose.result import log
 from nose.plugins.attrib import attr
@@ -31,10 +32,12 @@ settings.DEBUG = False
 cachedir = os.path.join(os.path.dirname(__file__), 'media/cfcache')
 
 def get_one_file_in(path):
-    for file in os.walk(path):
-        files = file[2] # the third element is an array of files
-        if files:
-            return os.path.join(file[0], files[0])
+    started = time()
+    while (time() - started < 3.0):
+        for file in os.walk(path):
+            files = file[2] # the third element is an array of files
+            if files:
+                return os.path.join(file[0], files[0])
 
     raise Exception, 'Could not find a file in %s' % path
 
@@ -262,6 +265,9 @@ def test_uses_the_page_instructions_cache_if_enabled():
 
     assert True
 
+    # Restore the debug setting
+    page_settings.DEBUG = True
+
 @with_setup(setup, teardown)
 def test_references_other_yaml_files():
     request = get_request_fixture()
@@ -314,26 +320,34 @@ def test_will_use_correct_doctype():
 def test_add_yaml_decorator():
     request = get_request_fixture()
     c = RequestContext(request, {})
-    pa = PageAssembly('dummyapp/tag/tag.yaml', c, 'templatetagcachekey')
+    pa = PageAssembly('dummyapp/page/tag.yaml', c, 'templatetagcachekey')
 
     content = pa.dumps()
 
+    assert get_one_file_in(os.path.join(
+        cachedir, 'dummyapp', 'tag', 'media', 'css')
+    )
+
     assert content.find('<div class="test">This is my tag test</div>') >= 0, 'Template tag did not render its contents'
     assert content.find('/media/cfcache/dummyapp/tag/media/css/screen.css" media="screen">') >= 0, 'Template tag style sheet was not included'
-
+                              
 @with_setup(setup, teardown)
-@attr('focus')
 def test_snippet_render():
     request = get_request_fixture()
     c = RequestContext(request, {})
-    sa = SnippetAssembly('dummyapp/page/sample.yaml', c, 'snippetrender')
+    sa = SnippetAssembly('dummyapp/snippet/snippet.yaml', c, 'snippetrender')
 
     content = sa.dumps()
 
     assert not '<html' in content
     assert not '<head' in content
     assert not '<body' in content
-    assert '<script' in content
-    assert '<link' in content
-    assert '<ul>' in content
-    assert '<li>' in content
+    assert not '<link' in content
+
+    assert "dojo.registerModuleUrl('DummyApp.Snippet'" in content
+
+    assert get_one_file_in(os.path.join(
+        cachedir, 'dummyapp', 'snippet', 'media', 'js')
+    )
+
+    assert content.find('<div class="test">This is my snippet test</div>') >= 0, 'Template tag did not render its contents'
