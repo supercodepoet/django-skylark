@@ -344,10 +344,25 @@ def test_snippet_render():
     assert not '<body' in content
     assert not '<link' in content
 
-    assert "dojo.registerModuleUrl('DummyApp.Snippet'" in content
+    assert "dojo.registerModulePath('DummyApp.Snippet'" in content
 
     assert get_one_file_in(os.path.join(
         cachedir, 'dummyapp', 'snippet', 'media', 'js')
     )
 
     assert content.find('<div class="test">This is my snippet test</div>') >= 0, 'Template tag did not render its contents'
+
+@with_setup(setup, teardown)
+@attr('focus')
+def test_dojo_renders_in_page():
+    request = get_request_fixture()
+    c = RequestContext(request, {})
+    pa = PageAssembly('dummyapp/page/dojo.yaml', c, 'dojorenderinpage')
+
+    content = pa.dumps()
+
+    assert "dojo.registerModulePath('DummyApp.Page'" in content
+    assert "dojo.require('DummyApp.Page.Controller');" in content
+    assert "dojo.require('DummyApp.Page.View');" in content
+    assert 'dummyapp/tag/media/css/screen.css' in content
+    assert 'dummyapp/page/media/js/sample.js' in content

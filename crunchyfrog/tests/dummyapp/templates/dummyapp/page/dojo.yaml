@@ -1,0 +1,12 @@
+title: Testing that Dojo requirements get rendered to the page
+body: dummyapp/page/dojo.html
+
+js:
+    - static: dummyapp/page/media/js/sample.js
+
+dojo:
+    - namespace: DummyApp.Page
+      location: dummyapp/page/media/js
+      require: 
+        - DummyApp.Page.Controller
+        - DummyApp.Page.View
