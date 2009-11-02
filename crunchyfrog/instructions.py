@@ -34,6 +34,7 @@ class PageInstructions(object):
         instructions.extend(self.js)
         instructions.extend(self.css)
         instructions.extend(self.meta)
+        instructions.extend(self.dojo)
 
         for instruction in instructions:
             if self._get_source_attribute(instruction) == self._get_source_attribute(part):
@@ -45,10 +46,10 @@ class PageInstructions(object):
         """
         Looks through a part of the yaml file and pulls out the location it references.
 
-        Since the parts can have a variety of keys (url, render, static) this method
-        is used to get whichever of the keys is set
+        Since the parts can have a variety of keys (url, render, static,
+        namespace) this method is used to get whichever of the keys is set
         """
-        for attr in ('url', 'inline', 'static'):
+        for attr in ('url', 'inline', 'static', 'namespace'):
             if attr in part:
                 return part[attr]
 

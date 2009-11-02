@@ -1,16 +1,3 @@
-{% if prepared_instructions.dojo %}
-    <!-- Dojo Toolkit dynamic loading output -->
-    <script>
-    //<![CDATA[
-    {% for dojo in prepared_instructions.dojo %}
-        dojo.registerModulePath('{{ dojo.namespace }}', '{{ cache_url }}{{ dojo.location }}');
-        {% for requirement in dojo.require %}
-            dojo.require('{{ requirement }}');
-        {% endfor %}
-    {% endfor %}
-    //]]>
-    </script>
-{% endif %}
 {% if prepared_instructions.js and prepared_instructions.render_full_page %}
     {% for js in prepared_instructions.js %}
         {% if js.ieversion %}
@@ -29,4 +16,17 @@
         <![endif]-->
         {% endif %}
     {% endfor %}
+{% endif %}
+{% if prepared_instructions.dojo %}
+    <!-- Dojo Toolkit dynamic loading output -->
+    <script>
+    //<![CDATA[
+    {% for dojo in prepared_instructions.dojo %}
+        dojo.registerModulePath('{{ dojo.namespace }}', '{{ cache_url }}{{ dojo.location }}');
+        {% for requirement in dojo.require %}
+            dojo.require('{{ requirement }}');
+        {% endfor %}
+    {% endfor %}
+    //]]>
+    </script>
 {% endif %}
