@@ -1,16 +1,17 @@
 from fabric.api import env, run, put, local, roles
 import datetime
 
+from pkginfo import version
+
 env.hosts     = ['localbase.webfactional.com']
 env.roledefs  = {'eggserver': ['localbase.webfactional.com']}
 env.user      = 'localbase'
-env.name_left = 'django-crunchyfrog-0.1dev'
+env.name_left = 'django-crunchyfrog'
 
 @roles('eggserver')
 def deploy():
     """Deploys Django Crunchy Frog to our eggs directory on Web Faction"""
-    today = datetime.date.today()
-    filename = '%s-%s.tar.gz' % (env.name_left, today.strftime('%Y%m%d'),) 
+    filename = '%s-%s.tar.gz' % (env.name_left, version,)
 
     local_filename  = 'dist/%s' % filename
     remote_filename = '/home/localbase/webapps/eggs/%s' % filename
