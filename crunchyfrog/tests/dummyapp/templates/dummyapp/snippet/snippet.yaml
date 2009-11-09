@@ -1,8 +1,8 @@
 body: dummyapp/snippet/snippet.html
 
 dojo:
-    - namespace: DummyApp.Snippet
-      location: dummyapp/snippet/media/js
+    - namespace: DynamicApp.Snippet
+      location: dynamicapp/media/js
       require: 
-        - DummyApp.Snippet.Controller
-        - DummyApp.Snippet.View
+        - DynamicApp.Snippet.Controller
+        - DynamicApp.Snippet.View

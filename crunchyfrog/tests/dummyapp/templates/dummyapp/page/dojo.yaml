@@ -5,8 +5,8 @@ js:
     - static: dummyapp/page/media/js/sample.js
 
 dojo:
-    - namespace: DummyApp.Page
-      location: dummyapp/page/media/js
+    - namespace: DynamicApp.Page
+      location: dynamicapp/media/js
       require: 
-        - DummyApp.Page.Controller
-        - DummyApp.Page.View
+        - DynamicApp.Page.Controller
+        - DynamicApp.Page.View

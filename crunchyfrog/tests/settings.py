@@ -83,6 +83,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'crunchyfrog',
     'dummyapp',
+    'dynamicapp',
 )
 
 CRUNCHYFROG_CACHE_ROOT = os.path.join(MEDIA_ROOT, 'cfcache')

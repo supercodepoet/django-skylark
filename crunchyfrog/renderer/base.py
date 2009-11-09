@@ -38,6 +38,19 @@ def add_yaml(yamlfile):
 
     return process_yaml
 
+def find_directory_from_loader(page_instructions, asset):
+    from django.template.loaders.app_directories import app_template_dirs
+    from django.conf import settings
+    template_dirs = list(settings.TEMPLATE_DIRS) + list(app_template_dirs)
+
+    for dir in template_dirs:
+        asset_dir = os.path.join(dir, asset)
+        if os.path.isdir(asset_dir):
+            return asset_dir
+
+    raise TemplateDoesNotExist, ('Unable to find a directory within known '
+        'template directories: %s' % asset)
+
 def process_clevercss(source):
     """
     This is part of the processing_funcs that Renderer will use to perform any
@@ -272,16 +285,40 @@ class Renderer(object):
             # yaml = app/page/page.yaml
             source, origin = self.find_template_source(yaml)
             del source # we don't need it
+
             origin = str(origin)
+            # /Users/me/Development/app/templates/app/page/page.yaml
 
-            yaml_basedir = os.path.dirname(yaml) # should give us app/page
-            template_basedir = origin[:origin.find(yaml)]
+            yaml_basedir = os.path.dirname(yaml)
+            # app/page
+            template_basedir = origin[:origin.find(yaml)] 
+            # /Users/me/Development/app/templates
 
-            for directory in assets:
-                if not yaml_basedir in directory:
-                    directory = os.path.join(yaml_basedir, directory)
+            for asset in assets:
+                # directory = /media/js/templates
+                if not yaml_basedir in asset:
+                    # The user might be specifying the directory relative to the
+                    # yaml file itself, so we'll add it for them if they gave us
+                    # something like 'media/js/templates'
+                    directory = os.path.join(yaml_basedir, asset)
+                else:
+                    directory = asset
 
                 sourcedirectory = os.path.join(template_basedir, directory)
+
+                if not os.path.isdir(sourcedirectory):
+                    # We're going to try and find it somewhere else, it may not
+                    # be relative to the YAML file
+                    #
+                    # This is quite possible if the yaml file is processing a
+                    # "dojo:" attribute.
+                    try:
+                        sourcedirectory = find_directory_from_loader(page_instructions, asset)
+                        # We need to reset this, it has the yaml_basedir on it
+                        # at this point
+                        directory = asset
+                    except TemplateDoesNotExist:
+                        continue
 
                 if not os.path.isdir(sourcedirectory): continue
 
@@ -349,9 +386,11 @@ class Renderer(object):
         self.prepared_instructions['meta'] = page_instructions.meta
 
     def prepare_dojo(self, page_instructions):
+
         dojo = page_instructions.dojo
 
         self.prepared_instructions['dojo'] = dojo
+
 
         for dojo_module in dojo:
             assert 'namespace' in dojo_module, ('You are missing the '

@@ -344,10 +344,10 @@ def test_snippet_render():
     assert not '<body' in content
     assert not '<link' in content
 
-    assert "dojo.registerModulePath('DummyApp.Snippet'" in content
+    assert "dojo.registerModulePath('DynamicApp.Snippet'" in content
 
     assert get_one_file_in(os.path.join(
-        cachedir, 'dummyapp', 'snippet', 'media', 'js')
+        cachedir, 'dynamicapp', 'media', 'js')
     )
 
     assert content.find('<div class="test">This is my snippet test</div>') >= 0, 'Template tag did not render its contents'
@@ -361,8 +361,8 @@ def test_dojo_renders_in_page():
 
     content = pa.dumps()
 
-    assert "dojo.registerModulePath('DummyApp.Page'" in content
-    assert "dojo.require('DummyApp.Page.Controller');" in content
-    assert "dojo.require('DummyApp.Page.View');" in content
+    assert "dojo.registerModulePath('DynamicApp.Page'" in content
+    assert "dojo.require('DynamicApp.Page.Controller');" in content
+    assert "dojo.require('DynamicApp.Page.View');" in content
     assert 'dummyapp/tag/media/css/screen.css' in content
     assert 'dummyapp/page/media/js/sample.js' in content
