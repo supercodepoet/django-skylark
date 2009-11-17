@@ -353,7 +353,6 @@ def test_snippet_render():
     assert content.find('<div class="test">This is my snippet test</div>') >= 0, 'Template tag did not render its contents'
 
 @with_setup(setup, teardown)
-@attr('focus')
 def test_dojo_renders_in_page():
     request = get_request_fixture()
     c = RequestContext(request, {})
@@ -366,3 +365,27 @@ def test_dojo_renders_in_page():
     assert "dojo.require('DynamicApp.Page.View');" in content
     assert 'dummyapp/tag/media/css/screen.css' in content
     assert 'dummyapp/page/media/js/sample.js' in content
+
+@with_setup(setup, teardown)
+@attr('focus')
+def test_stale_assets_regarding_dojo():
+    """
+    Issue #7
+
+    The problem that this test is verifying is related to the media/js/templates
+    directory being copied before other files in the directory.  Our method that
+    checks to see if that directory is stale (needs to be updated) was
+    malfunctioning.  It compared the dates on the source and cache directory,
+    since they were the same (because we just copied the templates directory) it
+    was not allowing the rest of the files to be copied.
+    """
+    request = get_request_fixture()
+    c = RequestContext(request, {})
+    sa = SnippetAssembly('dummyapp/staleassets/staleassets.yaml', c, 'staleassets')
+
+    content = sa.dumps()
+    file = get_one_file_in(os.path.join(
+        cachedir, 'dummyapp', 'staleassets', 'media', 'js')
+    )
+
+    assert 'Class.js' in file

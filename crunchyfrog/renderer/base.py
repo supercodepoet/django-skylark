@@ -1,5 +1,6 @@
 import copy
 import os
+import filecmp
 import shutil
 import yaml
 from django.template import Template, TemplateDoesNotExist, loader
@@ -334,15 +335,15 @@ class Renderer(object):
 
     def assets_are_stale(self, sourcedirectory, cachedirectory):
         """
-        Looks through the source files for either media/img or media/js/templates
-        and determines if the cache is stale
+        Looks through the given directories, determining if they are different
         """
-        cache_age = os.path.getmtime(cachedirectory)
-
-        for path in os.walk(sourcedirectory):
-            for file in path[2]:
-                if os.path.getmtime(os.path.join(path[0], file)) > cache_age:
-                    return True
+        comparison = filecmp.dircmp(sourcedirectory, cachedirectory, [], [])
+        if comparison.left_only or comparison.right_only:
+            # We have files in one directory and not the other
+            return True
+        if comparison.diff_files:
+            # Some of the files have changed
+            return True
 
         return False
 
@@ -390,7 +391,6 @@ class Renderer(object):
         dojo = page_instructions.dojo
 
         self.prepared_instructions['dojo'] = dojo
-
 
         for dojo_module in dojo:
             assert 'namespace' in dojo_module, ('You are missing the '

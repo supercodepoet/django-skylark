@@ -1,0 +1,7 @@
+body: dummyapp/staleassets/staleassets.html
+
+dojo:
+    - namespace: DummyApp.StaleAssets
+      location: dummyapp/staleassets/media/js
+      require: 
+        - DummyApp.StaleAssets.Class
