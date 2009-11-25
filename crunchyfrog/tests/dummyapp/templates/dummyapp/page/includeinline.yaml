@@ -1,0 +1,7 @@
+body: dummyapp/page/sample.html
+title: Testing inline and include catching
+
+css:
+    - inline: dummyapp/page/media/css/notreferenced.css
+      media: screen
+      include: false

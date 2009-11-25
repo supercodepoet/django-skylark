@@ -8,26 +8,19 @@ from nose.tools import with_setup
 from nose.result import log
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
-from crunchyfrog import RequestContext
+from crunchyfrog import *
 from crunchyfrog.page import PageAssembly
 from crunchyfrog.snippet import SnippetAssembly
-from crunchyfrog import settings as page_settings
 from django.http import HttpRequest, HttpResponse
 from django.template import TemplateDoesNotExist
 from django.template import Context, loader
+from django.core.cache import cache
 from django.core.management import setup_environ
 from yaml.parser import ParserError
 
-try:
-    import settings # Assumed to be in the same directory.
-except ImportError:
-    import sys
-    sys.stderr.write("Error: Can't find the file 'settings.py' in the directory containing %r. It appears you've customized things.\nYou'll have to run django-admin.py, passing it your settings module.\n(If the file settings.py does indeed exist, it's causing an ImportError somehow.)\n" % __file__)
-    sys.exit(1)
-
-setup_environ(settings)
-    
-settings.DEBUG = False
+import settings as settings_module# Assumed to be in the same directory.
+setup_environ(settings_module)
+from django.conf import settings
 
 cachedir = os.path.join(os.path.dirname(__file__), 'media/cfcache')
 
@@ -86,12 +79,12 @@ def test_can_not_create_page_assembly():
 
     """ Make sure that the context is correct """
     c = []
-    py.test.raises(AssertionError, 'pa = PageAssembly("somefile/test.yaml", c)')
+    py.test.raises(ValueError, 'pa = PageAssembly("somefile/test.yaml", c)')
 
     """ Make sure that you can't send it an empty yaml file """
     request = get_request_fixture()
     c = RequestContext(request, { 'foo': 'bar' })
-    py.test.raises(AssertionError, 'pa = PageAssembly((), c)')
+    py.test.raises(ValueError, 'pa = PageAssembly((), c)')
 
 def test_can_create_page_assembly():
     request = get_request_fixture()
@@ -110,14 +103,6 @@ def test_missing_template():
 
     py.test.raises(TemplateDoesNotExist, "pa.get_http_response()")
 
-@with_setup(setup, teardown)
-def test_returns_http_response():
-    request = get_request_fixture()
-    c = RequestContext(request, { 'foo': 'bar' })
-    pa = PageAssembly('dummyapp/page/sample.yaml', c)
-
-    assert isinstance(pa.get_http_response(), HttpResponse)
-
 def test_provides_page_instructions():
     request = get_request_fixture()
     c = RequestContext(request, { 'foo': 'bar' })
@@ -132,6 +117,22 @@ def test_missing_crunchyfrog_settings():
     assert settings.MEDIA_ROOT
     assert settings.CRUNCHYFROG_CACHE_ROOT
     assert settings.CRUNCHYFROG_CACHE_URL
+
+@with_setup(setup, teardown)
+def test_returns_http_response():
+    request = get_request_fixture()
+    c = RequestContext(request, { 'foo': 'bar' })
+    pa = PageAssembly('dummyapp/page/sample.yaml', c)
+
+    assert isinstance(pa.get_http_response(), HttpResponse)
+
+@with_setup(setup, teardown)
+def test_include_with_inline():
+    request = get_request_fixture()
+    c = RequestContext(request, { 'foo': 'bar' })
+    pa = PageAssembly('dummyapp/page/includeinline.yaml', c)
+
+    py.test.raises(AttributeError, pa.get_http_response)
 
 @with_setup(setup, teardown)
 def test_creates_a_file_in_cache():
@@ -149,7 +150,7 @@ def test_creates_a_file_in_cache():
 def test_creates_a_file_in_cache_with_key():
     request = get_request_fixture()
     c = RequestContext(request, { 'foo': 'bar' })
-    pa = PageAssembly('dummyapp/page/sample.yaml', c, 'somekeyname')
+    pa = PageAssembly('dummyapp/page/sample.yaml', c, 'fileincachewithkey')
 
     assert not os.path.isdir(cachedir)
 
@@ -161,7 +162,7 @@ def test_creates_a_file_in_cache_with_key():
 def test_can_render_an_asset():
     request = get_request_fixture()
     c = RequestContext(request, { 'color': 'gray' })
-    pa = PageAssembly('dummyapp/page/renderasset.yaml', c, 'renderasset')
+    pa = PageAssembly('dummyapp/page/renderasset.yaml', c)
 
     content = pa.dumps()
 
@@ -254,19 +255,52 @@ def test_will_copy_assets():
 
 @with_setup(setup, teardown)
 def test_uses_the_page_instructions_cache_if_enabled():
-    page_settings.CACHE_BACKEND = 'dummy://'
-    page_settings.DEBUG = False
+    settings.CACHE_BACKEND = 'locmem://'
+    orig_debug = settings.DEBUG
+    settings.DEBUG = False
 
     request = get_request_fixture()
     c = RequestContext(request, { 'foo': 'bar' })
-    pa = PageAssembly('dummyapp/page/sample.yaml', c, 'somecachekey')
+    pa = PageAssembly('dummyapp/page/sample.yaml', c, 'samecachekey')
+    first_content = pa.dumps()
 
-    pa.dumps()
+    page_assembly_cache = cache.get(PAGE_ASSEMBLY_CACHE_KEY)
+    assert len(page_assembly_cache) == 1
 
-    assert True
+    pa = PageAssembly('dummyapp/page/invalid.yaml', c, 'samecachekey')
+    second_content = pa.dumps()
+
+    page_assembly_cache = cache.get(PAGE_ASSEMBLY_CACHE_KEY)
+    assert len(page_assembly_cache) == 1
+
+    assert first_content == second_content
 
     # Restore the debug setting
-    page_settings.DEBUG = True
+    settings.DEBUG = orig_debug
+
+@with_setup(setup, teardown)
+def test_can_clear_page_assembly_cache():
+    settings.CACHE_BACKEND = 'locmem://'
+    orig_debug = settings.DEBUG
+    settings.DEBUG = False
+
+    request = get_request_fixture()
+    c = RequestContext(request, { 'foo': 'bar' })
+    pa = PageAssembly('dummyapp/page/sample.yaml', c, 'samecachekey')
+    content = pa.dumps()
+
+    # Restore the debug setting
+    settings.DEBUG = orig_debug
+
+    page_assembly_cache = cache.get(PAGE_ASSEMBLY_CACHE_KEY)
+    a_pa_key = page_assembly_cache[0]
+    assert len(page_assembly_cache) == 1
+    assert cache.get(a_pa_key)
+
+    clear_page_assembly_cache()
+
+    assert not cache.get(PAGE_ASSEMBLY_CACHE_KEY)
+    assert not cache.get(a_pa_key)
 
 @with_setup(setup, teardown)
 def test_references_other_yaml_files():
@@ -278,13 +312,14 @@ def test_references_other_yaml_files():
 
     assert len(re.findall('.*\.css', content)) == 2, 'There should be 2 css files from the sample.yaml in here'
     assert content.find('sample.js') < content.find('sampleafter.js'), 'The sample.js should come before the sampleafter.js'
-    assert "body {\n    background-color: red\n}" in content, 'Looking for the rendered css inline, it wasn\'t there'
+    assert "body {" in content
+    assert "background-color: red" in content
 
 @with_setup(setup, teardown)
 def test_renders_meta_section():
     request = get_request_fixture()
     c = RequestContext(request, { 'foo': 'bar' })
-    pa = PageAssembly('dummyapp/page/meta.yaml', c, 'metacachekey')
+    pa = PageAssembly('dummyapp/page/meta.yaml', c)
 
     content = pa.dumps()
 
@@ -294,33 +329,46 @@ def test_renders_meta_section():
 def test_will_do_conditional_comments():
     request = get_request_fixture()
     c = RequestContext(request, { 'foo': 'bar' })
-    pa = PageAssembly('dummyapp/page/ieversion.yaml', c, 'ieversioncachekey')
+    pa = PageAssembly('dummyapp/page/ieversion.yaml', c)
 
     content = pa.dumps()
 
-    assert content.find('<!--[if ') >= 0, 'Could not locate the conditional comment for IE we expected'
+    # For the CSS
+    assert '<!--[if gte IE 6]>' in content
+    # This is for the JS, which we also support
+    assert '<!--[if gte IE 7]>' in content
+
+@with_setup(setup, teardown)
+def test_will_tidy_output():
+    assert settings.DEBUG
+    request = get_request_fixture()
+    c = RequestContext(request)
+    pa = PageAssembly('dummyapp/page/sample.yaml', c)
+    assert len(pa.dumps().split("\n")) == 40
 
 @with_setup(setup, teardown)
 def test_will_use_correct_doctype():
     request = get_request_fixture()
     c = RequestContext(request, { 'foo': 'bar' })
-    pa = PageAssembly('dummyapp/page/sample.yaml', c, 'defaultdoctype')
+    pa = PageAssembly('dummyapp/page/sample.yaml', c)
 
     content = pa.dumps()
 
-    assert content.find('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">') >= 0, 'Could not locate the default HTML 4.01 Transitional doctype'
+    assert '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN' in content
+    assert 'html4/loose.dtd' in content
 
-    pa = PageAssembly('dummyapp/page/xhtmlstrict.yaml', c, 'xhtmlstrictdoctype')
+    pa = PageAssembly('dummyapp/page/xhtmlstrict.yaml', c)
 
     content = pa.dumps()
 
-    assert content.find('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">') >= 0, 'Could not locate the XHTML 1.0 Strict doctype'
+    assert '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"' in content
+    assert 'xhtml1-strict.dtd' in content
 
 @with_setup(setup, teardown)
 def test_add_yaml_decorator():
     request = get_request_fixture()
     c = RequestContext(request, {})
-    pa = PageAssembly('dummyapp/page/tag.yaml', c, 'templatetagcachekey')
+    pa = PageAssembly('dummyapp/page/tag.yaml', c)
 
     content = pa.dumps()
 
@@ -328,14 +376,14 @@ def test_add_yaml_decorator():
         cachedir, 'dummyapp', 'tag', 'media', 'css')
     )
 
-    assert content.find('<div class="test">This is my tag test</div>') >= 0, 'Template tag did not render its contents'
-    assert content.find('/media/cfcache/dummyapp/tag/media/css/screen.css" media="screen">') >= 0, 'Template tag style sheet was not included'
+    assert 'This is my tag test' in content
+    assert '/media/cfcache/dummyapp/tag/media/css/screen.css" media="screen"' in content
                               
 @with_setup(setup, teardown)
 def test_snippet_render():
     request = get_request_fixture()
     c = RequestContext(request, {})
-    sa = SnippetAssembly('dummyapp/snippet/snippet.yaml', c, 'snippetrender')
+    sa = SnippetAssembly('dummyapp/snippet/snippet.yaml', c)
 
     content = sa.dumps()
 
@@ -350,13 +398,13 @@ def test_snippet_render():
         cachedir, 'dynamicapp', 'media', 'js')
     )
 
-    assert content.find('<div class="test">This is my snippet test</div>') >= 0, 'Template tag did not render its contents'
+    assert 'This is my snippet test' in content
 
 @with_setup(setup, teardown)
 def test_dojo_renders_in_page():
     request = get_request_fixture()
     c = RequestContext(request, {})
-    pa = PageAssembly('dummyapp/page/dojo.yaml', c, 'dojorenderinpage')
+    pa = PageAssembly('dummyapp/page/dojo.yaml', c)
 
     content = pa.dumps()
 
@@ -381,7 +429,7 @@ def test_stale_assets_regarding_dojo():
     """
     request = get_request_fixture()
     c = RequestContext(request, {})
-    sa = SnippetAssembly('dummyapp/staleassets/staleassets.yaml', c, 'staleassets')
+    sa = SnippetAssembly('dummyapp/staleassets/staleassets.yaml', c)
 
     content = sa.dumps()
     file = get_one_file_in(os.path.join(

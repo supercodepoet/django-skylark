@@ -19,6 +19,7 @@ setup(name='django-crunchyfrog',
       zip_safe=False,
       install_requires=[
           'pyyaml',
+          'pytidylib',
       ],
       entry_points="""
       # -*- Entry points: -*-

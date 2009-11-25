@@ -244,6 +244,10 @@ class Renderer(object):
                 assert template_name, 'You must provide either "static" or "inline" properties that point to a file, provided object was %r' % instruction
 
                 if instruction.has_key('include') and not instruction['include']:
+                    if instruction.has_key('inline'):
+                        raise AttributeError('You have specified inline and '
+                            'include: false, these really don\'t make sense '
+                            'together')
                     continue
 
                 self.prepared_instructions[item_name].append(item)

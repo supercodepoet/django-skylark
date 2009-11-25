@@ -5,3 +5,7 @@ css:
     - static: dummyapp/page/media/css/sample.css
       media: screen
       ieversion: gte IE 6
+
+js:
+    - static: dummyapp/page/media/js/sample.js
+      ieversion: gte IE 7

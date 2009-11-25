@@ -17,4 +17,3 @@ css:
       media: screen
     - inline: dummyapp/page/media/css/notreferenced.css
       media: screen
-      include: false

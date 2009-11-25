@@ -1,11 +1,33 @@
 import hashlib
 import renderer
 import yaml
+import tidylib
 from django import http, template
 from django.core.cache import cache
 from django.core.urlresolvers import resolve
 from crunchyfrog.conf import settings
 from crunchyfrog.instructions import PageInstructions
+
+tidylib.BASE_OPTIONS = {
+    "indent": 1,
+    "indent-spaces": 4,
+    "quote-marks": 1,
+    "tidy-mark": 0,
+    "wrap": 0,
+    "indent-cdata": 1,
+    "force-output": 0,
+}
+
+PAGE_ASSEMBLY_CACHE_KEY = 'crunchyfrog::page_instructions::cachelist'
+
+def clear_page_assembly_cache():
+    cache_dict = cache.get(PAGE_ASSEMBLY_CACHE_KEY)
+    for key in cache_dict:
+        cache.delete(key)
+    cache.set(PAGE_ASSEMBLY_CACHE_KEY, [])
+
+class HtmlTidyErrors(Exception):
+    pass
 
 class HttpResponse(http.HttpResponse):
     """
@@ -26,6 +48,8 @@ class RequestContext(template.RequestContext):
         self.request = request
 
 class BaseAssembly(object):
+    _cache_dict_key = PAGE_ASSEMBLY_CACHE_KEY
+
     """
     Overview
     --------
@@ -72,11 +96,20 @@ class BaseAssembly(object):
     And behold the complete HTML page produced
     """
     def __init__(self, yamlfiles, context, cache_key = None, use_cache = True):
-        assert hasattr(self, 'render_full_page'), ('You must set render_full_page to True '
-            'or False on the subclass of BaseAssembly')
-        assert isinstance(context, RequestContext), '%r must be of type RequestContext, you provided %s' % (context, type(context), )
-        assert yamlfiles, '%r argument must not be empty or None' % (yamlfiles, )
-        assert len(yamlfiles) != 0, '%r must not be zero length' % (yamlfiles, )
+        if not hasattr(self, 'render_full_page'):
+            raise ValueError('You must set render_full_page to True '
+                'or False on the subclass of BaseAssembly')
+
+        if not isinstance(context, RequestContext):
+            raise ValueError('%r must be of type RequestContext, you provided '
+                '%s' % (context, type(context),))
+
+        if not yamlfiles:
+            raise ValueError('%r argument must not be empty or None' %
+                 (yamlfiles,))
+
+        if not len(yamlfiles):
+            raise ValueError('%r must not be zero length' % (yamlfiles,))
 
         self.use_cache = use_cache
 
@@ -98,7 +131,7 @@ class BaseAssembly(object):
         we set our instance variable it needs to be normalized to a tuple.
 
         In other words, this needs to happen:
-            'some/file.yaml'   -->  ('some/file.yaml')
+            'some/file.yaml'   -->  ('some/file.yaml',)
         """
         if isinstance(yamlfiles, str):
             yamlfiles = (yamlfiles,)
@@ -127,7 +160,11 @@ class BaseAssembly(object):
             self.__add_page_instructions(page_instructions, file)
 
         if settings.CACHE_BACKEND and not settings.DEBUG:
-            cache.set(self.cache_key, page_instructions, 86400)
+            cache_dict = cache.get(self._cache_dict_key) or []
+            cache.set(self.cache_key, page_instructions,
+                settings.CRUNCHYFROG_PAGEASSEMBLY_CACHE_EXPIRE)
+            cache_dict.append(self.cache_key)
+            cache.set(self._cache_dict_key, cache_dict)
 
         return page_instructions
 
@@ -175,7 +212,18 @@ class BaseAssembly(object):
         page_renderer = renderer.get(doctype, instructions, self.context,
                                      self.render_full_page)
 
-        return page_renderer.render()
+        content = page_renderer.render()
+
+        if not settings.DEBUG or not self.render_full_page:
+            return content
+
+        document, errors = tidylib.tidy_document(content)
+        if errors and settings.CRUNCHYFROG_ENABLE_TIDY:
+            import pdb; pdb.set_trace()
+            raise HtmlTidyErrors('We tried to tidy up the document and got '
+                 'these errors: %s' % errors)
+
+        return unicode(document)
 
     def get_http_response(self):
         """

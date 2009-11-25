@@ -19,7 +19,7 @@
 {% endif %}
 {% if prepared_instructions.dojo %}
     <!-- Dojo Toolkit dynamic loading output -->
-    <script>
+    <script type="text/javascript">
     //<![CDATA[
     {% for dojo in prepared_instructions.dojo %}
         dojo.registerModulePath('{{ dojo.namespace }}', '{{ cache_url }}{{ dojo.location }}');
