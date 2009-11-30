@@ -12,4 +12,4 @@ renderers = {
 }
     
 def get(doctype, instructions, context, render_full_page):
-    return renderers[doctype](instructions, context, render_full_page)
+    return renderers[str(doctype)](instructions, context, render_full_page)

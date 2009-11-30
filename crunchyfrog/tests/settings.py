@@ -84,6 +84,7 @@ INSTALLED_APPS = (
     'crunchyfrog',
     'dummyapp',
     'dynamicapp',
+    'planapp',
 )
 
 CRUNCHYFROG_CACHE_ROOT = os.path.join(MEDIA_ROOT, 'cfcache')

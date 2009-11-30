@@ -1,0 +1,5 @@
+title: A second used YAML
+
+js:
+    - url: http://localhost:8000/media/uses2.js
+    - static: planapp/page/media/js/static_uses2.js

@@ -152,7 +152,10 @@ class BaseAssembly(object):
         """
         Combines all the files and instructions into one object
         """
-        page_instructions = PageInstructions(render_full_page=self.render_full_page)
+        page_instructions = PageInstructions(
+            render_full_page=self.render_full_page,
+            context_instance=self.context
+        )
 
         tried = []
 
@@ -176,21 +179,6 @@ class BaseAssembly(object):
         assert sourcerendered, 'yamlfile needs to contain something'
 
         instructions = yaml.load(sourcerendered)
-
-        if 'uses' in instructions:
-            """
-            We look for the uses section inside the YAML file, this is how
-            we extend or reference other YAML files so we can factor out common things
-            like javascript libraries, common css, or whatever else.
-
-            This recursion places the "used" YAML file in front of the on we are
-            currently processing.  Which makes the most sense.  You want you common
-            libraries to come before the page specific ones.
-            """
-            uses = instructions['uses']
-
-            for usesfile in uses:
-                self.__add_page_instructions(page_instructions, usesfile['file'])
 
         page_instructions.add(instructions, file)
 
@@ -219,7 +207,6 @@ class BaseAssembly(object):
 
         document, errors = tidylib.tidy_document(content)
         if errors and settings.CRUNCHYFROG_ENABLE_TIDY:
-            import pdb; pdb.set_trace()
             raise HtmlTidyErrors('We tried to tidy up the document and got '
                  'these errors: %s' % errors)
 

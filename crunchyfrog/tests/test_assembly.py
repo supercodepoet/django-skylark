@@ -1,59 +1,19 @@
 import py.test
 import os
-import shutil
 import re
 
-from time import time
 from nose.tools import with_setup
-from nose.result import log
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
 from crunchyfrog import *
 from crunchyfrog.page import PageAssembly
 from crunchyfrog.snippet import SnippetAssembly
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpResponse
 from django.template import TemplateDoesNotExist
-from django.template import Context, loader
 from django.core.cache import cache
-from django.core.management import setup_environ
 from yaml.parser import ParserError
 
-import settings as settings_module# Assumed to be in the same directory.
-setup_environ(settings_module)
-from django.conf import settings
-
-cachedir = os.path.join(os.path.dirname(__file__), 'media/cfcache')
-
-def get_one_file_in(path):
-    started = time()
-    while (time() - started < 3.0):
-        for file in os.walk(path):
-            files = file[2] # the third element is an array of files
-            if files:
-                return os.path.join(file[0], files[0])
-
-    raise Exception, 'Could not find a file in %s' % path
-
-def get_contents(filename):
-    f = open(filename, 'r')
-
-    content = f.read()
-    f.close()
-
-    return content
-
-def get_request_fixture():
-    request = HttpRequest()
-    request.path = '/'
-    request.META = { 'REMOTE_ADDR': '127.0.0.1', 'SERVER_NAME': '127.0.0.1', 'SERVER_PORT': '8000' }
-    return request
-
-def setup():
-    pass
-
-def teardown():
-    if os.path.isdir(cachedir):
-        shutil.rmtree(cachedir)
+from crunchyfrog.tests import *
 
 """
 To run only one tests you can do something like this.  Edit the setup.cfg file::
@@ -251,7 +211,7 @@ def test_will_copy_assets():
     assert content.find('notreferenced') == -1, 'Found a reference to a file that has been set include: false in the yaml file.  It should not show up in the rendered output'
 
     for template_name in filenames:
-        assert os.path.isfile(os.path.join(cachedir, template_name))
+        assert os.path.isfile(os.path.join(cachedir, 'se', template_name))
 
 @with_setup(setup, teardown)
 def test_uses_the_page_instructions_cache_if_enabled():
@@ -373,7 +333,7 @@ def test_add_yaml_decorator():
     content = pa.dumps()
 
     assert get_one_file_in(os.path.join(
-        cachedir, 'dummyapp', 'tag', 'media', 'css')
+        cachedir, 'se', 'dummyapp', 'tag', 'media', 'css')
     )
 
     assert 'This is my tag test' in content
@@ -395,7 +355,7 @@ def test_snippet_render():
     assert "dojo.registerModulePath('DynamicApp.Snippet'" in content
 
     assert get_one_file_in(os.path.join(
-        cachedir, 'dynamicapp', 'media', 'js')
+        cachedir, 'se', 'dynamicapp', 'media', 'js')
     )
 
     assert 'This is my snippet test' in content
@@ -415,7 +375,6 @@ def test_dojo_renders_in_page():
     assert 'dummyapp/page/media/js/sample.js' in content
 
 @with_setup(setup, teardown)
-@attr('focus')
 def test_stale_assets_regarding_dojo():
     """
     Issue #7
@@ -433,7 +392,34 @@ def test_stale_assets_regarding_dojo():
 
     content = sa.dumps()
     file = get_one_file_in(os.path.join(
-        cachedir, 'dummyapp', 'staleassets', 'media', 'js')
+        cachedir, 'se', 'dummyapp', 'staleassets', 'media', 'js')
     )
 
     assert 'Class.js' in file
+
+@with_setup(setup, teardown)
+@attr('focus')
+def test_can_change_deploy_plan_name():
+    from crunchyfrog.plans import get_for_context
+    from crunchyfrog.plans import SeparateEverything, FewestFiles
+    context = {}
+    render_full_page = False
+
+    plan = get_for_context(context, render_full_page)
+    assert isinstance(plan, SeparateEverything)
+
+    # Make sure that if there is no deploy plan (file missing) that it comes
+    # back with SeparateEverything
+    settings.CRUNCHYFROG_PLANS = 'mediadeploy_notthere'
+    plan = get_for_context(context, render_full_page)
+    assert isinstance(plan, SeparateEverything)
+
+    # Change it to something valid that is not the default
+    settings.CRUNCHYFROG_PLANS = 'mediadeploy_alt'
+    settings.CRUNCHYFROG_PLANS_DEFAULT = 'alternative'
+    plan = get_for_context(context, render_full_page)
+    assert isinstance(plan, FewestFiles)
+
+    settings.CRUNCHYFROG_PLANS = 'mediadeploy_bad'
+    settings.CRUNCHYFROG_PLANS_DEFAULT = 'default'
+    py.test.raises(ValueError, get_for_context, context, render_full_page)

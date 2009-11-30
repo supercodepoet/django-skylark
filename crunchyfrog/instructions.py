@@ -1,28 +1,43 @@
+import copy
 import yaml
 
+from django import template
+
+class StringWithSourcefile(object):
+    """
+    A string that include the source file from whence it came
+    """
+    def __init__(self, s, sourcefile):
+        self.value = s
+        self.sourcefile = sourcefile
+
+    def __str__(self):
+        return self.value.__str__()
+
+    def __call__(self, f):
+        return self.value.__call__(f)
+        
 class PageInstructions(object):
     """
     Object to contain the page instructions that come from our YAML files
     """
-    def __init__(self, instructions = None, **kwargs):
+    def __init__(self, **kwargs):
         self.render_full_page = kwargs.get('render_full_page', True)
-        self.yaml = []
+        self.context = kwargs.get('context_instance', template.Context())
 
         """
         These are the ones we expect, these are all the possible kinds of
         instructions that can be handled
         """
-        self.doctype = None
-        self.uses    = []
-        self.js      = []
-        self.css     = []
-        self.body    = None
-        self.title   = None
-        self.meta    = []
-        self.dojo    = []
-
-        if instructions:
-            self.add(instructions)
+        self.root_yaml = None
+        self.uses_yaml = []
+        self.doctype   = None
+        self.js        = []
+        self.css       = []
+        self.body      = None
+        self.title     = None
+        self.meta      = []
+        self.dojo      = []
 
     def _part_exists(self, part):
         """
@@ -55,7 +70,55 @@ class PageInstructions(object):
 
         return None
 
-    def add(self, instructions, sourcefile):
+    def filter(self, **kwargs):
+        filtered = copy.copy(self) 
+        for kw in kwargs:
+            try:
+                attr = getattr(filtered, '_PageInstructions__filter_%s' % kw)
+                attr()
+            except TypeError:
+                pass
+            except AttributeError:
+                pass
+
+        return filtered
+
+    def __filter_only_uses(filtered, **kwargs):
+        for attr in ('js', 'css', 'meta', 'dojo'):
+            subject = getattr(filtered, attr)
+            cleaned = [ i for i in subject if i['sourcefile'] in
+                       filtered.uses_yaml ]
+            setattr(filtered, attr, cleaned)
+
+    def __filter_exclude_uses(filtered, **kwargs):
+        for attr in ('js', 'css', 'meta', 'dojo'):
+            subject = getattr(filtered, attr)
+            cleaned = [ i for i in subject if i['sourcefile'] in
+                       filtered.root_yaml ]
+            setattr(filtered, attr, cleaned)
+
+    @property
+    def yaml(self):
+        if self.root_yaml:
+            yield self.root_yaml
+
+        for uses in self.uses_yaml:
+            yield uses
+
+    def __get_object(self, yamlfile, context):
+        source, origin = template.loader.find_template_source(yamlfile)
+        assert source, 'The template loader found the template but it is completely empty'
+
+        sourcerendered = template.Template(source).render(context)
+        assert sourcerendered, 'yamlfile needs to contain something'
+
+        return yaml.load(sourcerendered)
+
+    def add(self, instructions, sourcefile, **kwargs):
+        if not self.root_yaml:
+            # If this is the first time we see this, it's got to be the root
+            self.root_yaml = sourcefile
+
         """
         Adds the instructions from one YAML file to this object, combining
         it with what's already here
@@ -63,11 +126,17 @@ class PageInstructions(object):
         if not isinstance(instructions, list) or not isinstance(instructions, tuple):
             instructions = (instructions, )
 
-        self.yaml.append(sourcefile)
-
         for instruction in instructions:
+            if instruction.has_key('uses'):
+                for uses in instruction['uses']:
+                    self.uses_yaml.append(uses['file'])
+                    self.add(
+                        self.__get_object(uses['file'], self.context),
+                        uses['file']
+                    )
+
             for attr in ('doctype', 'js', 'css', 'body', 'title', 'meta',
-                         'uses', 'dojo'):
+                         'dojo'):
                 if instruction.has_key(attr):
                     pi_object = getattr(self, attr)
                     i_object  = instruction[attr]
@@ -78,6 +147,9 @@ class PageInstructions(object):
                                 if self._part_exists(part):
                                     continue
 
+                            part['sourcefile'] = sourcefile
                             pi_object.append(part)
                     else:
-                        setattr(self, attr, i_object)
+                        str_plus_source = StringWithSourcefile(
+                            i_object, sourcefile)
+                        setattr(self, attr, str_plus_source)

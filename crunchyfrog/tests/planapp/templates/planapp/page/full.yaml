@@ -1,0 +1,39 @@
+title: Full monty of a YAML file
+body: planapp/page/dojo.html
+
+uses:
+    - file: planapp/page/uses1.yaml
+
+meta:
+    - key: http-equiv
+      name: test
+      content: test-content
+
+js:
+    - url: http://localhost:8000/media/files.js
+    - static: planapp/page/media/js/static.js
+    - inline: planapp/page/media/js/inline.js
+    - static: planapp/page/media/js/notreferenced.js
+      include: false
+    - static: planapp/page/media/js/duplicated.js
+    - static: planapp/page/media/js/duplicated.js
+    - static: planapp/page/media/js/ie7only.js
+      ieversion: IE 7
+
+css:
+    - url: http://cdn.google.com/site.com/handheld.css
+      media: handheld
+    - static: planapp/page/media/css/static.css
+      media: screen
+    - static: planapp/page/media/css/gte_ie6only.css
+      media: screen
+      ieversion: gte IE 6
+    - inline: planapp/page/media/css/inline.css
+      media: screen
+
+dojo:
+    - namespace: PlanApp.Page
+      location: planapp/page/media/js
+      require: 
+        - PlanApp.Page.Controller
+        - PlanApp.Page.View
