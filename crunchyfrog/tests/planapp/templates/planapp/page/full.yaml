@@ -1,5 +1,5 @@
 title: Full monty of a YAML file
-body: planapp/page/dojo.html
+body: planapp/page/full.html
 
 uses:
     - file: planapp/page/uses1.yaml
@@ -25,6 +25,7 @@ css:
       media: handheld
     - static: planapp/page/media/css/static.css
       media: screen
+      process: clevercss
     - static: planapp/page/media/css/gte_ie6only.css
       media: screen
       ieversion: gte IE 6

@@ -1,0 +1,2 @@
+// Static
+var static = null;

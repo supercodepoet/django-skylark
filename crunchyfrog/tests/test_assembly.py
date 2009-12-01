@@ -15,24 +15,6 @@ from yaml.parser import ParserError
 
 from crunchyfrog.tests import *
 
-"""
-To run only one tests you can do something like this.  Edit the setup.cfg file::
-
-    [nosetests]
-    attr=focus
-
-This tells nose to only run the tests that have the attribute of "focus".
-
-Your test can look something like this:
-
-    from nose.plugins.attrib import attr
-    @attr('focus')
-    def test_big_download():
-            import urllib
-            # commence slowness...
-
-"""
-
 def test_can_not_create_page_assembly():
     py.test.raises(TypeError, "pa = PageAssembly()")
     py.test.raises(TypeError, 'pa = PageAssembly("somefile/test.yaml")')
@@ -396,30 +378,3 @@ def test_stale_assets_regarding_dojo():
     )
 
     assert 'Class.js' in file
-
-@with_setup(setup, teardown)
-@attr('focus')
-def test_can_change_deploy_plan_name():
-    from crunchyfrog.plans import get_for_context
-    from crunchyfrog.plans import SeparateEverything, FewestFiles
-    context = {}
-    render_full_page = False
-
-    plan = get_for_context(context, render_full_page)
-    assert isinstance(plan, SeparateEverything)
-
-    # Make sure that if there is no deploy plan (file missing) that it comes
-    # back with SeparateEverything
-    settings.CRUNCHYFROG_PLANS = 'mediadeploy_notthere'
-    plan = get_for_context(context, render_full_page)
-    assert isinstance(plan, SeparateEverything)
-
-    # Change it to something valid that is not the default
-    settings.CRUNCHYFROG_PLANS = 'mediadeploy_alt'
-    settings.CRUNCHYFROG_PLANS_DEFAULT = 'alternative'
-    plan = get_for_context(context, render_full_page)
-    assert isinstance(plan, FewestFiles)
-
-    settings.CRUNCHYFROG_PLANS = 'mediadeploy_bad'
-    settings.CRUNCHYFROG_PLANS_DEFAULT = 'default'
-    py.test.raises(ValueError, get_for_context, context, render_full_page)

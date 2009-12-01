@@ -6,3 +6,10 @@ uses:
 js:
     - url: http://localhost:8000/media/uses1.js
     - static: planapp/page/media/js/static_uses1.js
+
+css:
+    - url: http://localbase:8000/media/uses1.css
+      media: all
+    - static: planapp/page/media/css/static_uses1.css
+      media: all
+      process: clevercss

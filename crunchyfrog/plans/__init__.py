@@ -2,6 +2,9 @@ from fewest import FewestFiles
 from reusable import ReusableFiles
 from separate import SeparateEverything
 
+class MissingMediaPlan(Exception):
+    pass
+        
 def get_for_context(context, render_full_page):
     try:
         from crunchyfrog.conf import settings
@@ -19,4 +22,11 @@ def get_for_context(context, render_full_page):
 
         return plan(context, render_full_page)
     except ImportError:
-        return SeparateEverything(context, render_full_page)
+        if settings.DEBUG:
+            return SeparateEverything(context, render_full_page)
+        else:
+            raise MissingMediaPlan('Could not import the media plan for '
+                'CrunchyFrog media deployment: %s name %s' % (
+                    settings.CRUNCHYFROG_PLANS,
+                    settings.CRUNCHYFROG_PLANS_DEFAULT,
+                ))

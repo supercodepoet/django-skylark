@@ -1,0 +1,2 @@
+// View
+var view = null;

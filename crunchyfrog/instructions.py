@@ -30,18 +30,18 @@ class PageInstructions(object):
         instructions that can be handled
         """
         self.root_yaml = None
-        self.uses_yaml = []
         self.doctype   = None
-        self.js        = []
-        self.css       = []
         self.body      = None
         self.title     = None
+        self.uses_yaml = []
+        self.js        = []
+        self.css       = []
         self.meta      = []
         self.dojo      = []
 
     def _part_exists(self, part):
         """
-        Withing our existing page instruction for javascrip and css, we look to see
+        Withing our existing page instruction for javascript and css, we look to see
         if the part already has been added.  There is no reason to duplicate either
         one of these.
         """
@@ -69,33 +69,6 @@ class PageInstructions(object):
                 return part[attr]
 
         return None
-
-    def filter(self, **kwargs):
-        filtered = copy.copy(self) 
-        for kw in kwargs:
-            try:
-                attr = getattr(filtered, '_PageInstructions__filter_%s' % kw)
-                attr()
-            except TypeError:
-                pass
-            except AttributeError:
-                pass
-
-        return filtered
-
-    def __filter_only_uses(filtered, **kwargs):
-        for attr in ('js', 'css', 'meta', 'dojo'):
-            subject = getattr(filtered, attr)
-            cleaned = [ i for i in subject if i['sourcefile'] in
-                       filtered.uses_yaml ]
-            setattr(filtered, attr, cleaned)
-
-    def __filter_exclude_uses(filtered, **kwargs):
-        for attr in ('js', 'css', 'meta', 'dojo'):
-            subject = getattr(filtered, attr)
-            cleaned = [ i for i in subject if i['sourcefile'] in
-                       filtered.root_yaml ]
-            setattr(filtered, attr, cleaned)
 
     @property
     def yaml(self):

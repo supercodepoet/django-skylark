@@ -85,7 +85,7 @@ class BasePlan(object):
     def __init__(self, context, render_full_page):
         self.cache_root = os.path.join(
             settings.CRUNCHYFROG_CACHE_ROOT, self.cache_prefix)
-        self.cache_url = settings.CRUNCHYFROG_CACHE_URL
+        self.cache_url = urljoin(settings.CRUNCHYFROG_CACHE_URL, '%s/' % self.cache_prefix)
         self.context = context
         self.render_full_page = render_full_page
 
@@ -133,7 +133,7 @@ class BasePlan(object):
         filename = os.path.basename(template_name)
         fullpath = os.path.join(dirpath, filename)
 
-        if settings.DEBUG:
+        if not os.path.isfile(fullpath) or settings.DEBUG:
             if not os.path.exists(dirpath):
                 os.makedirs(dirpath)
 
@@ -146,6 +146,26 @@ class BasePlan(object):
             f.close()
 
         return urljoin(self.cache_url, template_name), filename
+
+    def _get_processing_function(self, process_func):
+        """
+        Retrieves one of the processing functions that can transform our source
+        into something else
+        
+        An example here is using CleverCSS:
+
+            css:
+                - static: screen.css
+                  process: clevercss
+        """
+        if not process_func:
+            return None
+
+        if self.processing_funcs.has_key(process_func):
+            return self.processing_funcs[process_func]
+        else:
+            raise AttributeError('Could not find a process function matching %s, available ones are: %s' % 
+                (process_func, ', '.join(self.processing_funcs.keys()),))
 
     def prepare_file(self, item_name, page_instructions):
         """
@@ -171,11 +191,9 @@ class BasePlan(object):
             else:
                 template_name = context = process_func = None
 
-                if instruction.has_key('process') and self.processing_funcs.has_key(instruction['process']):
-                    process_func = self.processing_funcs[instruction['process']]
-                elif instruction.has_key('process'):
-                    raise AttributeError('Could not find a process function matching %s, available ones are: %s' % 
-                        (instruction['process'], ', '.join(self.processing_funcs.keys()),))
+                if instruction.has_key('process'):
+                    process_func = self._get_processing_function(
+                        instruction.get('process'))
 
                 item = copy.copy(instruction)
 

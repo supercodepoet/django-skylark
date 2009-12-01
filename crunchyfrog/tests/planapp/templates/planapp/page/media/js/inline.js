@@ -1,0 +1,2 @@
+// Inline
+var inline = null;
