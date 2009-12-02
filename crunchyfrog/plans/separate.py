@@ -7,14 +7,14 @@ class SeparateEverything(BasePlan):
         if not hasattr(page_instructions, 'js'):
             return
 
-        self.prepare_assets(page_instructions, ('media/js/templates',))
+        self._prepare_assets(page_instructions, ('media/js/templates',))
 
-        self.prepare_file('js', page_instructions)
+        self._prepare_file('js', page_instructions)
 
     def prepare_css(self, page_instructions):
         if not hasattr(page_instructions, 'css'):
             return
 
-        self.prepare_assets(page_instructions, ('media/img',))
+        self._prepare_assets(page_instructions, ('media/img',))
 
-        self.prepare_file('css', page_instructions)
+        self._prepare_file('css', page_instructions)

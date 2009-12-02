@@ -3,10 +3,39 @@ import os
 import filecmp
 import shutil
 import yaml
+import hashlib
+import pickle
+import cssutils
+import functools
+import urllib
+import logging
+
 from django.template import Template, TemplateDoesNotExist, loader
 from urlparse import urljoin
 from crunchyfrog.conf import settings
 from crunchyfrog.processor import clevercss
+
+if not settings.DEBUG:
+    cssutils.ser.prefs.useMinified()
+
+class CssFormatError(Exception):
+    pass
+        
+class CssUtilsLoggingHandler(logging.Handler):
+    _records = []
+    def emit(self, record):
+        self._records.append(record)
+
+    def get_errors(self):
+        records = self._records
+        self._records = []
+        return records
+
+cssutils_handler = CssUtilsLoggingHandler()
+__log = logging.getLogger('CssUtilsLogging')
+__log.addHandler(cssutils_handler)
+__log.setLevel(logging.ERROR)
+cssutils.log.setLog(__log)
 
 def find_directory_from_loader(page_instructions, asset):
     from django.template.loaders.app_directories import app_template_dirs
@@ -55,7 +84,7 @@ class BasePlan(object):
 
     cache_prefix = None
 
-    def find_template_source(self, name, dirs=None):
+    def _find_template_source(self, name, dirs=None):
         """
         This is a copy paste job from django.template.loader.
 
@@ -99,14 +128,14 @@ class BasePlan(object):
         if not os.path.exists(self.cache_root):
             os.makedirs(self.cache_root)
 
-    def get_media_source(self, template_name, process_func=None, context=None):
+    def _get_media_source(self, template_name, process_func=None, context=None):
         """
         Responsible for taking a template and generating the contents.
 
             * Renders the template with the given context if applicable
             * Passes it through the process function if provided
         """
-        source, origin = self.find_template_source(template_name)
+        source, origin = self._find_template_source(template_name)
 
         if context:
             template = Template(source)
@@ -117,7 +146,7 @@ class BasePlan(object):
 
         return source
 
-    def copy_to_media(self, template_name, process_func=None):
+    def _copy_to_media(self, template_name, source=''):
         """
         Part of our goal here is to make the placement of media a transparent deal.
         Django does not currently make this easy, you typically have to handle your
@@ -136,10 +165,6 @@ class BasePlan(object):
         if not os.path.isfile(fullpath) or settings.DEBUG:
             if not os.path.exists(dirpath):
                 os.makedirs(dirpath)
-
-            source, origin = self.find_template_source(template_name)
-
-            source = self.get_media_source(template_name, process_func)
 
             f = open(fullpath, 'w')
             f.write(source)
@@ -167,7 +192,45 @@ class BasePlan(object):
             raise AttributeError('Could not find a process function matching %s, available ones are: %s' % 
                 (process_func, ', '.join(self.processing_funcs.keys()),))
 
-    def prepare_file(self, item_name, page_instructions):
+    def __format_css_errors(self, document_raw, errors):
+        document = document_raw.split('\n')
+        for error in errors:
+            yield '%s: (%s; line %s)' % (
+                error.getMessage(),
+                document_raw,
+                '?'
+            )
+
+    def _fix_css_urls(self, page_instruction, css_source):
+        def replacer(url, **kwargs):
+            if url.startswith('http') or url.startswith('/'):
+                return url
+
+            cache_url = kwargs.get('cache_url')
+            relative_path = kwargs.get('relative_path')
+            path = os.path.join(relative_path, urllib.url2pathname(url))
+
+            return urljoin(cache_url, urllib.pathname2url(path))
+
+        parser = cssutils.CSSParser()
+        sheet = parser.parseString(css_source)
+        errors = cssutils_handler.get_errors()
+        if errors:
+            formatted_errors = self.__format_css_errors(css_source, errors)
+            raise CssFormatError(
+                ', '.join(formatted_errors)
+            )
+
+        if page_instruction.has_key('static'):
+            template_name = page_instruction['static']
+        elif page_instruction.has_key('inline'):
+            template_name = page_instruction['inline']
+        cssutils.replaceUrls(sheet, functools.partial(replacer,
+            relative_path=os.path.dirname(template_name),
+            cache_url=self.cache_url))
+        return sheet.cssText
+
+    def _prepare_file(self, item_name, page_instructions):
         """
         This method takes lines from our YAML files and decides what to do with
         them.
@@ -199,12 +262,18 @@ class BasePlan(object):
 
                 if instruction.has_key('static'):
                     template_name = instruction['static']
-                    location, filename = self.copy_to_media(template_name, process_func)
+                    source = self._get_media_source(template_name, process_func, context)
+                    if 'css' in item_name:
+                        source = self._fix_css_urls(instruction, source)
+                    location, filename = self._copy_to_media(
+                        template_name, source)
                     item['location'] = location
                 elif instruction.has_key('inline'):
                     template_name = instruction['inline']
                     context = self.context
-                    source = self.get_media_source(template_name, process_func, context)
+                    source = self._get_media_source(template_name, process_func, context)
+                    if 'css' in item_name:
+                        source = self._fix_css_urls(instruction, source)
                     item['source'] = source
 
                 assert template_name, 'You must provide either "static" or "inline" properties that point to a file, provided object was %r' % instruction
@@ -218,7 +287,7 @@ class BasePlan(object):
 
                 self.prepared_instructions[item_name].append(item)
 
-    def prepare_assets(self, page_instructions, assets=None):
+    def _prepare_assets(self, page_instructions, assets=None):
         """
         There are some special cases when working with css and javascript that
         we make allowances for.
@@ -246,15 +315,15 @@ class BasePlan(object):
         file or the app's templates directory.  The following will essentially
         copy the same directory to the cache:
 
-            self.prepare_assets(pi, ('media/js',))
-            self.prepare_assets(pi, ('blog/list/media/js',))
+            self._prepare_assets(pi, ('media/js',))
+            self._prepare_assets(pi, ('blog/list/media/js',))
 
         """
         assert type(assets) == tuple or type(assets) == list
 
         for yaml in page_instructions.yaml:
             # yaml = app/page/page.yaml
-            source, origin = self.find_template_source(yaml)
+            source, origin = self._find_template_source(yaml)
             del source # we don't need it
 
             origin = str(origin)
@@ -296,14 +365,15 @@ class BasePlan(object):
                 cachedirectory = os.path.join(self.cache_root, directory)
 
                 if os.path.isdir(cachedirectory):
-                    if self.assets_are_stale(sourcedirectory, cachedirectory):
+                    if self._assets_are_stale(sourcedirectory, cachedirectory):
                         shutil.rmtree(cachedirectory)
                     else:
                         continue
 
                 shutil.copytree(sourcedirectory, cachedirectory)
 
-    def assets_are_stale(self, sourcedirectory, cachedirectory):
+
+    def _assets_are_stale(self, sourcedirectory, cachedirectory):
         """
         Looks through the given directories, determining if they are different
         """
@@ -363,7 +433,7 @@ class BasePlan(object):
             Since this is within the context of Dojo, that may not make the most
             sense.
             """
-            self.prepare_assets(page_instructions, (location,))
+            self._prepare_assets(page_instructions, (location,))
 
     def prepare(self, page_instructions):
         self.page_instructions = page_instructions
@@ -376,3 +446,57 @@ class BasePlan(object):
         self.prepare_dojo(page_instructions)
 
         return self.prepared_instructions
+
+class RollupPlan(object):
+    """
+    These are extra methods that are needed for rolling up files
+
+    A rollup is when you take multiple files and concatenate them into one.
+    """
+    def _concat_files(self, instructions, fix_css_urls = False):
+        source = [] 
+        for i in instructions:
+            processed = self._get_media_source(
+                i['static'], self._get_processing_function(i.get('process')))
+            if fix_css_urls:
+                processed = self._fix_css_urls(i, processed)
+            source.append(processed)
+        return "\n".join(source)
+
+    def _make_filename(self, files):
+        files.sort()
+        return hashlib.md5(pickle.dumps(files)).hexdigest()
+
+    def _prepare_rollup(self, attr, rollup, keep, insert_point, **kwargs):
+        rollup_instruction = self._rollup_static_files(
+            rollup, attr, kwargs.get('minifier', None))
+        other_instruction = self.prepared_instructions[attr]
+        self.prepared_instructions[attr] = \
+            other_instruction[:insert_point] + \
+            [rollup_instruction] + \
+            other_instruction[insert_point:]
+
+    def _rollup_static_files(self, instructions, extension, minifier = None):
+        fix_css_urls = True if 'css' in extension else False
+
+        if not minifier:
+            def minifier(arg):
+                return arg
+        """
+        Creates one file from a list of others.  It also minifies the source
+        using the appropriate function
+        """
+        # Figure out a name
+        files = [ i['static'] for i in instructions ]
+
+        basename = '%s.%s' % (self._make_filename(files), extension,)
+        filename = os.path.join(self.cache_root, basename)
+        location = urljoin(self.cache_url, basename)
+
+        if not os.path.isfile(filename) or settings.DEBUG:
+            f = open(filename, 'w')
+            source = minifier(self._concat_files(instructions, fix_css_urls))
+            f.write(source)
+            f.close()
+
+        return { 'location': location, }

@@ -1,0 +1,6 @@
+body: dummyapp/page/sample.html
+title: Bad CSS test
+
+css:
+    - static: dummyapp/page/media/css/badcss.css
+      media: all

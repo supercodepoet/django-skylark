@@ -22,6 +22,7 @@ Contents:
    cfjsbridge
    settings
    CleverCSS syntax reference <clevercssref>
+   deployment
 
 
 Indices and tables

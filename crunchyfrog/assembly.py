@@ -2,6 +2,7 @@ import hashlib
 import renderer
 import yaml
 import tidylib
+import re
 
 from django import http, template
 from django.core.urlresolvers import resolve
@@ -160,6 +161,26 @@ class BaseAssembly(object):
 
         page_instructions.add(instructions, file)
 
+    def __format_tidy_errors(self, document_raw, errors_raw):
+        """
+        The errors we get back from the tidy are formatted for output including
+        newlines in the string.  Each line is a single error, so we split on the
+        line to get a list
+        """
+        line_pattern = '^line\ (?P<l>\d+)\ column\ (?P<c>\d+)\ \-\ (?P<desc>.*)$'
+        line_re = re.compile(line_pattern)
+
+        errors = [ i for i in errors_raw.split('\n') if i ]
+        document = document_raw.split('\n')
+
+        for error in errors:
+            details = line_re.match(error)
+            yield '%s: (%s; line %s)' % (
+                details.group('desc'),
+                document[int(details.group('l')) - 1],
+                details.group('l'),
+            )
+
     def dumps(self):
         """
         Renders the page based on the page instructions, returning a string
@@ -185,8 +206,11 @@ class BaseAssembly(object):
 
         document, errors = tidylib.tidy_document(content)
         if errors and settings.CRUNCHYFROG_ENABLE_TIDY:
+            formatted_errors = self.__format_tidy_errors(content, errors)
             raise HtmlTidyErrors('We tried to tidy up the document and got '
-                 'these errors: %s' % errors)
+               'these errors: %s' % 
+               ', '.join(formatted_errors)
+            )
 
         return unicode(document)
 

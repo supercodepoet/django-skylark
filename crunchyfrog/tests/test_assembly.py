@@ -8,6 +8,7 @@ from nose.plugins.skip import SkipTest
 from crunchyfrog import *
 from crunchyfrog.assembly import *
 from crunchyfrog.page import PageAssembly
+from crunchyfrog.plans.base import CssFormatError
 from crunchyfrog.snippet import SnippetAssembly
 from django.http import HttpResponse
 from django.template import TemplateDoesNotExist
@@ -110,7 +111,7 @@ def test_can_render_an_asset():
     content = pa.dumps()
 
     assert 'my_favorite_color = "gray"' in content
-    assert 'body { background-color: gray }' in content
+    assert 'background-color: gray' in content
 
 @with_setup(setup, teardown)
 def test_can_detect_bad_processor():
@@ -130,7 +131,7 @@ def test_can_render_clevercss():
 
     css = get_contents(get_one_file_in(cachedir))
 
-    assert css == 'body {\n  background-color: gray;\n}'
+    assert css == 'body {\n    background-color: gray\n    }'
 
 @with_setup(setup, teardown)
 def test_missing_yaml_attributes():
@@ -287,7 +288,7 @@ def test_will_tidy_output():
     request = get_request_fixture()
     c = RequestContext(request)
     pa = PageAssembly('dummyapp/page/sample.yaml', c)
-    assert len(pa.dumps().split("\n")) == 40
+    assert len(pa.dumps().split("\n")) == 38 
 
 @with_setup(setup, teardown)
 def test_will_use_correct_doctype():
@@ -379,3 +380,24 @@ def test_stale_assets_regarding_dojo():
     )
 
     assert 'Class.js' in file
+
+@with_setup(setup, teardown)
+def test_bad_html():
+    request = get_request_fixture()
+    c = RequestContext(request, {})
+    pa = PageAssembly('dummyapp/page/badhtml.yaml', c)
+
+    e = py.test.raises(HtmlTidyErrors, pa.dumps)
+
+    assert 'line 22' in str(e.value)
+    assert "Warning: <tag> missing '>'" in str(e.value)
+
+@with_setup(setup, teardown)
+def test_bad_css():
+    request = get_request_fixture()
+    c = RequestContext(request, {})
+    pa = PageAssembly('dummyapp/page/badcss.yaml', c)
+
+    e = py.test.raises(CssFormatError, pa.dumps)
+
+    assert 'CSSStyleRule' in str(e.value)

@@ -82,3 +82,46 @@ def test_deploy_reusable():
         content.find('ee184e5fad8366ee655a090043693c30.css')
     assert content.find('ee184e5fad8366ee655a090043693c30.css') < \
         content.find('site.com/handheld.css')
+
+@with_setup(setup, teardown)
+@attr('focus')
+def test_deploy_reusable():
+    settings.CRUNCHYFROG_PLANS = 'mediadeploy_fewest'
+
+    request = get_request_fixture()
+    c = RequestContext(request)
+    pa = PageAssembly('planapp/page/full.yaml', c)
+
+    content = pa.dumps()
+
+    jsfile = get_contents(
+        os.path.join(cachedir, 'ff', 'f87385fc7d0a0eef92c19a7110966425.js')
+    )
+    assert 'static_uses2' in jsfile
+    assert 'static_uses1' in jsfile
+    assert 'static=' in jsfile
+    assert 'duplicated' in jsfile
+
+    cssfile = get_contents(
+        os.path.join(cachedir, 'ff', '9ecd76d6b65856eb899846a6271a527a.css')
+    )
+
+    assert '.static_uses2' in cssfile
+    assert '.static_uses1' in cssfile
+    assert '.static {' in cssfile
+
+    assert 'f87385fc7d0a0eef92c19a7110966425.js' in content
+    assert 'planapp/page/media/js/static' not in content
+    assert 'planapp/page/media/js/duplicated' not in content
+
+    assert '9ecd76d6b65856eb899846a6271a527a.css' in content
+
+    assert content.find('media/uses2.js') < \
+        content.find('f87385fc7d0a0eef92c19a7110966425.js')
+    assert content.find('f87385fc7d0a0eef92c19a7110966425.js') < \
+        content.find('media/uses1.js')
+
+    assert content.find('media/uses1.css') < \
+        content.find('9ecd76d6b65856eb899846a6271a527a.css')
+    assert content.find('9ecd76d6b65856eb899846a6271a527a.css') < \
+        content.find('site.com/handheld.css')
