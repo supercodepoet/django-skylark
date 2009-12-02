@@ -6,6 +6,7 @@ from nose.tools import with_setup
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
 from crunchyfrog import *
+from crunchyfrog.assembly import *
 from crunchyfrog.page import PageAssembly
 from crunchyfrog.snippet import SnippetAssembly
 from django.http import HttpResponse
@@ -319,7 +320,7 @@ def test_add_yaml_decorator():
     )
 
     assert 'This is my tag test' in content
-    assert '/media/cfcache/dummyapp/tag/media/css/screen.css" media="screen"' in content
+    assert '/media/cfcache/se/dummyapp/tag/media/css/screen.css" media="screen"' in content
                               
 @with_setup(setup, teardown)
 def test_snippet_render():

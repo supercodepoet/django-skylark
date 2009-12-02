@@ -91,6 +91,15 @@ class ReusableFiles(BasePlan):
 
         return (rollup, keep, insert_point)
 
+    def prepare_rollup(self, attr, rollup, keep, insert_point, **kwargs):
+        rollup_instruction = self.__rollup_static_files(
+            rollup, attr, kwargs.get('minifier', None))
+        other_instruction = self.prepared_instructions[attr]
+        self.prepared_instructions[attr] = \
+            other_instruction[:insert_point] + \
+            [rollup_instruction] + \
+            other_instruction[insert_point:]
+
     def prepare_js(self, page_instructions):
         if not hasattr(page_instructions, 'js'):
             return
@@ -100,15 +109,13 @@ class ReusableFiles(BasePlan):
         rollup, keep, insert_point = self._split_static_uses(
             'js', page_instructions)
 
+        minifier = jsmin
+
         setattr(page_instructions, 'js', keep)
         self.prepare_file('js', page_instructions)
 
-        rollup_instruction = self.__rollup_static_files(rollup, 'js', jsmin)
-        other_instruction = self.prepared_instructions['js']
-        self.prepared_instructions['js'] = \
-            other_instruction[:insert_point] + \
-            [rollup_instruction] + \
-            other_instruction[insert_point:]
+        self.prepare_rollup('js', rollup, keep, insert_point,
+            minifier=minifier)
 
     def prepare_css(self, page_instructions):
         if not hasattr(page_instructions, 'css'):
@@ -121,10 +128,5 @@ class ReusableFiles(BasePlan):
 
         setattr(page_instructions, 'css', keep)
         self.prepare_file('css', page_instructions)
-        rollup_instruction = self.__rollup_static_files(rollup, 'css')
 
-        other_instruction = self.prepared_instructions['css']
-        self.prepared_instructions['css'] = \
-            other_instruction[:insert_point] + \
-            [rollup_instruction] + \
-            other_instruction[insert_point:]
+        self.prepare_rollup('css', rollup, keep, insert_point)
