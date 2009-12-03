@@ -42,7 +42,6 @@ def test_can_change_deploy_plan_name():
     settings.DEBUG = old_debug
 
 @with_setup(setup, teardown)
-@attr('focus')
 def test_deploy_reusable():
     settings.CRUNCHYFROG_PLANS = 'mediadeploy_reusable'
 
@@ -84,7 +83,6 @@ def test_deploy_reusable():
         content.find('site.com/handheld.css')
 
 @with_setup(setup, teardown)
-@attr('focus')
 def test_deploy_reusable():
     settings.CRUNCHYFROG_PLANS = 'mediadeploy_fewest'
 

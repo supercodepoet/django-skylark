@@ -95,18 +95,6 @@ def test_creates_a_file_in_cache():
     assert not os.path.isdir(cachedir)
 
 @with_setup(setup, teardown)
-def test_creates_a_file_in_cache_with_key():
-    request = get_request_fixture()
-    c = RequestContext(request, { 'foo': 'bar' })
-    pa = PageAssembly('dummyapp/page/sample.yaml', c, 'fileincachewithkey')
-
-    assert not os.path.isdir(cachedir)
-
-    pa.dumps()
-
-    assert get_one_file_in(cachedir)
-
-@with_setup(setup, teardown)
 def test_can_render_an_asset():
     request = get_request_fixture()
     c = RequestContext(request, { 'color': 'gray' })
@@ -135,7 +123,7 @@ def test_can_render_clevercss():
 
     css = get_contents(get_one_file_in(cachedir))
 
-    assert css == 'body {\n    background-color: gray\n    }'
+    assert css == 'body {\n  background-color: gray;\n}'
 
 @with_setup(setup, teardown)
 def test_missing_yaml_attributes():
@@ -202,55 +190,6 @@ def test_will_copy_assets():
         assert os.path.isfile(os.path.join(cachedir, 'se', template_name))
 
 @with_setup(setup, teardown)
-def test_uses_the_page_instructions_cache_if_enabled():
-    settings.CACHE_BACKEND = 'locmem://'
-    orig_debug = settings.DEBUG
-    settings.DEBUG = False
-
-    request = get_request_fixture()
-    c = RequestContext(request, { 'foo': 'bar' })
-    pa = PageAssembly('dummyapp/page/sample.yaml', c, 'samecachekey')
-    first_content = pa.dumps()
-
-    page_assembly_cache = cache.get(PAGE_ASSEMBLY_CACHE_KEY)
-    assert len(page_assembly_cache) == 1
-
-    pa = PageAssembly('dummyapp/page/invalid.yaml', c, 'samecachekey')
-    second_content = pa.dumps()
-
-    page_assembly_cache = cache.get(PAGE_ASSEMBLY_CACHE_KEY)
-    assert len(page_assembly_cache) == 1
-
-    assert first_content == second_content
-
-    # Restore the debug setting
-    settings.DEBUG = orig_debug
-
-@with_setup(setup, teardown)
-def test_can_clear_page_assembly_cache():
-    settings.CACHE_BACKEND = 'locmem://'
-    orig_debug = settings.DEBUG
-    settings.DEBUG = False
-
-    request = get_request_fixture()
-    c = RequestContext(request, { 'foo': 'bar' })
-    pa = PageAssembly('dummyapp/page/sample.yaml', c, 'samecachekey')
-    content = pa.dumps()
-
-    # Restore the debug setting
-    settings.DEBUG = orig_debug
-
-    page_assembly_cache = cache.get(PAGE_ASSEMBLY_CACHE_KEY)
-    a_pa_key = page_assembly_cache[0]
-    assert len(page_assembly_cache) == 1
-    assert cache.get(a_pa_key)
-
-    clear_page_assembly_cache()
-
-    assert not cache.get(PAGE_ASSEMBLY_CACHE_KEY)
-    assert not cache.get(a_pa_key)
-
-@with_setup(setup, teardown)
 def test_references_other_yaml_files():
     request = get_request_fixture()
     c = RequestContext(request, { 'background_color': 'red' })
@@ -292,7 +231,7 @@ def test_will_tidy_output():
     request = get_request_fixture()
     c = RequestContext(request)
     pa = PageAssembly('dummyapp/page/sample.yaml', c)
-    assert len(pa.dumps().split("\n")) == 38 
+    assert len(pa.dumps().split("\n")) == 40 
 
 @with_setup(setup, teardown)
 def test_will_use_correct_doctype():
@@ -407,6 +346,9 @@ def test_bad_css():
     c = RequestContext(request, {})
     pa = PageAssembly('dummyapp/page/badcss.yaml', c)
 
+    old_plans = settings.CRUNCHYFROG_PLANS
+    settings.CRUNCHYFROG_PLANS = 'mediadeploy_reusable'
+
     e = py.test.raises(CssFormatError, pa.dumps)
 
     assert 'CSSStyleRule' in str(e.value)
@@ -415,3 +357,5 @@ def test_bad_css():
 
     assert pa.dumps()
 
+    # Reset our plans
+    settings.CRUNCHYFROG_PLANS = old_plans

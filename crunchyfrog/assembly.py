@@ -6,7 +6,6 @@ import re
 
 from django import http, template
 from django.core.urlresolvers import resolve
-from django.core.cache import cache
 from crunchyfrog import HttpResponse, RequestContext
 from crunchyfrog.conf import settings
 from crunchyfrog.instructions import PageInstructions
@@ -21,60 +20,27 @@ tidylib.BASE_OPTIONS = {
     "force-output": 0,
 }
 
-PAGE_ASSEMBLY_CACHE_KEY = 'crunchyfrog::page_instructions::cachelist'
-
 class HtmlTidyErrors(Exception):
     pass
 
 class BaseAssembly(object):
-    _cache_dict_key = PAGE_ASSEMBLY_CACHE_KEY
+    """
+    The yaml files we were constructed with, this probably came from a Django
+    view
+    """
+    yamlfiles = None
 
     """
-    Overview
-    --------
-    Provides a way to specify a minimal set of instructions inside of a YAML file
-    that get rendered to an HTML page.
-
-    * You don't have to worry about <html> or <head> sections of your page
-    * You don't have to craft <script> or <style> tags
-    * You can reference any file as if it were a Dango template
-    * You can combine YAML page instructions to make things modular
-    * CleverCSS is built-in
-    * and more to come
-
-    The goal of this is to make web development quicker by eliminating some of the
-    repated hastle of setting up HTML, CSS, images, and javascript.
-
-    Basic usage:
-    ------------
-
-    Make a YAML file called blog/list/list.yaml::
-
-        page: blog/list/list.html
-        title: My Blog
-
-    Make blog/list/list.html::
-
-        <body>
-            <h1>Hello {{ what }}</h1>
-        </body>
-
-    Create a Django view like this::
-        from django.http import HttpResponse
-        from crunchyfrog.page import PageAssembly, RequestContext
-
-        def list(request):
-            c = RequestContext(request, {
-                'what': 'World'
-            })
-
-            pa = PageAssembly('blog/list/list.yaml', c)
-
-            return pa.get_http_response()
-
-    And behold the complete HTML page produced
+    The Django template context object we will render everything with
     """
-    def __init__(self, yamlfiles, context, cache_key = None, use_cache = True):
+    context = None
+
+    """
+    Are we going to render as a full page or a snippet?
+    """
+    render_full_page = True
+
+    def __init__(self, yamlfiles, context):
         if not hasattr(self, 'render_full_page'):
             raise ValueError('You must set render_full_page to True '
                 'or False on the subclass of BaseAssembly')
@@ -89,21 +55,6 @@ class BaseAssembly(object):
 
         if not len(yamlfiles):
             raise ValueError('%r must not be zero length' % (yamlfiles,))
-
-        self.use_cache = use_cache
-
-        if self.use_cache:
-            md5 = hashlib.md5()
-
-            md5.update(context.request.get_host())
-
-            if cache_key:
-                md5.update(str(cache_key))
-            else:
-                view, args, kwargs = resolve(context.request.path)
-                md5.update(view.__name__)
-
-            self.cache_key = "crunchy_frog::page_instructions::%s" % (md5.hexdigest(),)
 
         """
         We can get the yamlfiles as a single string or a tuple, but by the time
@@ -127,7 +78,7 @@ class BaseAssembly(object):
 
         self.context = context
 
-    def __get_page_instructions(self):
+    def __create_page_instructions(self):
         """
         Combines all the files and instructions into one object
         """
@@ -140,14 +91,6 @@ class BaseAssembly(object):
 
         for file in self.yamlfiles:
             self.__add_page_instructions(page_instructions, file)
-
-        if settings.CACHE_BACKEND and not settings.DEBUG and \
-           settings.CRUNCHYFROG_PAGEASSEMBLY_CACHE_EXPIRE:
-            cache_dict = cache.get(self._cache_dict_key) or []
-            cache.set(self.cache_key, page_instructions,
-                settings.CRUNCHYFROG_PAGEASSEMBLY_CACHE_EXPIRE)
-            cache_dict.append(self.cache_key)
-            cache.set(self._cache_dict_key, cache_dict)
 
         return page_instructions
 
@@ -183,17 +126,7 @@ class BaseAssembly(object):
             )
 
     def dumps(self):
-        """
-        Renders the page based on the page instructions, returning a string
-        """
-        if settings.CACHE_BACKEND and not settings.DEBUG:
-            instructions = cache.get(self.cache_key)
-
-            if not instructions:
-                instructions = self.__get_page_instructions()
-
-        else:
-            instructions = self.__get_page_instructions()
+        instructions = self.__create_page_instructions()
 
         doctype = instructions.doctype or 'HTML 4.01 Transitional'
 

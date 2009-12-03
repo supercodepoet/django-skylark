@@ -66,6 +66,8 @@ class BasePlan(object):
     copying directories, and other fancy pants things like that.
     """
 
+    __media_source_cache = {}
+
     """
     These are a set of special functions that can be used to manipulate the
     source of the page.  The way these get triggered is through the attribute
@@ -138,16 +140,26 @@ class BasePlan(object):
             * Renders the template with the given context if applicable
             * Passes it through the process function if provided
         """
-        source, origin = self._find_template_source(template_name)
+        cache = self.__media_source_cache
 
-        if context:
-            template = Template(source)
-            source   = template.render(context)
+        mem_args = (template_name, process_func)
+        if mem_args in cache and not context:
+            source = cache[mem_args]
+            is_cached = True
+        else:
+            source, origin = self._find_template_source(template_name)
 
-        if process_func:
-            source = process_func(source)
+            if context:
+                template = Template(source)
+                return template.render(context), False
 
-        return source
+            if process_func:
+                source = process_func(source)
+
+            cache[mem_args] = source
+            is_cached = False
+
+        return source, is_cached
 
     def _copy_to_media(self, template_name, source=''):
         """
@@ -249,7 +261,8 @@ class BasePlan(object):
 
         for instruction in getattr(page_instructions, item_name):
             if instruction.has_key('url'):
-                self.prepared_instructions[item_name].append({ 'location': instruction['url'] })
+                self.prepared_instructions[item_name].append(
+                    { 'location': instruction['url'] })
             else:
                 template_name = context = process_func = None
 
@@ -259,23 +272,30 @@ class BasePlan(object):
 
                 item = copy.copy(instruction)
 
+                template_name = instruction.get('static', False) or \
+                    instruction.get('inline', False)
+
+                assert template_name, (
+                    'You must provide either "static" or "inline" properties '
+                    'that point to a file, provided object was %r' % instruction
+                )
+
+                if instruction.has_key('inline'):
+                    context = self.context
+                else:
+                    context = None
+
+                source, is_cached = self._get_media_source(template_name, process_func, context)
+                if 'css' in item_name and self.make_css_urls_absolute \
+                   and not is_cached:
+                    source = self._fix_css_urls(instruction, source)
+
                 if instruction.has_key('static'):
-                    template_name = instruction['static']
-                    source = self._get_media_source(template_name, process_func, context)
-                    if 'css' in item_name and self.make_css_urls_absolute:
-                        source = self._fix_css_urls(instruction, source)
                     location, filename = self._copy_to_media(
                         template_name, source)
                     item['location'] = location
                 elif instruction.has_key('inline'):
-                    template_name = instruction['inline']
-                    context = self.context
-                    source = self._get_media_source(template_name, process_func, context)
-                    if 'css' in item_name:
-                        source = self._fix_css_urls(instruction, source)
                     item['source'] = source
-
-                assert template_name, 'You must provide either "static" or "inline" properties that point to a file, provided object was %r' % instruction
 
                 if instruction.has_key('include') and not instruction['include']:
                     if instruction.has_key('inline'):
@@ -364,13 +384,15 @@ class BasePlan(object):
                 cachedirectory = os.path.join(self.cache_root, directory)
 
                 if os.path.isdir(cachedirectory):
+                    if not settings.DEBUG:
+                        continue
+
                     if self._assets_are_stale(sourcedirectory, cachedirectory):
                         shutil.rmtree(cachedirectory)
                     else:
                         continue
 
                 shutil.copytree(sourcedirectory, cachedirectory)
-
 
     def _assets_are_stale(self, sourcedirectory, cachedirectory):
         """
@@ -455,7 +477,7 @@ class RollupPlan(object):
     def _concat_files(self, instructions, fix_css_urls = False):
         source = [] 
         for i in instructions:
-            processed = self._get_media_source(
+            processed, is_cached = self._get_media_source(
                 i['static'], self._get_processing_function(i.get('process')))
             if fix_css_urls:
                 processed = self._fix_css_urls(i, processed)
