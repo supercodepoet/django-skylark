@@ -1,9 +1,9 @@
 from django.core.management.base import BaseCommand, CommandError 
 from django.core.cache import cache
-from django.conf import settings
 from django.utils.importlib import import_module
 from optparse import make_option
 from messages import *
+from crunchyfrog.conf import settings
 
 import os
 import hashlib

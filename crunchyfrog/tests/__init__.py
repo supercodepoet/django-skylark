@@ -9,7 +9,8 @@ setup_environ(settings_module)
 from django.conf import settings
 
 projectdir = os.path.join(os.path.dirname(__file__))
-cachedir = os.path.join(os.path.dirname(__file__), 'media/cfcache')
+
+cachedir = settings.CRUNCHYFROG_CACHE_ROOT
 
 def get_one_file_in(path):
     started = time()

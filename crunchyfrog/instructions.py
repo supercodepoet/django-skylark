@@ -29,15 +29,16 @@ class PageInstructions(object):
         These are the ones we expect, these are all the possible kinds of
         instructions that can be handled
         """
-        self.root_yaml = None
-        self.doctype   = None
-        self.body      = None
-        self.title     = None
-        self.uses_yaml = []
-        self.js        = []
-        self.css       = []
-        self.meta      = []
-        self.dojo      = []
+        self.root_yaml  = None
+        self.doctype    = None
+        self.body       = None
+        self.title      = None
+        self.uses_yaml  = []
+        self.other_yaml = []
+        self.js         = []
+        self.css        = []
+        self.meta       = []
+        self.dojo       = []
 
     def _part_exists(self, part):
         """
@@ -77,6 +78,9 @@ class PageInstructions(object):
 
         for uses in self.uses_yaml:
             yield uses
+            
+        for uses in self.other_yaml:
+            yield uses
 
     def __get_object(self, yamlfile, context):
         source, origin = template.loader.find_template_source(yamlfile)
@@ -107,6 +111,10 @@ class PageInstructions(object):
                         self.__get_object(uses['file'], self.context),
                         uses['file']
                     )
+            else:
+                if not sourcefile == self.root_yaml:
+                    # This must be coming from our add_yaml decorator
+                    self.other_yaml.append(sourcefile)
 
             for attr in ('doctype', 'js', 'css', 'body', 'title', 'meta',
                          'dojo'):

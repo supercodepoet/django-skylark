@@ -1,5 +1,9 @@
+import os
+import shutil
+
 from django import http, template
 from django.core.cache import cache
+from crunchyfrog.conf import settings
 
 __all__ = ['clear_page_assembly_cache', 'HttpResponse', 'RequestContext']
 
@@ -9,6 +13,11 @@ def clear_page_assembly_cache():
     for key in cache_dict:
         cache.delete(key)
     cache.set(PAGE_ASSEMBLY_CACHE_KEY, [])
+
+def clear_media_cache():
+    cachedir = settings.CRUNCHYFROG_CACHE_ROOT
+    if os.path.isdir(cachedir):
+        shutil.rmtree(cachedir)
 
 class HttpResponse(http.HttpResponse):
     """

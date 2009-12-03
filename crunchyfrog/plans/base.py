@@ -24,7 +24,8 @@ class CssFormatError(Exception):
 class CssUtilsLoggingHandler(logging.Handler):
     _records = []
     def emit(self, record):
-        self._records.append(record)
+        if 'CSSStyleRule' in record.msg:
+            self._records.append(record)
 
     def get_errors(self):
         records = self._records
@@ -39,7 +40,6 @@ cssutils.log.setLog(__log)
 
 def find_directory_from_loader(page_instructions, asset):
     from django.template.loaders.app_directories import app_template_dirs
-    from django.conf import settings
     template_dirs = list(settings.TEMPLATE_DIRS) + list(app_template_dirs)
 
     for dir in template_dirs:
@@ -81,6 +81,8 @@ class BasePlan(object):
     processing_funcs = {
         'clevercss': process_clevercss
     }
+
+    make_css_urls_absolute = False
 
     cache_prefix = None
 
@@ -124,6 +126,7 @@ class BasePlan(object):
         """
         self.prepared_instructions = {}
         self.prepared_instructions['render_full_page'] = self.render_full_page
+        self.prepared_instructions['cache_prefix'] = '%s/' % self.cache_prefix
 
         if not os.path.exists(self.cache_root):
             os.makedirs(self.cache_root)
@@ -195,11 +198,7 @@ class BasePlan(object):
     def __format_css_errors(self, document_raw, errors):
         document = document_raw.split('\n')
         for error in errors:
-            yield '%s: (%s; line %s)' % (
-                error.getMessage(),
-                document_raw,
-                '?'
-            )
+            yield '%s' % error.getMessage()
 
     def _fix_css_urls(self, page_instruction, css_source):
         def replacer(url, **kwargs):
@@ -215,7 +214,7 @@ class BasePlan(object):
         parser = cssutils.CSSParser()
         sheet = parser.parseString(css_source)
         errors = cssutils_handler.get_errors()
-        if errors:
+        if errors and settings.CRUNCHYFROG_RAISE_CSS_ERRORS:
             formatted_errors = self.__format_css_errors(css_source, errors)
             raise CssFormatError(
                 ', '.join(formatted_errors)
@@ -263,7 +262,7 @@ class BasePlan(object):
                 if instruction.has_key('static'):
                     template_name = instruction['static']
                     source = self._get_media_source(template_name, process_func, context)
-                    if 'css' in item_name:
+                    if 'css' in item_name and self.make_css_urls_absolute:
                         source = self._fix_css_urls(instruction, source)
                     location, filename = self._copy_to_media(
                         template_name, source)

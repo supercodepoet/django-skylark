@@ -2,6 +2,7 @@ from base import BasePlan, RollupPlan
 from crunchyfrog.utils.jsmin import jsmin
 
 class FewestFiles(BasePlan, RollupPlan):
+    make_css_urls_absolute = True
     cache_prefix = 'ff'
 
     def __split_static_all(self, attr, page_instructions):

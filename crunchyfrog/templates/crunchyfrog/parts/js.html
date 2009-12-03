@@ -22,7 +22,7 @@
     <script type="text/javascript">
     //<![CDATA[
     {% for dojo in prepared_instructions.dojo %}
-        dojo.registerModulePath('{{ dojo.namespace }}', '{{ cache_url }}{{ dojo.location }}');
+    dojo.registerModulePath('{{ dojo.namespace }}', '{{ cache_url }}{{ prepared_instructions.cache_prefix }}{{ dojo.location }}');
         {% for requirement in dojo.require %}
             dojo.require('{{ requirement }}');
         {% endfor %}

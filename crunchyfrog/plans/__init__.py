@@ -8,7 +8,8 @@ class MissingMediaPlan(Exception):
 def get_for_context(context, render_full_page):
     try:
         from crunchyfrog.conf import settings
-        plans = __import__(settings.CRUNCHYFROG_PLANS)
+        plans = __import__(settings.CRUNCHYFROG_PLANS, globals(), locals(),
+                           settings.CRUNCHYFROG_PLANS_DEFAULT)
 
         plan = getattr(plans, settings.CRUNCHYFROG_PLANS_DEFAULT)
 

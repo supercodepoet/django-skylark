@@ -2,6 +2,8 @@ import os
 from django.conf import settings as django_settings
 from urlparse import urljoin
 
+CRUNCHYFROG_RAISE_CSS_ERRORS = django_settings.DEBUG
+CRUNCHYFROG_RAISE_HTML_ERRORS = django_settings.DEBUG
 CRUNCHYFROG_PLANS = 'mediadeploy'
 CRUNCHYFROG_PLANS_DEFAULT = 'default'
 CRUNCHYFROG_PAGEASSEMBLY_CACHE_EXPIRE = 86400

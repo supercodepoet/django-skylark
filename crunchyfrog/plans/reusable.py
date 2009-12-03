@@ -2,6 +2,7 @@ from base import BasePlan, RollupPlan
 from crunchyfrog.utils.jsmin import jsmin
 
 class ReusableFiles(BasePlan, RollupPlan):
+    make_css_urls_absolute = True
     cache_prefix = 'rf'
 
     def __split_static_uses(self, attr, page_instructions):

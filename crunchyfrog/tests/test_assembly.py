@@ -90,6 +90,10 @@ def test_creates_a_file_in_cache():
 
     assert get_one_file_in(cachedir)
 
+    from crunchyfrog import clear_media_cache
+    clear_media_cache()
+    assert not os.path.isdir(cachedir)
+
 @with_setup(setup, teardown)
 def test_creates_a_file_in_cache_with_key():
     request = get_request_fixture()
@@ -357,6 +361,7 @@ def test_dojo_renders_in_page():
     assert "dojo.require('DynamicApp.Page.View');" in content
     assert 'dummyapp/tag/media/css/screen.css' in content
     assert 'dummyapp/page/media/js/sample.js' in content
+    assert 'media/cfcache/se/dynamicapp' in content
 
 @with_setup(setup, teardown)
 def test_stale_assets_regarding_dojo():
@@ -392,6 +397,10 @@ def test_bad_html():
     assert 'line 22' in str(e.value)
     assert "Warning: <tag> missing '>'" in str(e.value)
 
+    settings.CRUNCHYFROG_RAISE_HTML_ERRORS = False
+
+    assert pa.dumps()
+
 @with_setup(setup, teardown)
 def test_bad_css():
     request = get_request_fixture()
@@ -401,3 +410,8 @@ def test_bad_css():
     e = py.test.raises(CssFormatError, pa.dumps)
 
     assert 'CSSStyleRule' in str(e.value)
+
+    settings.CRUNCHYFROG_RAISE_CSS_ERRORS = False
+
+    assert pa.dumps()
+

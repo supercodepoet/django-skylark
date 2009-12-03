@@ -141,7 +141,8 @@ class BaseAssembly(object):
         for file in self.yamlfiles:
             self.__add_page_instructions(page_instructions, file)
 
-        if settings.CACHE_BACKEND and not settings.DEBUG:
+        if settings.CACHE_BACKEND and not settings.DEBUG and \
+           settings.CRUNCHYFROG_PAGEASSEMBLY_CACHE_EXPIRE:
             cache_dict = cache.get(self._cache_dict_key) or []
             cache.set(self.cache_key, page_instructions,
                 settings.CRUNCHYFROG_PAGEASSEMBLY_CACHE_EXPIRE)
@@ -204,15 +205,18 @@ class BaseAssembly(object):
         if not settings.DEBUG or not self.render_full_page:
             return content
 
-        document, errors = tidylib.tidy_document(content)
-        if errors and settings.CRUNCHYFROG_ENABLE_TIDY:
-            formatted_errors = self.__format_tidy_errors(content, errors)
-            raise HtmlTidyErrors('We tried to tidy up the document and got '
-               'these errors: %s' % 
-               ', '.join(formatted_errors)
-            )
+        if not settings.CRUNCHYFROG_ENABLE_TIDY:
+            document = content
+        else:
+            document, errors = tidylib.tidy_document(content)
+            if errors and settings.CRUNCHYFROG_RAISE_HTML_ERRORS:
+                formatted_errors = self.__format_tidy_errors(content, errors)
+                raise HtmlTidyErrors('We tried to tidy up the document and got '
+                   'these errors: %s' % 
+                   ', '.join(formatted_errors)
+                )
 
-        return unicode(document)
+        return unicode(document or content)
 
     def get_http_response(self):
         """
