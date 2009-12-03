@@ -6,8 +6,9 @@ from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
 from crunchyfrog import *
 from crunchyfrog.page import PageAssembly
-from crunchyfrog.plans import get_for_context, MissingMediaPlan
-from crunchyfrog.plans import SeparateEverything, FewestFiles
+from crunchyfrog.plans import *
+from crunchyfrog.plans.separate import SeparateEverything
+from crunchyfrog.plans.fewest import FewestFiles
 
 from crunchyfrog.tests import *
 
