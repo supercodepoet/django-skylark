@@ -94,16 +94,19 @@ class BasePlan(object):
 
         The reason you find this here is that in DEBUG mode, Django will not
         return the origin, which is imporant to us since we are trying to mirror
-        the directory structure and also copy some of the files inside of any media
-        directory into the cache as well.
+        the directory structure and also copy some of the files inside of any 
+        media directory into the cache as well.
 
-        So, we have to implement our own so that we are always able to determing
-        the origin
+        So, we have to implement our own so that we are always able to
+        determining the origin.
         """
         # Calculate template_source_loaders the first time the function is executed
         # because putting this logic in the module-level namespace may cause
         # circular import errors. See Django ticket #1292.
-        assert loader.template_source_loaders, 'The template loader has not initialized the template_source_loader, this is very unsual'
+        assert loader.template_source_loaders, (''
+            'The template loader has not initialized the '
+            'template_source_loader, this is very unusual'
+        )
 
         for djangoloader in loader.template_source_loaders:
             try:
@@ -143,7 +146,7 @@ class BasePlan(object):
         cache = self.__media_source_cache
 
         mem_args = (template_name, process_func)
-        if mem_args in cache and not context:
+        if mem_args in cache and not context and not settings.DEBUG:
             source = cache[mem_args]
             is_cached = True
         else:

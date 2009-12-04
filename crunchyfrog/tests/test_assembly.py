@@ -359,3 +359,37 @@ def test_bad_css():
 
     # Reset our plans
     settings.CRUNCHYFROG_PLANS = old_plans
+
+@with_setup(setup, teardown)
+@attr('focus')
+def test_cache_in_debug_mode():
+    request = get_request_fixture()
+    c = RequestContext(request, {})
+    pa = PageAssembly('dummyapp/page/sample.yaml', c)
+
+    sample_path = str(template.loader.find_template_source(
+        'dummyapp/page/media/js/sample.js'
+    )[1])
+    temp_path = '%s_temp' % sample_path
+
+    pa.dumps()
+    content_before = get_contents(os.path.join(
+        cachedir, 'se', 'dummyapp', 'page', 'media', 'js', 'sample.js')
+    )
+
+    # Copy to a temp file and alter the original
+    shutil.copyfile(sample_path, temp_path)
+    sample_fh = open(sample_path, 'a')
+    sample_fh.write('var changed = true;')
+    sample_fh.close()
+
+    pa.dumps()
+    content_after = get_contents(os.path.join(
+        cachedir, 'se', 'dummyapp', 'page', 'media', 'js', 'sample.js')
+    )
+
+    # Restore the file
+    shutil.copyfile(temp_path, sample_path)
+    os.remove(temp_path)
+
+    assert content_before != content_after
