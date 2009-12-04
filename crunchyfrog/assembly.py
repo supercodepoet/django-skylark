@@ -1,7 +1,6 @@
 import hashlib
 import renderer
 import yaml
-import tidylib
 import re
 
 from django import http, template
@@ -10,15 +9,23 @@ from crunchyfrog import HttpResponse, RequestContext
 from crunchyfrog.conf import settings
 from crunchyfrog.instructions import PageInstructions
 
-tidylib.BASE_OPTIONS = {
-    "indent": 1,
-    "indent-spaces": 4,
-    "quote-marks": 1,
-    "tidy-mark": 0,
-    "wrap": 0,
-    "indent-cdata": 1,
-    "force-output": 0,
-}
+try:
+    import tidylib
+
+    tidylib.BASE_OPTIONS = {
+        "indent": 1,
+        "indent-spaces": 4,
+        "quote-marks": 1,
+        "tidy-mark": 0,
+        "wrap": 0,
+        "indent-cdata": 1,
+        "force-output": 0,
+    }
+except OSError:
+    """
+    We can't use tidy, most likely libtidy is not installed on the system
+    """
+    settings.CRUNCHYFROG_ENABLE_TIDY = False
 
 class HtmlTidyErrors(Exception):
     pass
