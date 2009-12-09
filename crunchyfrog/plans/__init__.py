@@ -5,16 +5,16 @@ from reusable import ReusableFiles
 from separate import SeparateEverything
 
 __all__ = ['MissingMediaPlan', 'get_plan', 'get_for_context']
-
-class MissingMediaPlan(Exception):
-    pass
-
 __plan_cache = {}
+
 def get_plan(module, attr):
     plans = __import__(module, globals(), locals(), attr)
 
     return getattr(plans, attr)
 get_plan = memoize(get_plan, __plan_cache, 2)
+
+class MissingMediaPlan(Exception):
+    pass
         
 def get_for_context(context, render_full_page):
     try:

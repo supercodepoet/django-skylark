@@ -2,11 +2,15 @@ import planapp
 from crunchyfrog import plans
 from django.conf import settings
 
+se = plans.SeparateEverything
+rf = plans.ReusableFiles
+ff = plans.FewestFiles
+
 if settings.DEBUG:
-    default = plans.SeparateEverything
+    default = se
 else:
     #default = plans.FewestFiles
-    default = plans.ReusableFiles
+    default = rf
 
 """
 Eventually we want to be able to apply settings for specific views, this seemed

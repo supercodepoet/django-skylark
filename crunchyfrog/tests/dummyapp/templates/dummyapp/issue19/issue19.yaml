@@ -1,0 +1,16 @@
+title: Testing fix for issue #19
+body: dummyapp/issue19/issue19.html
+
+js:
+    - static: dummyapp/issue19/media/js/static.js
+
+dojo:
+    - namespace: DummyApp.Issue19
+      location: dummyapp/issue19/media/js
+      require: 
+        - DummyApp.Issue19.Class
+
+    - namespace: DummyApp.Issue19.Again
+      location: dummyapp/issue19/media/js
+      require: 
+        - DummyApp.Issue19.Again.Class

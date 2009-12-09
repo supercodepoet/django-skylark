@@ -1,7 +1,7 @@
 import py.test
-import os
 import re
 
+from os.path import isdir, isfile, join
 from nose.tools import with_setup
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
@@ -79,20 +79,26 @@ def test_include_with_inline():
     py.test.raises(AttributeError, pa.get_http_response)
 
 @with_setup(setup, teardown)
-def test_creates_a_file_in_cache():
+def test_creates_files_in_cache():
     request = get_request_fixture()
     c = RequestContext(request, { 'foo': 'bar' })
     pa = PageAssembly('dummyapp/page/sample.yaml', c)
 
-    assert not os.path.isdir(cachedir)
-
     pa.dumps()
 
-    assert get_one_file_in(cachedir)
+    exist(
+        'se/dummyapp/page/media/css/sample.css',
+        'se/dummyapp/page/media/img/notreferenced.png',
+        'se/dummyapp/page/media/img/test.png',
+        'se/dummyapp/page/media/js/notreferenced.js',
+        'se/dummyapp/page/media/js/sample.js',
+        'se/dummyapp/page/media/js/templates/notreferenced.html',
+        'se/dummyapp/page/media/js/templates/sample.js',
+    )
 
     from crunchyfrog import clear_media_cache
     clear_media_cache()
-    assert not os.path.isdir(cachedir)
+    assert not isdir(cachedir)
 
 @with_setup(setup, teardown)
 def test_can_render_an_asset():
@@ -101,6 +107,13 @@ def test_can_render_an_asset():
     pa = PageAssembly('dummyapp/page/renderasset.yaml', c)
 
     content = pa.dumps()
+
+    exist(
+        'se/dummyapp/page/media/img/notreferenced.png',
+        'se/dummyapp/page/media/img/test.png',
+        'se/dummyapp/page/media/js/templates/notreferenced.html',
+        'se/dummyapp/page/media/js/templates/sample.js',
+    )
 
     assert 'my_favorite_color = "gray"' in content
     assert 'background-color: gray' in content
@@ -121,9 +134,16 @@ def test_can_render_clevercss():
 
     pa.dumps()
 
-    css = get_contents(get_one_file_in(cachedir))
-
+    media = (cachedir, 'se', 'dummyapp', 'page', 'media')
+    css = get_contents(join(*media + ('css', 'clevercss.css')))
     assert css == 'body {\n  background-color: gray;\n}'
+
+    exist(
+        'se/dummyapp/page/media/img/notreferenced.png',
+        'se/dummyapp/page/media/img/test.png',
+        'se/dummyapp/page/media/js/templates/notreferenced.html',
+        'se/dummyapp/page/media/js/templates/sample.js',
+    )
 
 @with_setup(setup, teardown)
 def test_missing_yaml_attributes():
@@ -156,6 +176,16 @@ def test_will_not_duplicate_assets():
 
     content = pa.dumps()
 
+    exist(
+        'se/dummyapp/page/media/css/sample.css',
+        'se/dummyapp/page/media/img/notreferenced.png',
+        'se/dummyapp/page/media/img/test.png',
+        'se/dummyapp/page/media/js/notreferenced.js',
+        'se/dummyapp/page/media/js/sample.js',
+        'se/dummyapp/page/media/js/templates/notreferenced.html',
+        'se/dummyapp/page/media/js/templates/sample.js',
+    )
+
     assert len(re.findall('sample.js', content)) == 1
     assert len(re.findall('files.js', content)) == 1
 
@@ -175,19 +205,19 @@ def test_will_copy_assets():
     c = RequestContext(request, { 'title': unicode('Title < > \' "') })
     pa = PageAssembly('dummyapp/page/sample.yaml', c)
 
-    filenames = ('dummyapp/page/media/img/test.png',
-                 'dummyapp/page/media/img/notreferenced.png',
-                 'dummyapp/page/media/js/templates/sample.js',
-                 'dummyapp/page/media/js/notreferenced.js',
-                 'dummyapp/page/media/js/templates/notreferenced.html',
-                )
-
     content = pa.dumps()
 
-    assert content.find('notreferenced') == -1, 'Found a reference to a file that has been set include: false in the yaml file.  It should not show up in the rendered output'
+    exist(
+        'se/dummyapp/page/media/css/sample.css',
+        'se/dummyapp/page/media/img/test.png',
+        'se/dummyapp/page/media/img/notreferenced.png',
+        'se/dummyapp/page/media/js/templates/sample.js',
+        'se/dummyapp/page/media/js/notreferenced.js',
+        'se/dummyapp/page/media/js/templates/notreferenced.html',
+        'se/dummyapp/page/media/js/templates/sample.js',
+    )
 
-    for template_name in filenames:
-        assert os.path.isfile(os.path.join(cachedir, 'se', template_name))
+    assert content.find('notreferenced') == -1, 'Found a reference to a file that has been set include: false in the yaml file.  It should not show up in the rendered output'
 
 @with_setup(setup, teardown)
 def test_references_other_yaml_files():
@@ -196,6 +226,17 @@ def test_references_other_yaml_files():
     pa = PageAssembly('dummyapp/page/uses.yaml', c)
 
     content = pa.dumps()
+
+    exist(
+        'se/dummyapp/page/media/css/sample.css',
+        'se/dummyapp/page/media/img/notreferenced.png',
+        'se/dummyapp/page/media/img/test.png',
+        'se/dummyapp/page/media/js/notreferenced.js',
+        'se/dummyapp/page/media/js/sample.js',
+        'se/dummyapp/page/media/js/sampleafter.js',
+        'se/dummyapp/page/media/js/templates/notreferenced.html',
+        'se/dummyapp/page/media/js/templates/sample.js',
+    )
 
     assert len(re.findall('.*\.css', content)) == 2, 'There should be 2 css files from the sample.yaml in here'
     assert content.find('sample.js') < content.find('sampleafter.js'), 'The sample.js should come before the sampleafter.js'
@@ -209,6 +250,13 @@ def test_renders_meta_section():
     pa = PageAssembly('dummyapp/page/meta.yaml', c)
 
     content = pa.dumps()
+
+    exist(
+        'se/dummyapp/page/media/img/notreferenced.png',
+        'se/dummyapp/page/media/img/test.png',
+        'se/dummyapp/page/media/js/templates/notreferenced.html',
+        'se/dummyapp/page/media/js/templates/sample.js',
+    )
 
     assert content.find('<meta http-equiv="test" content="test-content">') >= 0, 'Could not locate the meta information expected'
 
@@ -251,6 +299,16 @@ def test_will_use_correct_doctype():
     assert '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"' in content
     assert 'xhtml1-strict.dtd' in content
 
+    exist(
+        'se/dummyapp/page/media/css/sample.css',
+        'se/dummyapp/page/media/img/notreferenced.png',
+        'se/dummyapp/page/media/img/test.png',
+        'se/dummyapp/page/media/js/notreferenced.js',
+        'se/dummyapp/page/media/js/sample.js',
+        'se/dummyapp/page/media/js/templates/notreferenced.html',
+        'se/dummyapp/page/media/js/templates/sample.js',
+    )
+
 @with_setup(setup, teardown)
 def test_add_yaml_decorator():
     request = get_request_fixture()
@@ -259,8 +317,14 @@ def test_add_yaml_decorator():
 
     content = pa.dumps()
 
-    assert get_one_file_in(os.path.join(
-        cachedir, 'se', 'dummyapp', 'tag', 'media', 'css')
+    exist(
+        'se/dummyapp/page/media/img/notreferenced.png',
+        'se/dummyapp/page/media/img/test.png',
+        'se/dummyapp/page/media/js/templates/notreferenced.html',
+        'se/dummyapp/page/media/js/templates/sample.js',
+        'se/dummyapp/tag/media/css/screen.css',
+        'se/dummyapp/tag/media/img/testimage.png',
+        'se/dummyapp/tag/media/js/templates/test.html',
     )
 
     assert 'This is my tag test' in content
@@ -281,8 +345,9 @@ def test_snippet_render():
 
     assert "dojo.registerModulePath('DynamicApp.Snippet'" in content
 
-    assert get_one_file_in(os.path.join(
-        cachedir, 'se', 'dynamicapp', 'media', 'js')
+    exist(
+        'se/dynamicapp/media/js/dojoloaded.js',
+        'se/dynamicapp/media/js/templates/dojoloaded.html',
     )
 
     assert 'This is my snippet test' in content
@@ -295,6 +360,19 @@ def test_dojo_renders_in_page():
 
     content = pa.dumps()
 
+    exist(
+        'se/dummyapp/page/media/img/notreferenced.png',
+        'se/dummyapp/page/media/img/test.png',
+        'se/dummyapp/page/media/js/sample.js',
+        'se/dummyapp/page/media/js/templates/notreferenced.html',
+        'se/dummyapp/page/media/js/templates/sample.js',
+        'se/dummyapp/tag/media/css/screen.css',
+        'se/dummyapp/tag/media/img/testimage.png',
+        'se/dummyapp/tag/media/js/templates/test.html',
+        'se/dynamicapp/media/js/dojoloaded.js',
+        'se/dynamicapp/media/js/templates/dojoloaded.html',
+    )
+
     assert "dojo.registerModulePath('DynamicApp.Page'" in content
     assert "dojo.require('DynamicApp.Page.Controller');" in content
     assert "dojo.require('DynamicApp.Page.View');" in content
@@ -302,28 +380,6 @@ def test_dojo_renders_in_page():
     assert 'dummyapp/page/media/js/sample.js' in content
     assert 'media/cfcache/se/dynamicapp' in content
 
-@with_setup(setup, teardown)
-def test_stale_assets_regarding_dojo():
-    """
-    Issue #7
-
-    The problem that this test is verifying is related to the media/js/templates
-    directory being copied before other files in the directory.  Our method that
-    checks to see if that directory is stale (needs to be updated) was
-    malfunctioning.  It compared the dates on the source and cache directory,
-    since they were the same (because we just copied the templates directory) it
-    was not allowing the rest of the files to be copied.
-    """
-    request = get_request_fixture()
-    c = RequestContext(request, {})
-    sa = SnippetAssembly('dummyapp/staleassets/staleassets.yaml', c)
-
-    content = sa.dumps()
-    file = get_one_file_in(os.path.join(
-        cachedir, 'se', 'dummyapp', 'staleassets', 'media', 'js')
-    )
-
-    assert 'Class.js' in file
 
 @with_setup(setup, teardown)
 def test_bad_html():
@@ -346,7 +402,6 @@ def test_bad_css():
     c = RequestContext(request, {})
     pa = PageAssembly('dummyapp/page/badcss.yaml', c)
 
-    old_plans = settings.CRUNCHYFROG_PLANS
     settings.CRUNCHYFROG_PLANS = 'mediadeploy_reusable'
 
     e = py.test.raises(CssFormatError, pa.dumps)
@@ -357,11 +412,7 @@ def test_bad_css():
 
     assert pa.dumps()
 
-    # Reset our plans
-    settings.CRUNCHYFROG_PLANS = old_plans
-
 @with_setup(setup, teardown)
-@attr('focus')
 def test_cache_in_debug_mode():
     request = get_request_fixture()
     c = RequestContext(request, {})
@@ -373,7 +424,18 @@ def test_cache_in_debug_mode():
     temp_path = '%s_temp' % sample_path
 
     pa.dumps()
-    content_before = get_contents(os.path.join(
+
+    exist(
+        'se/dummyapp/page/media/css/sample.css',
+        'se/dummyapp/page/media/img/notreferenced.png',
+        'se/dummyapp/page/media/img/test.png',
+        'se/dummyapp/page/media/js/notreferenced.js',
+        'se/dummyapp/page/media/js/sample.js',
+        'se/dummyapp/page/media/js/templates/notreferenced.html',
+        'se/dummyapp/page/media/js/templates/sample.js',
+    )
+
+    content_before = get_contents(join(
         cachedir, 'se', 'dummyapp', 'page', 'media', 'js', 'sample.js')
     )
 
@@ -384,7 +446,7 @@ def test_cache_in_debug_mode():
     sample_fh.close()
 
     pa.dumps()
-    content_after = get_contents(os.path.join(
+    content_after = get_contents(join(
         cachedir, 'se', 'dummyapp', 'page', 'media', 'js', 'sample.js')
     )
 

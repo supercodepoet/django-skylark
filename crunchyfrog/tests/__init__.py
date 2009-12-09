@@ -12,6 +12,10 @@ projectdir = os.path.join(os.path.dirname(__file__))
 
 cachedir = settings.CRUNCHYFROG_CACHE_ROOT
 
+def exist(*filelist):
+    for file in filelist:
+        assert os.path.isfile(os.path.join(cachedir, file))
+
 def get_one_file_in(path):
     started = time()
     while (time() - started < 3.0):
@@ -37,7 +41,9 @@ def get_request_fixture():
     return request
 
 def setup():
-    pass
+    settings.DEBUG = True
+    settings.CRUNCHYFROG_PLANS = 'mediadeploy'
+    settings.CRUNCHYFROG_PLANS_DEFAULT = 'default'
 
 def teardown():
     if os.path.isdir(cachedir):

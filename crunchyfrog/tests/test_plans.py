@@ -36,14 +36,13 @@ def test_can_change_deploy_plan_name():
     settings.CRUNCHYFROG_PLANS_DEFAULT = 'default'
     py.test.raises(ValueError, get_for_context, context, render_full_page)
 
-    old_debug = settings.DEBUG
     settings.DEBUG = False
     settings.CRUNCHYFROG_PLANS = 'mediadeploy_notthere'
     py.test.raises(MissingMediaPlan, get_for_context, context, render_full_page)
-    settings.DEBUG = old_debug
 
 @with_setup(setup, teardown)
 def test_deploy_reusable():
+    settings.DEBUG = False
     settings.CRUNCHYFROG_PLANS = 'mediadeploy_reusable'
 
     request = get_request_fixture()
@@ -84,7 +83,7 @@ def test_deploy_reusable():
         content.find('site.com/handheld.css')
 
 @with_setup(setup, teardown)
-def test_deploy_reusable():
+def test_deploy_fewest():
     settings.CRUNCHYFROG_PLANS = 'mediadeploy_fewest'
 
     request = get_request_fixture()
@@ -92,6 +91,23 @@ def test_deploy_reusable():
     pa = PageAssembly('planapp/page/full.yaml', c)
 
     content = pa.dumps()
+
+    exist(
+        'ff/9ecd76d6b65856eb899846a6271a527a.css',
+        'ff/f87385fc7d0a0eef92c19a7110966425.js',
+        'ff/planapp/page/media/css/gte_ie6only.css',
+        'ff/planapp/page/media/img/uses1.gif',
+        'ff/planapp/page/media/img/uses2.gif',
+        'ff/planapp/page/media/js/Controller.js',
+        'ff/planapp/page/media/js/duplicated.js',
+        'ff/planapp/page/media/js/ie7only.js',
+        'ff/planapp/page/media/js/inline.js',
+        'ff/planapp/page/media/js/notreferenced.js',
+        'ff/planapp/page/media/js/static.js',
+        'ff/planapp/page/media/js/static_uses1.js',
+        'ff/planapp/page/media/js/static_uses2.js',
+        'ff/planapp/page/media/js/View.js',
+    )
 
     jsfile = get_contents(
         os.path.join(cachedir, 'ff', 'f87385fc7d0a0eef92c19a7110966425.js')
@@ -124,3 +140,4 @@ def test_deploy_reusable():
         content.find('9ecd76d6b65856eb899846a6271a527a.css')
     assert content.find('9ecd76d6b65856eb899846a6271a527a.css') < \
         content.find('site.com/handheld.css')
+

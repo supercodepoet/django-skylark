@@ -11,12 +11,10 @@ import urllib
 import logging
 
 from django.template import Template, TemplateDoesNotExist, loader
+from django.utils.functional import memoize
 from urlparse import urljoin
 from crunchyfrog.conf import settings
 from crunchyfrog.processor import clevercss
-
-if not settings.DEBUG:
-    cssutils.ser.prefs.useMinified()
 
 class CssFormatError(Exception):
     pass
@@ -119,6 +117,10 @@ class BasePlan(object):
         raise TemplateDoesNotExist, name
 
     def __init__(self, context, render_full_page):
+        self._prepare_assets_cache = {}
+        setattr(self, '_prepare_assets', memoize(
+            self._prepare_assets, self._prepare_assets_cache, 2))
+
         self.cache_root = os.path.join(
             settings.CRUNCHYFROG_CACHE_ROOT, self.cache_prefix)
         self.cache_url = urljoin(settings.CRUNCHYFROG_CACHE_URL, '%s/' % self.cache_prefix)
@@ -225,6 +227,11 @@ class BasePlan(object):
             path = os.path.join(relative_path, urllib.url2pathname(url))
 
             return urljoin(cache_url, urllib.pathname2url(path))
+
+        if not settings.DEBUG:
+            cssutils.ser.prefs.useMinified()
+        else:
+            cssutils.ser.prefs.useDefaults()
 
         parser = cssutils.CSSParser()
         sheet = parser.parseString(css_source)
@@ -387,15 +394,13 @@ class BasePlan(object):
                 cachedirectory = os.path.join(self.cache_root, directory)
 
                 if os.path.isdir(cachedirectory):
-                    if not settings.DEBUG:
-                        continue
-
                     if self._assets_are_stale(sourcedirectory, cachedirectory):
                         shutil.rmtree(cachedirectory)
                     else:
                         continue
 
                 shutil.copytree(sourcedirectory, cachedirectory)
+
 
     def _assets_are_stale(self, sourcedirectory, cachedirectory):
         """
