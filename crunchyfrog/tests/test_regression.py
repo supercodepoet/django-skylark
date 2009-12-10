@@ -11,7 +11,6 @@ from crunchyfrog.page import PageAssembly
 from crunchyfrog.snippet import SnippetAssembly
 
 from crunchyfrog.tests import *
-from crunchyfrog.tests import mediadeploy
 
 @with_setup(setup, teardown)
 def test_issue_07():

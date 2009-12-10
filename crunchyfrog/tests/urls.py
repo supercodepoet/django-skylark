@@ -1,20 +1,13 @@
 from django.conf.urls.defaults import *
 from dummyapp.views import index
 
-# Uncomment the next two lines to enable the admin:
-# from django.contrib import admin
-# admin.autodiscover()
+from crunchyfrog.views.generic import *
+
+handler404 = render_404_from_yaml('dummyapp/handler/404.yaml')
+handler500 = render_500_from_yaml('dummyapp/handler/500.yaml')
 
 urlpatterns = patterns('',
-    # Example:
-    # (r'^example/', include('example.foo.urls')),
-
-    # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
-    # to INSTALLED_APPS to enable admin documentation:
-    # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
-    # Uncomment the next line to enable the admin:
-    # (r'^admin/', include(admin.site.urls)),
     (r'^$', 'dummyapp.views.index'),
+    (r'^badview$', 'dummyapp.views.badview'),
     (r'^planapp$', 'planapp.views.index'),
 )
