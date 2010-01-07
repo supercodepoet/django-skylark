@@ -6,6 +6,9 @@
 Welcome to CrunchyFrog's documentation!
 =======================================
 
+CrunchyFrog aims to make web development more pleasant.  Imagine web development
+is a baby dead frog; we cover it in chocolate so it goes down easier.
+
 Contents:
 
 .. toctree::
@@ -23,6 +26,7 @@ Contents:
    settings
    CleverCSS syntax reference <clevercssref>
    deployment
+   handlers
 
 
 Indices and tables

@@ -298,7 +298,7 @@ To add assests from a yaml file to the page using CrunchyFrog::
     from django import template
     from crunchyfrog.renderer import add_yaml # Add this import
 
-    register = template.Library()z
+    register = template.Library()
 
     @register.tag(name="testtag")
     def do_test(parser, token)
