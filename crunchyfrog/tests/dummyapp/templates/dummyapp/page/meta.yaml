@@ -5,3 +5,5 @@ meta:
     - key: http-equiv
       name: test
       content: test-content
+    - name: test-meta
+      content: foo

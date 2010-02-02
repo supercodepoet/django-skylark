@@ -49,7 +49,6 @@ class PageInstructions(object):
         instructions = []
         instructions.extend(self.js)
         instructions.extend(self.css)
-        instructions.extend(self.meta)
         instructions.extend(self.dojo)
 
         for instruction in instructions:
@@ -124,7 +123,7 @@ class PageInstructions(object):
 
                     if isinstance(pi_object, list):
                         for part in i_object:
-                            if attr in ('js', 'css', 'meta', 'dojo',):
+                            if attr in ('js', 'css', 'dojo',):
                                 if self._part_exists(part):
                                     continue
 

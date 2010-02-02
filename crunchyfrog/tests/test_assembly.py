@@ -244,6 +244,7 @@ def test_references_other_yaml_files():
     assert "background-color: red" in content
 
 @with_setup(setup, teardown)
+@attr('focus')
 def test_renders_meta_section():
     request = get_request_fixture()
     c = RequestContext(request, { 'foo': 'bar' })
@@ -258,7 +259,8 @@ def test_renders_meta_section():
         'se/dummyapp/page/media/js/templates/sample.js',
     )
 
-    assert content.find('<meta http-equiv="test" content="test-content">') >= 0, 'Could not locate the meta information expected'
+    assert '<meta http-equiv="test" content="test-content">' in content
+    assert '<meta name="test-meta" content="foo">' in content
 
 @with_setup(setup, teardown)
 def test_will_do_conditional_comments():
