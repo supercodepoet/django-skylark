@@ -244,7 +244,6 @@ def test_references_other_yaml_files():
     assert "background-color: red" in content
 
 @with_setup(setup, teardown)
-@attr('focus')
 def test_renders_meta_section():
     request = get_request_fixture()
     c = RequestContext(request, { 'foo': 'bar' })
