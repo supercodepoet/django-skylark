@@ -1,0 +1,17 @@
+<body>
+    <script type="text/javascript">
+        dojo.setObject('RibtTools.TestRunner.TestEntryPoints', {
+            'items':  {{ test_entry_points_json|safe }}
+        });
+    </script>
+    <div ribtType="RibtTools.TestRunner.Display.Controller" testCount="{{ test_count }}">
+        <div ribtBind="testRunner" id="testRunner">
+            <a class="control" ribtBind="run" href="#">Run</a>
+            <ul class="test-entry-points" ribtBind="testEntryPoints">
+            </ul>
+        </div>
+        <div ribtBind="subject" style="display: none;" id="subject">
+            <iframe ribtBind="subjectFrame" id="subject-frame" src={% url ribt-testrunner-subject-start %}></iframe>
+        </div>
+    </div>
+</body>

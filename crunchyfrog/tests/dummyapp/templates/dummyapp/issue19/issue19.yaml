@@ -4,7 +4,7 @@ body: dummyapp/issue19/issue19.html
 js:
     - static: dummyapp/issue19/media/js/static.js
 
-dojo:
+ribt:
     - namespace: DummyApp.Issue19
       location: dummyapp/issue19/media/js
       require: 

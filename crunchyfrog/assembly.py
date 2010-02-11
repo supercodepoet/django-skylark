@@ -8,6 +8,8 @@ from django.core.urlresolvers import resolve
 from crunchyfrog import HttpResponse, RequestContext
 from crunchyfrog.conf import settings
 from crunchyfrog.instructions import PageInstructions
+from crunchyfrog import ribt
+from crunchyfrog.ribt import check_instrumentation
 
 try:
     import tidylib
@@ -30,6 +32,9 @@ except OSError:
 class HtmlTidyErrors(Exception):
     pass
 
+class HandlerError(Exception):
+    pass
+
 class BaseAssembly(object):
     """
     The yaml files we were constructed with, this probably came from a Django
@@ -46,6 +51,12 @@ class BaseAssembly(object):
     Are we going to render as a full page or a snippet?
     """
     render_full_page = True
+
+    """
+    A list of handlers that can be used to alter the Page Assembly before it
+    renders content
+    """
+    _page_assembly_handlers = []
 
     def __init__(self, yamlfiles, context):
         if not hasattr(self, 'render_full_page'):
@@ -85,6 +96,26 @@ class BaseAssembly(object):
 
         self.context = context
 
+    @staticmethod
+    def register_handler(handler):
+        if not callable(handler):
+            raise HandlerError(
+                'Handler provided cannot be registered, it is not callable')
+        if handler in BaseAssembly._page_assembly_handlers:
+            return
+        BaseAssembly._page_assembly_handlers.append(handler)
+
+    @staticmethod
+    def unregister_handler(handler):
+        try:
+            BaseAssembly._page_assembly_handlers.remove(handler)
+        except ValueError:
+            pass
+
+    @staticmethod
+    def unregister_all():
+        BaseAssembly._page_assembly_handlers = []
+
     def __create_page_instructions(self):
         """
         Combines all the files and instructions into one object
@@ -97,11 +128,11 @@ class BaseAssembly(object):
         tried = []
 
         for file in self.yamlfiles:
-            self.__add_page_instructions(page_instructions, file)
+            self.add_page_instructions(page_instructions, file)
 
         return page_instructions
 
-    def __add_page_instructions(self, page_instructions, file):
+    def add_page_instructions(self, page_instructions, file):
         source, origin = template.loader.find_template_source(file)
         assert source, 'The template loader found the template but it is completely empty'
 
@@ -112,26 +143,44 @@ class BaseAssembly(object):
 
         page_instructions.add(instructions, file)
 
-    def __format_tidy_errors(self, document_raw, errors_raw):
+    def __convert_tidy_errors(self, errors_raw, **kwargs):
         """
         The errors we get back from the tidy are formatted for output including
         newlines in the string.  Each line is a single error, so we split on the
         line to get a list
         """
+        filter = kwargs.get('filter', None)
         line_pattern = '^line\ (?P<l>\d+)\ column\ (?P<c>\d+)\ \-\ (?P<desc>.*)$'
         line_re = re.compile(line_pattern)
 
-        errors = [ i for i in errors_raw.split('\n') if i ]
+        errors = []
+        for e in errors_raw.split('\n'):
+            try:
+                line, column, desc = line_re.match(e).groups()
+                if [ True for i in filter if i in desc]:
+                    continue
+                errors.append({
+                    'line': int(line),
+                    'column': int(column),
+                    'desc': desc,
+                })
+            except AttributeError:
+                pass
+
+        return errors
+
+    def __format_tidy_errors(self, document_raw, errors):
         document = document_raw.split('\n')
 
         for error in errors:
-            details = line_re.match(error)
             yield '%s: (%s; line %s)' % (
-                details.group('desc'),
-                document[int(details.group('l')) - 1],
-                details.group('l'),
+                error['desc'],
+                document[error['line'] - 1],
+                error['line'],
             )
 
+
+    @check_instrumentation
     def dumps(self):
         instructions = self.__create_page_instructions()
 
@@ -139,6 +188,9 @@ class BaseAssembly(object):
 
         page_renderer = renderer.get(doctype, instructions, self.context,
                                      self.render_full_page)
+
+        for handler in BaseAssembly._page_assembly_handlers:
+            handler(instructions, page_renderer, self)
 
         content = page_renderer.render()
 
@@ -149,6 +201,9 @@ class BaseAssembly(object):
             document = content
         else:
             document, errors = tidylib.tidy_document(content)
+            # We want to let the proprietary attributes slide, Ribt uses these
+            errors = self.__convert_tidy_errors(
+                errors, filter=['proprietary attribute'])
             if errors and settings.CRUNCHYFROG_RAISE_HTML_ERRORS:
                 formatted_errors = self.__format_tidy_errors(content, errors)
                 raise HtmlTidyErrors('We tried to tidy up the document and got '

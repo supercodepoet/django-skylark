@@ -1,0 +1,44 @@
+body:
+    margin: 0px
+    padding: 0px
+    background-color: #ececec
+
+#testRunner:
+    padding: 0px 18px
+    height: 48px
+    overflow: hidden
+    background: #222222;
+
+    a.control:
+        background: green
+        -moz-border-radius: 5px
+        -webkit-border-radius: 5px
+        -moz-box-shadow: 1px 1px 2px #000;
+        -webkit-box-shadow: 1px 1px 2px #000;
+        float: left
+        padding: 8px
+        margin-right: 18px
+        position: relative
+        top: 5px
+
+    ul, ol, dl, dialog:
+        margin: 0
+
+    ul.test-entry-points:
+        li:
+            background: white
+            list-style: none
+            -moz-border-radius: 5px
+            -webkit-border-radius: 5px
+            -moz-box-shadow: 1px 1px 2px #000;
+            -webkit-box-shadow: 1px 1px 2px #000;
+            float: left
+            padding: 8px
+
+        li+li:
+            margin-left: 18px
+
+#subject-frame:
+    background: white
+    border: none
+    width: 100%

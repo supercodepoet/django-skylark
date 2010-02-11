@@ -96,9 +96,11 @@ def test_creates_files_in_cache():
         'se/dummyapp/page/media/js/templates/sample.js',
     )
 
-    from crunchyfrog import clear_media_cache
+    from crunchyfrog import clear_media_cache, copy_addons
     clear_media_cache()
     assert not isdir(cachedir)
+    # And fix the addons since we just dumped them
+    copy_addons()
 
 @with_setup(setup, teardown)
 def test_can_render_an_asset():
@@ -330,57 +332,6 @@ def test_add_yaml_decorator():
 
     assert 'This is my tag test' in content
     assert '/media/cfcache/se/dummyapp/tag/media/css/screen.css" media="screen"' in content
-                              
-@with_setup(setup, teardown)
-def test_snippet_render():
-    request = get_request_fixture()
-    c = RequestContext(request, {})
-    sa = SnippetAssembly('dummyapp/snippet/snippet.yaml', c)
-
-    content = sa.dumps()
-
-    assert not '<html' in content
-    assert not '<head' in content
-    assert not '<body' in content
-    assert not '<link' in content
-
-    assert "dojo.registerModulePath('DynamicApp.Snippet'" in content
-
-    exist(
-        'se/dynamicapp/media/js/dojoloaded.js',
-        'se/dynamicapp/media/js/templates/dojoloaded.html',
-    )
-
-    assert 'This is my snippet test' in content
-
-@with_setup(setup, teardown)
-def test_dojo_renders_in_page():
-    request = get_request_fixture()
-    c = RequestContext(request, {})
-    pa = PageAssembly('dummyapp/page/dojo.yaml', c)
-
-    content = pa.dumps()
-
-    exist(
-        'se/dummyapp/page/media/img/notreferenced.png',
-        'se/dummyapp/page/media/img/test.png',
-        'se/dummyapp/page/media/js/sample.js',
-        'se/dummyapp/page/media/js/templates/notreferenced.html',
-        'se/dummyapp/page/media/js/templates/sample.js',
-        'se/dummyapp/tag/media/css/screen.css',
-        'se/dummyapp/tag/media/img/testimage.png',
-        'se/dummyapp/tag/media/js/templates/test.html',
-        'se/dynamicapp/media/js/dojoloaded.js',
-        'se/dynamicapp/media/js/templates/dojoloaded.html',
-    )
-
-    assert "dojo.registerModulePath('DynamicApp.Page'" in content
-    assert "dojo.require('DynamicApp.Page.Controller');" in content
-    assert "dojo.require('DynamicApp.Page.View');" in content
-    assert 'dummyapp/tag/media/css/screen.css' in content
-    assert 'dummyapp/page/media/js/sample.js' in content
-    assert 'media/cfcache/se/dynamicapp' in content
-
 
 @with_setup(setup, teardown)
 def test_bad_html():
@@ -456,3 +407,49 @@ def test_cache_in_debug_mode():
     os.remove(temp_path)
 
     assert content_before != content_after
+
+global handler_called
+handler_called = False
+
+@with_setup(setup, teardown)
+def test_can_register_handlers():
+    def handler(page_instructions, renderer, assembly):
+        global handler_called
+        assembly.add_page_instructions(
+            page_instructions, 'dummyapp/page/uses.yaml')
+        handler_called = True
+        assert page_instructions.other_yaml == ['dummyapp/page/uses.yaml']
+        assert page_instructions.uses_yaml == []
+        assert page_instructions.root_yaml == 'dummyapp/page/sample.yaml'
+
+    request = get_request_fixture()
+    c = RequestContext(request, { 'foo': 'bar' })
+    pa = PageAssembly('dummyapp/page/sample.yaml', c)
+
+    pa.register_handler(handler)
+    # Make sure we can't get a dupe
+    pa.register_handler(handler)
+
+    assert len(BaseAssembly._page_assembly_handlers) == 1
+
+    content = pa.dumps()
+
+    assert handler_called
+
+    pa.unregister_all()
+
+    assert len(BaseAssembly._page_assembly_handlers) == 0
+
+@with_setup(setup, teardown)
+def test_can_unregister_handlers():
+    def handler(page_instructions, renderer, assembly):
+        pass
+
+    request = get_request_fixture()
+    c = RequestContext(request, { 'foo': 'bar' })
+    pa = PageAssembly('dummyapp/page/sample.yaml', c)
+
+    pa.register_handler(handler)
+    pa.unregister_handler(handler)
+
+    assert len(BaseAssembly._page_assembly_handlers) == 0

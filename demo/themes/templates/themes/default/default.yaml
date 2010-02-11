@@ -1,0 +1,3 @@
+css:
+    - static: themes/default/media/css/baseline.compress.css
+    - static: themes/default/media/css/default.css

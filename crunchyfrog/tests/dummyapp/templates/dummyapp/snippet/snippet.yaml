@@ -1,6 +1,6 @@
 body: dummyapp/snippet/snippet.html
 
-dojo:
+ribt:
     - namespace: DynamicApp.Snippet
       location: dynamicapp/media/js
       require: 

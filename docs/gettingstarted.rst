@@ -11,19 +11,19 @@ to `Django installation guide`_ and get a handle on this.
 
 ::
     
-    django-admin.py startproject whizzochocolates 
+    django-admin.py startproject demo 
 
 If we do a directory listing, you should see something like this::
 
-    whizzochocolates
-    whizzochocolates/__init__.py
-    whizzochocolates/manage.py
-    whizzochocolates/settings.py
-    whizzochocolates/urls.py
+    demo
+    demo/__init__.py
+    demo/manage.py
+    demo/settings.py
+    demo/urls.py
 
 Let's change directories into our new project. ::
 
-    cd whizzochocolates
+    cd demo
 
 Great, we've got a Django project started.  Let's install Django CrunchyFrog.
     
@@ -64,7 +64,7 @@ You should see this if all goes well. ::
     Validating models...
     0 errors found
 
-    Django version 1.1 beta 1, using settings 'whizzochocolates.settings'
+    Django version 1.1 beta 1, using settings 'demo.settings'
     Development server is running at http://127.0.0.1:8000/
     Quit the server with CONTROL-C.
 
@@ -97,7 +97,7 @@ doing. ::
 
     We can create this for you and continue from here if you like.
                                                            
-    Create /Users/robmadole/Development/workbench/crunchytutorial/whizzochocolates/goodies/templates (yes/no)? 
+    Create /Users/robmadole/Development/workbench/crunchytutorial/demo/goodies/templates (yes/no)? 
 
 Tell it ``yes`` so it will create the missing templates directory. ::
 
@@ -158,7 +158,7 @@ Edit ``urls.py`` for the main project ::
 
     urlpatterns = patterns('',
         # Example:
-        # (r'^whizzochocolates/', include('whizzochocolates.foo.urls')),
+        # (r'^demo/', include('demo.foo.urls')),
 
         # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
         # to INSTALLED_APPS to enable admin documentation:

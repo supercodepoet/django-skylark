@@ -46,8 +46,8 @@ def test_issue_19():
     files within the cfcache.  The reason that this creates a problem, is that
     the directory may be created by another directive like js: -file:
     app/page/media/js/file.js and then another directive may add content to
-    that same directory dojo: -location: app/page/media/js. The first js
-    will create the directory and the dojo section will then be skipped.
+    that same directory ribt: -location: app/page/media/js. The first js
+    will create the directory and the ribt section will then be skipped.
     """
     settings.DEBUG = False
     settings.CRUNCHYFROG_PLANS = 'mediadeploy'

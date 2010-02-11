@@ -1,0 +1,8 @@
+uses:
+    - file: ribt/tools.yaml
+
+js:
+    - static: ribt/testrunner/media/js/events.js
+    - static: ribt/testrunner/media/js/channel.js
+    - static: ribt/testrunner/media/js/collector.js
+    - static: ribt/testrunner/media/js/testcase.js

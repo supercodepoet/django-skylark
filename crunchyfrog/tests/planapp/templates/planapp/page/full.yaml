@@ -32,7 +32,7 @@ css:
     - inline: planapp/page/media/css/inline.css
       media: screen
 
-dojo:
+ribt:
     - namespace: PlanApp.Page
       location: planapp/page/media/js
       require: 

@@ -1,6 +1,9 @@
 <script type="text/javascript">
     //<![CDATA[
     // Injected by Django CrunchyFrog
-    var $CF = { MEDIA_URL: "{{ cache_url }}{{ prepared_instructions.cache_prefix }}" }
+    var $CF = {
+        MEDIA_URL: "{{ cache_url }}{{ prepared_instructions.cache_prefix }}",
+        INSTRUMENTED: {{ is_instrumented|lower }}
+    }
     //]]>
 </script>

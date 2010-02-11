@@ -7,6 +7,7 @@ from django.core.management import setup_environ
 import settings as settings_module
 setup_environ(settings_module)
 from django.conf import settings
+from crunchyfrog import copy_addons
 
 projectdir = os.path.join(os.path.dirname(__file__))
 
@@ -46,5 +47,11 @@ def setup():
     settings.CRUNCHYFROG_PLANS_DEFAULT = 'default'
 
 def teardown():
-    if os.path.isdir(cachedir):
-        shutil.rmtree(cachedir)
+    # Remove everything but the addons
+    skip = ['addon']
+    try:
+        for topdir in os.listdir(cachedir):
+            if topdir in skip: continue
+            shutil.rmtree(os.path.join(cachedir, topdir))
+    except OSError:
+        pass

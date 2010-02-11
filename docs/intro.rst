@@ -17,7 +17,7 @@ It's not Flex_, Sproutcore_, or Cappuccino_.  Instead it's somewhere in between
 those tools and stringing together Javascript, HTML, CSS, and images.
 
 The intent is to make web development easier.  To simplify the things we do all
-the time and to prevent the spaghetti code that typically somes about when you
+the time and to prevent the spaghetti code that typically comes about when you
 try and create Web 2.0 applications from scratch.
 
 Page assemblies

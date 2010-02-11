@@ -1,0 +1,9 @@
+css:
+    - static: ribt/testrunner/media/css/baseline.compress.css
+    - static: ribt/testrunner/media/css/testrunner.css
+      process: clevercss
+
+js:
+    - inline: ribt/testrunner/media/js/config.js
+    - static: ribt/testrunner/media/js/events.js
+    - static: ribt/testrunner/media/js/channel.js

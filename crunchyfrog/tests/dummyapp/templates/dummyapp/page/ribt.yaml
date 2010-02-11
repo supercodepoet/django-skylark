@@ -1,0 +1,17 @@
+title: Testing that Dojo requirements get rendered to the page
+body: dummyapp/page/ribt.html
+
+uses:
+    - file: ribt/tools.yaml
+
+js:
+    - static: dummyapp/page/media/js/sample.js
+
+ribt:
+    - namespace: DynamicApp.Page
+      location: dynamicapp/media/js
+      require: 
+        - DynamicApp.Page.Controller
+        - DynamicApp.Page.View
+      tests:
+        - DynamicApp.Page.Test

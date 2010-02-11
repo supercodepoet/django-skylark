@@ -17,15 +17,27 @@
         {% endif %}
     {% endfor %}
 {% endif %}
-{% if prepared_instructions.dojo %}
+{% if prepared_instructions.ribt %}
     <!-- Dojo Toolkit dynamic loading output -->
     <script type="text/javascript">
     //<![CDATA[
-    {% for dojo in prepared_instructions.dojo %}
-    dojo.registerModulePath('{{ dojo.namespace }}', '{{ cache_url }}{{ prepared_instructions.cache_prefix }}{{ dojo.location }}');
-        {% for requirement in dojo.require %}
+    {% for ribt in prepared_instructions.ribt %}
+    dojo.registerModulePath('{{ ribt.namespace }}', '{{ cache_url }}{{ prepared_instructions.cache_prefix }}{{ ribt.location }}');
+        {% for requirement in ribt.require %}
             dojo.require('{{ requirement }}');
         {% endfor %}
+        {% if is_instrumented %}
+            (function() {
+                if (RibtTools.TestRunner.TestCaseCollector) {
+                    var collector = RibtTools.TestRunner.TestCaseCollector;
+                    {% for testcase in ribt.tests %}
+                        collector.add('{{ testcase }}');
+                    {% endfor %}
+
+                    dojo.addOnLoad(function() { collector.kickoff(); });
+                }
+            })()
+        {% endif %}
     {% endfor %}
     //]]>
     </script>

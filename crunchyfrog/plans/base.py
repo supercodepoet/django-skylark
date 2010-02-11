@@ -15,6 +15,7 @@ from django.utils.functional import memoize
 from urlparse import urljoin
 from crunchyfrog.conf import settings
 from crunchyfrog.processor import clevercss
+from crunchyfrog import ribt
 
 class CssFormatError(Exception):
     pass
@@ -380,7 +381,7 @@ class BasePlan(object):
                     # be relative to the YAML file
                     #
                     # This is quite possible if the yaml file is processing a
-                    # "dojo:" attribute.
+                    # "ribt:" attribute.
                     try:
                         sourcedirectory = find_directory_from_loader(page_instructions, asset)
                         # We need to reset this, it has the yaml_basedir on it
@@ -437,23 +438,28 @@ class BasePlan(object):
         """
         self.prepared_instructions['meta'] = page_instructions.meta
 
-    def prepare_dojo(self, page_instructions):
+    def prepare_ribt(self, page_instructions):
+        ribt_instructions = page_instructions.ribt
 
-        dojo = page_instructions.dojo
+        self.prepared_instructions['ribt'] = ribt_instructions
 
-        self.prepared_instructions['dojo'] = dojo
-
-        for dojo_module in dojo:
-            assert 'namespace' in dojo_module, ('You are missing the '
+        for ribt_module in ribt_instructions:
+            assert 'namespace' in ribt_module, ('You are missing the '
                 'namespace attribute for this item')
-            assert 'location' in dojo_module, ('You are missing the '
+            assert 'location' in ribt_module, ('You are missing the '
                  'location attribute for this item')
-            assert 'require' in dojo_module, ('You are missing the '
+            assert 'require' in ribt_module, ('You are missing the '
                  'require list for this item')
 
-            namespace = dojo_module['namespace']
-            location = dojo_module['location']
-            require = dojo_module['require']
+            namespace = ribt_module['namespace']
+            location = ribt_module['location']
+            require = ribt_module['require']
+
+            tests = []
+            if ribt.is_instrumented():
+                tests = ribt_module.get('tests', tests)
+
+            require.extend(tests)
 
             """
             We're going to copy all the files that are in this directory to the
@@ -472,7 +478,7 @@ class BasePlan(object):
         self.prepare_js(page_instructions)
         self.prepare_css(page_instructions)
         self.prepare_meta(page_instructions)
-        self.prepare_dojo(page_instructions)
+        self.prepare_ribt(page_instructions)
 
         return self.prepared_instructions
 

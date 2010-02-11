@@ -11,6 +11,8 @@ docs/_build
 dist/*
 *.coverage
 .noseids
+ext/dojo-release*
+demo/media/cfcache
 
 syntax: regexp
 ^parts/.*

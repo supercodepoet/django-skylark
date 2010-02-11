@@ -1,6 +1,6 @@
 body: dummyapp/issue07/issue07.html
 
-dojo:
+ribt:
     - namespace: DummyApp.Issue07
       location: dummyapp/issue07/media/js
       require: 

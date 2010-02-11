@@ -1,0 +1,13 @@
+title: Beginning Ribt tests
+body: ribt/testrunner/subjectstart/subjectstart.html
+
+uses:
+    - file: ribt/tools.yaml
+    - file: ribt/testrunner/testrunner.yaml
+
+ribt:
+    - namespace: RibtTools.TestRunner.SubjectStart
+      location: ribt/testrunner/subjectstart/media/js
+      require:
+        - RibtTools.TestRunner.SubjectStart.Controller
+        - RibtTools.TestRunner.SubjectStart.View

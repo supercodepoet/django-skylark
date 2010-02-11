@@ -9,6 +9,8 @@ Welcome to CrunchyFrog's documentation!
 CrunchyFrog aims to make web development more pleasant.  Imagine web development
 is a baby dead frog; we cover it in chocolate so it goes down easier.
 
+.. todolist::
+
 Contents:
 
 .. toctree::
@@ -21,13 +23,13 @@ Contents:
    ieversion
    uses
    meta
+   ribt/mvc
    snippets
    cfjsbridge
    settings
    CleverCSS syntax reference <clevercssref>
    deployment
    handlers
-
 
 Indices and tables
 ==================

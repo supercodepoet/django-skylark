@@ -1,0 +1,49 @@
+<body class="page-form">
+    <div id="page" class="layout-grid">
+        <h1>What kind of goodies do we have here?</h1>
+
+        <div ribtType="Whizzo.Goodies.List.Controller" favorite="{{ confection }}">
+            <ul>
+                <li><a href="#tabs-cf">Crunchy Frog</a></li>
+                <li><a href="#tabs-rbc">Ram's Bladder Cup</a></li>
+                <li><a href="#tabs-lv">Lark's Vomit</a></li>
+                <li><a href="#tabs-cc">Cockroach Cluster</a></li>
+                <li><a href="#tabs-ar">Anthrax Ripple</a></li>
+                <li><a href="#tabs-ss">Spring Surprise</a></li>
+            </ul>
+
+            <div id="tabs-cf">
+                <div class="width4">
+                    Only the finest baby frogs, dew picked and flown from Iraq,
+                    cleansed in finest quality spring water, lightly killed, and then
+                    sealed in a succulent Swiss quintuple smooth treble cream milk
+                    chocolate envelope and lovingly frosted with glucose
+                </div>
+
+                <fieldset class="width2">
+                    <legend>Tell us about your frog experience</legend>
+                    <label class="width2 field-first first">How many have you eaten?
+                        <input type="text" ribtBind="numberFrogsEaten" />
+                    </label>
+                </fieldset>
+
+                <button ribtBind="tellUsAboutFrogs">Tell us about it</button>
+            </div>
+            <div id="tabs-rbc">
+                Ram's Bladder Cup
+            </div>
+            <div id="tabs-lv">
+                Lark's Vomit
+            </div>
+            <div id="tabs-cc">
+                Cockroach Cluster
+            </div>
+            <div id="tabs-ar">
+                Anthrax Ripple
+            </div>
+            <div id="tabs-ss">
+                Spring Suprise
+            </div>
+        </div>
+    </div>
+</body>

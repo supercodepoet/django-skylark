@@ -38,7 +38,7 @@ class PageInstructions(object):
         self.js         = []
         self.css        = []
         self.meta       = []
-        self.dojo       = []
+        self.ribt       = []
 
     def _part_exists(self, part):
         """
@@ -49,7 +49,7 @@ class PageInstructions(object):
         instructions = []
         instructions.extend(self.js)
         instructions.extend(self.css)
-        instructions.extend(self.dojo)
+        instructions.extend(self.ribt)
 
         for instruction in instructions:
             if self._get_source_attribute(instruction) == self._get_source_attribute(part):
@@ -95,6 +95,15 @@ class PageInstructions(object):
             # If this is the first time we see this, it's got to be the root
             self.root_yaml = sourcefile
 
+        if not sourcefile == self.root_yaml:
+            # This must be coming from our add_yaml decorator or from someone
+            # who is invoking the add method through
+            # PageAssembly.add_page_instruction.  We need to put this in the
+            # proper spot though, so make sure we aren't adding this to the
+            # other_yaml dictionary if it's already in the uses_yaml dictionary
+            if not sourcefile in self.uses_yaml:
+                self.other_yaml.append(sourcefile)
+
         """
         Adds the instructions from one YAML file to this object, combining
         it with what's already here
@@ -105,25 +114,27 @@ class PageInstructions(object):
         for instruction in instructions:
             if instruction.has_key('uses'):
                 for uses in instruction['uses']:
+                    if uses['file'] == self.root_yaml or \
+                       uses['file'] in self.other_yaml or \
+                       uses['file'] in self.uses_yaml:
+                        # We've already seen this guy, there is no reason to add
+                        # this YAML again
+                        continue
                     self.uses_yaml.append(uses['file'])
                     self.add(
                         self.__get_object(uses['file'], self.context),
                         uses['file']
                     )
-            else:
-                if not sourcefile == self.root_yaml:
-                    # This must be coming from our add_yaml decorator
-                    self.other_yaml.append(sourcefile)
 
             for attr in ('doctype', 'js', 'css', 'body', 'title', 'meta',
-                         'dojo'):
+                         'ribt'):
                 if instruction.has_key(attr):
                     pi_object = getattr(self, attr)
                     i_object  = instruction[attr]
 
                     if isinstance(pi_object, list):
                         for part in i_object:
-                            if attr in ('js', 'css', 'dojo',):
+                            if attr in ('js', 'css', 'ribt',):
                                 if self._part_exists(part):
                                     continue
 

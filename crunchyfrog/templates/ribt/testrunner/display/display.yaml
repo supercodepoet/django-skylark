@@ -1,0 +1,17 @@
+title: Ribt test runner
+body: ribt/testrunner/display/display.html
+
+uses: 
+    - file: ribt/tools.yaml
+    - file: ribt/testrunner/testrunner.yaml
+
+css:
+    - static: ribt/testrunner/media/css/baseline.compress.css
+
+ribt:
+    - namespace: RibtTools.TestRunner.Display
+      location: ribt/testrunner/display/media/js
+      require:
+        - RibtTools.TestRunner.Display.Controller
+        - RibtTools.TestRunner.Display.View
+        - RibtTools.TestRunner.Display.TestEntryPoint

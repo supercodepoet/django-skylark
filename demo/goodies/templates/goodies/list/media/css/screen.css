@@ -1,0 +1,12 @@
+#page:
+    color: #333333
+    margin: 0 auto
+    padding: 0 18px
+    width: 1015px
+
+.ui-tabs:
+    padding-top: 0px
+
+    .ui-tabs-nav:
+        margin-left: 3px
+        margin-right: 3px

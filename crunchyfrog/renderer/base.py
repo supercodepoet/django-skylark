@@ -4,10 +4,11 @@ import yaml
 from django.template import Template, loader
 from crunchyfrog import plans
 from crunchyfrog.conf import settings
+from crunchyfrog import ribt
 
 def add_yaml(yamlfile):
     """
-    Template tag that can be used to add crunchy dependencies out side the normal PageAssembly
+    Decorator that can be used to add crunchy dependencies out side the normal PageAssembly
     """
     def render_yaml(yamlfile, page_instructions, context):
         source, origin = loader.find_template_source(yamlfile)
@@ -67,6 +68,7 @@ class Renderer(object):
 
         This return a string representing the HTML or similar output
         """
+
         assert self.page_instructions.body, 'The body has not been specified in the page instructions (body: in your yaml file)'
 
         if self.render_full_page:
@@ -80,5 +82,6 @@ class Renderer(object):
         render_context['cache_url'] = settings.CRUNCHYFROG_CACHE_URL
         render_context['doctype'] = self.doctype
         render_context['prepared_instructions'] = prepared_instructions
+        render_context['is_instrumented'] = ribt.is_instrumented()
 
         return self.template.render(render_context)
