@@ -6,11 +6,9 @@ dojo.declare('RibtTools.TestRunner.SubjectStart.Controller', RibtTools.Mvc.Contr
     constructor: function(domNode) {
         this.view = new RibtTools.TestRunner.SubjectStart.View(domNode);
 
-        this.channel = RibtTools.TestRunner.Channel;
-
         dojo.subscribe(RibtTools.TestRunner.Events.TestCount, this, this.handleTestCount);
 
-        this.channel.publish(RibtTools.TestRunner.Events.SubjectFrame.Ready);
+        dojo.publish(RibtTools.TestRunner.Events.SubjectFrame.Ready);
     },
 
     handleTestCount: function(testCount) {

@@ -80,6 +80,8 @@ def copy_addons():
     mediadir = ['templates', 'ribt', 'media',]
     dojodir = os.path.join(thisdir, *(mediadir + ['dojo']))
     shutil.copytree(dojodir, os.path.join(addondir, 'dojo'))
+    dojoxdir = os.path.join(thisdir, *(mediadir + ['dojox']))
+    shutil.copytree(dojoxdir, os.path.join(addondir, 'dojox'))
 
 if settings.CRUNCHYFROG_DOJO_COPY_INTERNALBUILD and not __copy_addons:
     copy_addons()

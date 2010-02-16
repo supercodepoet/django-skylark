@@ -62,7 +62,7 @@ def test_ribt_renders_in_page():
 
     exist(
         'addon/dojo/dojo.js',
-        'addon/dojo/dojox_for_ribt.js',
+        'addon/dojox/timing/_base.js',
         'se/dummyapp/page/media/img/notreferenced.png',
         'se/dummyapp/page/media/img/test.png',
         'se/dummyapp/page/media/js/sample.js',

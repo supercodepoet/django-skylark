@@ -29,7 +29,7 @@ dojo.declare('RibtTools.TestRunner.Display.View', RibtTools.Mvc.View, {
     },
 
     /**
-     *
+     * Show the test runner and the subject frame
      */
     showAll: function() {
         dojo.style(this.testRunner, 'display', 'block');
@@ -37,13 +37,28 @@ dojo.declare('RibtTools.TestRunner.Display.View', RibtTools.Mvc.View, {
     },
 
     /**
+     * Shows the test entry points we are preparing to test
      *
+     * @param teps Array of test entry points
      */
     showTestEntryPoints: function(teps) {
         dojo.forEach(teps, function(tep) {
             node = dojo.create('li', { innerHTML: tep.name }, this.testEntryPoints, 'last');
             tep.setNode(node);
         }, this);
+    },
+
+    /**
+     * All tests are done, show the results
+     *
+     * @params results An array of results from all the tests for all test entry points
+     */
+    displayResults: function(results) {
+        dojo.forEach(results, dojo.hitch(this, function(result) {
+            if (result.failures.length > 0) {
+                dojo.style(result.testEntryPoint.node, 'color', '#FF0000');
+            }
+        }));
     },
 
     /**

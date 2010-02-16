@@ -11,11 +11,11 @@ js:
     {% endif %}
     {% if not crunchyfrog_internals.settings.CRUNCHYFROG_DOJO_VIA_CDN_AOL and not crunchyfrog_internals.settings.CRUNCHYFROG_DOJO_VIA_URL and not crunchyfrog_internals.settings.CRUNCHYFROG_DOJO_VIA_PATH and crunchyfrog_internals.settings.CRUNCHYFROG_DOJO_VIA_INTERNALBUILD %}
     - url: {{ crunchyfrog_internals.settings.CRUNCHYFROG_CACHE_URL }}addon/dojo/dojo.js.uncompressed.js
-    - url: {{ crunchyfrog_internals.settings.CRUNCHYFROG_CACHE_URL }}addon/dojo/dojox_for_ribt.js.uncompressed.js
     {% endif %}
     - static: ribt/media/tools/base.js
     - static: ribt/media/tools/subscriptioncache.js
     - static: ribt/media/tools/parser.js
+    - static: ribt/media/tools/synctimer.js
     - static: ribt/media/tools/events.js
     - static: ribt/media/tools/controller.js
     - static: ribt/media/tools/view.js

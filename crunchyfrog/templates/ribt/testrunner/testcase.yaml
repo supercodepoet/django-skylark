@@ -2,7 +2,13 @@ uses:
     - file: ribt/tools.yaml
 
 js:
+    - static: ribt/testrunner/media/js/logger.js
     - static: ribt/testrunner/media/js/events.js
     - static: ribt/testrunner/media/js/channel.js
     - static: ribt/testrunner/media/js/collector.js
     - static: ribt/testrunner/media/js/testcase.js
+    - static: ribt/testrunner/media/js/action/base.js
+    - static: ribt/testrunner/media/js/action/when.js
+    - static: ribt/testrunner/media/js/action/wait.js
+    - static: ribt/testrunner/media/js/action/exists.js
+    - static: ribt/testrunner/media/js/action/then.js

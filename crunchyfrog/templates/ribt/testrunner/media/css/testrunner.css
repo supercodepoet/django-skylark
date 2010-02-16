@@ -3,7 +3,10 @@ body:
     padding: 0px
     background-color: #ececec
 
-#testRunner:
+#test-runner-wrapper:
+    padding: 0;
+
+#test-runner:
     padding: 0px 18px
     height: 48px
     overflow: hidden
@@ -37,6 +40,9 @@ body:
 
         li+li:
             margin-left: 18px
+
+#subject:
+    padding: 0
 
 #subject-frame:
     background: white
