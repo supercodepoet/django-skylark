@@ -18,12 +18,15 @@ fi
 
 if [ -f "$BUILDDIR/$BUILD" ]; then
     cd $BUILDDIR
-    ./$BUILD action=clean,release dojodir=../../../$DOJODIR profileFile=../../../$PROFILE releaseDir=../../../$DESTDIR version=$DOJORELEASEVERSION optimize=none copyTests=false
+    ./$BUILD action=clean,release dojodir=../../../$DOJODIR profileFile=../../../$PROFILE releaseDir=../../../$DESTDIR version=$DOJORELEASEVERSION optimize=none copyTests=true
     cd ../../../$DESTDIR/dojo
     # And we don't need the dojox directory, so trash it
-    rm -rf dojox
     rm -rf ../../dojo
+    rm -rf ../../dojox
+    rm -rf ../../util
     mv dojo ../../
+    mv dojox ../../
+    mv util ../../
     cd ../../
     rm -rf _build
 fi
