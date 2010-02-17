@@ -47,6 +47,10 @@ dojo.declare('RibtTools.Mvc.Controller', null, {
             dojo.attr(this.domNode, 'ribtType', this.declaredClass);
         }
 
+        if (dojo.attr(this.domNode, 'ribtBind') || dojo.attr(this.domNode, 'ribtGroup')) {
+            throw new RibtToolsError('You cannot use ribtBind or ribtGroup on the same node as ribtType');
+        }
+
         if (params) {
             this._params = {};
             // Go through the domNode and pull out variables on the root

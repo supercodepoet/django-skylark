@@ -100,7 +100,7 @@ dojo.declare('RibtTools.Mvc.Parser', null, {
             // can be intelligent about how we destroy the view and controller
             element._controller = obj;
         } catch (e) {
-            throw new RibtToolsError('Unable to create an instance of ' + ribtType + ' after we ran across a ribtType attribute telling us to do so');
+            throw new RibtToolsError('Unable to create an instance of ' + ribtType + ', error was: ' + e.message);
         }
     },
 
