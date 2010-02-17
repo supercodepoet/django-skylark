@@ -23,6 +23,7 @@ class PageInstructions(object):
     """
     def __init__(self, **kwargs):
         self.render_full_page = kwargs.get('render_full_page', True)
+        self.loading_via_xhr = kwargs.get('loading_via_xhr', False)
         self.context = kwargs.get('context_instance', template.Context())
 
         """

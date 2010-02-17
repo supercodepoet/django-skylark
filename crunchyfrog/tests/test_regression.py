@@ -64,3 +64,11 @@ def test_issue_19():
         'rf/dummyapp/issue19/media/js/Class.js',
         'rf/dummyapp/issue19/media/js/templates/file.html',
     )
+
+@with_setup(setup, teardown)
+def test_issue_23():
+    request = get_request_fixture()
+    c = RequestContext(request, {})
+    pa = PageAssembly('dummyapp/issue23/issue23.yaml', c)
+
+    assert 'dummyapp/issue23/media/js/tt_after_sa.js' in pa.dumps()

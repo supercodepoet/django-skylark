@@ -172,6 +172,8 @@ def test_ribt_includes_tests():
 
     ribt.instrument_site(False)
 
+    c = RequestContext(request, {})
+    pa = PageAssembly('dummyapp/page/ribt.yaml', c)
     content = pa.dumps()
 
     assert "dojo.require('DynamicApp.Page.Test')" not in content
