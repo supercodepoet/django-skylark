@@ -13,6 +13,7 @@ dist/*
 .noseids
 ext/dojo-release*
 demo/media/cfcache
+crunchyfrog/tests/media/cfcache
 
 syntax: regexp
 ^parts/.*

@@ -33,11 +33,6 @@ def check_instrumentation(meth):
             # testing
             instrument_site(True)
 
-        if not settings.CRUNCHYFROG_RIBT_INSTRUMENTED and \
-           is_instrumented():
-            # The user wants instrumentation off
-            instrument_site(False)
-
         return meth(*args, **kwargs)
     return check
 
@@ -143,6 +138,10 @@ class TestRegistry(object):
         if not url in self:
             self._tests.append(TestEntryPoint(
                 url=url, name=kwargs.get('name', None)))
+
+    def clear(self):
+        for test in self._tests:
+            self._tests.remove(test)
 
     def __contains__(self, key):
         url = key in [ tep.url for tep in self._tests ]

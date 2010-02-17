@@ -282,7 +282,7 @@ def test_will_tidy_output():
     request = get_request_fixture()
     c = RequestContext(request)
     pa = PageAssembly('dummyapp/page/sample.yaml', c)
-    assert len(pa.dumps().split("\n")) == 40 
+    assert len(pa.dumps().split("\n")) == 43 
 
 @with_setup(setup, teardown)
 def test_will_use_correct_doctype():
@@ -341,7 +341,7 @@ def test_bad_html():
 
     e = py.test.raises(HtmlTidyErrors, pa.dumps)
 
-    assert 'line 22' in str(e.value)
+    assert 'line 25' in str(e.value)
     assert "Warning: <tag> missing '>'" in str(e.value)
 
     settings.CRUNCHYFROG_RAISE_HTML_ERRORS = False
