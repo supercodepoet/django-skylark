@@ -14,7 +14,7 @@ dojo.setObject('ribt', {
         var nameParts = name.split('.');
 
         for (var i in evs) {
-            var e = evs[i]; if (typeof e == 'function') { continue; }
+            var e = evs[i]; if (dojo.isFunction(e)) { continue; }
 
             eventParts = nameParts.concat(e.split('.'));
             dojo.setObject(eventParts.join('.'), dojo.map(eventParts, lower).join('::'));

@@ -187,7 +187,7 @@ dojo.declare('_RibtTools.TestRunner.Channel', null, {
     dumpQueue: function() {
         for (var i in this.queue.publish) {
             var pair = this.queue.publish[i];
-            if (typeof pair == 'function') { continue; }
+            if (dojo.isFunction(pair)) { continue; }
             this.publish(pair[0], pair[1]);
         }
         this.queue.publish = [];

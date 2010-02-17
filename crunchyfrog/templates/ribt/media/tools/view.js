@@ -52,7 +52,7 @@ dojo.declare('RibtTools.Mvc.View', null, {
             if (!handlers) { return; }
 
             for (i in handlers) {
-                var handler  = handlers[i]; if (typeof handler == 'function') { continue; }
+                var handler  = handlers[i]; if (dojo.isFunction(handler)) { continue; }
                 var funcName = handler.funcName;
                 var context  = {'scope': this, 'name': funcName, 'func': handler.func};
 
@@ -67,7 +67,7 @@ dojo.declare('RibtTools.Mvc.View', null, {
      */
     _unbind: function() {
         for (var i in this._bindHandles) {
-            var bindHandle = this._bindHandles[i]; if (typeof bindHandle == 'function') { continue; }
+            var bindHandle = this._bindHandles[i]; if (dojo.isFunction(bindHandle)) { continue; }
             dojo.forEach(bindHandle, function(eventHandle) {
                 dojo.disconnect(eventHandle);
             });
@@ -88,7 +88,7 @@ dojo.declare('RibtTools.Mvc.View', null, {
         for (var funcName in this) {
             var func = this[funcName];
 
-            if (typeof(func) != 'function' || funcName.indexOf('_') == 0) {
+            if (!dojo.isFunction(func) || funcName.indexOf('_') == 0) {
                 continue
             };
 

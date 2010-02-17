@@ -223,7 +223,7 @@ dojo.declare('RibtTools.Mvc.Controller', null, {
         for (var i in delegates) {
             var delegate = delegates[i];
 
-            if (typeof delegate == 'function') { continue; }
+            if (dojo.isFunction(delegate)) { continue; }
 
             if (delegate.view == view) { return true; }
 

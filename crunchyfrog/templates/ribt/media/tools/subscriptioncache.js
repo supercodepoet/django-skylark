@@ -13,10 +13,10 @@ dojo.declare('RibtTools.Mvc.SubscriptionCache', null, {
         // and method objects.  Makes this more flexible (debatable if this is a
         // good idea but we want to match our parent framework because
         // developers will be accustomed to it)
-        if (typeof(context) == 'function') {
+        if (dojo.isFunction(context)) {
             // Our context IS the function
             return context;
-        } else if (typeof(method) == 'function') {
+        } else if (dojo.isFunction(method)) {
             return method;
         } else {
             return context[method];
