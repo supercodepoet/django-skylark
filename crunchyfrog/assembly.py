@@ -53,11 +53,6 @@ class BaseAssembly(object):
     render_full_page = True
 
     """
-    Are we loading this page via ajax?
-    """
-    loading_via_xhr = False
-
-    """
     A list of handlers that can be used to alter the Page Assembly before it
     renders content
     """
@@ -66,10 +61,6 @@ class BaseAssembly(object):
     def __init__(self, yamlfiles, context):
         if not hasattr(self, 'render_full_page'):
             raise ValueError('You must set render_full_page to True '
-                'or False on the subclass of BaseAssembly')
-
-        if not hasattr(self, 'loading_via_xhr'):
-            raise ValueError('You must set loading_via_xhr to True '
                 'or False on the subclass of BaseAssembly')
 
         if not isinstance(context, RequestContext):
@@ -134,7 +125,6 @@ class BaseAssembly(object):
         else:
             page_instructions = PageInstructions(
                 render_full_page=self.render_full_page,
-                loading_via_xhr=self.loading_via_xhr,
                 context_instance=self.context
             )
 
