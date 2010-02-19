@@ -110,16 +110,6 @@ def test_ribt_dojo_settings():
 
     settings.CRUNCHYFROG_DOJO_VIA_URL = None
 
-    settings.CRUNCHYFROG_DOJO_VIA_PATH = '/media/somedojohere/dojo.js'
-
-    request = get_request_fixture()
-    c = RequestContext(request, {})
-    pa = PageAssembly('dummyapp/page/ribt.yaml', c)
-    content = pa.dumps()
-    assert '/media/somedojohere/dojo.js' in content
-
-    settings.CRUNCHYFROG_DOJO_VIA_PATH = None
-
 @with_setup(setup, teardown_ribt)
 def test_ribt_test_registry_add():
     py.test.raises(ribt.RibtError, ribt.test_registry.add, None)

@@ -1,5 +1,6 @@
 import py.test
 import os
+from time import sleep
 
 from nose.tools import with_setup
 from nose.plugins.attrib import attr
@@ -8,6 +9,7 @@ from django.template import TemplateDoesNotExist
 
 from crunchyfrog import *
 from crunchyfrog import ribt
+from crunchyfrog import loader
 from crunchyfrog.page import PageAssembly
 from crunchyfrog.plans import *
 from crunchyfrog.plans.separate import SeparateEverything
@@ -188,7 +190,7 @@ def test_deploy_fewest_instrumented():
 
     ribt.instrument_site(False)
 
-@attr('focus')
+@with_setup(setup, teardown)
 def test_missing_rollup_requirement():
     settings.CRUNCHYFROG_PLANS = 'mediadeploy_fewest'
 
@@ -197,3 +199,49 @@ def test_missing_rollup_requirement():
     pa = PageAssembly('planapp/page/full_missing.yaml', c)
 
     py.test.raises(TemplateDoesNotExist, pa.dumps)
+
+@with_setup(setup, teardown)
+def test_deploy_reusable_unroll_updated():
+    settings.CRUNCHYFROG_PLANS = 'mediadeploy_reusable'
+
+    request = get_request_fixture()
+    c = RequestContext(request)
+    pa = PageAssembly('planapp/page/full.yaml', c)
+
+    content = pa.dumps()
+
+    assert 'planapp/page/media/js/static_uses1.js' not in content
+
+    sleep(1.0) 
+    os.utime(loader.find_template_path('planapp/page/media/js/static_uses1.js'),
+        None)
+
+    request = get_request_fixture()
+    c = RequestContext(request)
+    pa = PageAssembly('planapp/page/full.yaml', c)
+
+    content = pa.dumps()
+
+    assert 'planapp/page/media/js/static_uses1.js' not in content
+
+    plan_options(unroll_recently_modified=True)
+
+    request = get_request_fixture()
+    c = RequestContext(request)
+    pa = PageAssembly('planapp/page/full.yaml', c)
+
+    content = pa.dumps()
+
+    assert 'planapp/page/media/js/static_uses1.js' in content
+
+    sleep(1.0) 
+    os.utime(loader.find_template_path('planapp/page/media/js/Controller.js'),
+        None)
+
+    request = get_request_fixture()
+    c = RequestContext(request)
+    pa = PageAssembly('planapp/page/full.yaml', c)
+
+    content = pa.dumps()
+
+    assert "dojo.require('PlanApp.Page.Controller');" in content

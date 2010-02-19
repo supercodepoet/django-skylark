@@ -1,4 +1,5 @@
 import os
+import time
 import shutil
 
 from django import http, template
@@ -7,6 +8,11 @@ from django.conf import UserSettingsHolder
 from crunchyfrog.conf import settings
 
 __all__ = ['clear_media_cache', 'HttpResponse', 'RequestContext']
+
+__time_started = time.time()
+
+def time_started():
+    return __time_started
 
 class HttpResponse(http.HttpResponse):
     """

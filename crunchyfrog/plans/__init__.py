@@ -1,10 +1,11 @@
 from django.utils.functional import memoize
 
+from base import BasePlan
 from fewest import FewestFiles
 from reusable import ReusableFiles
 from separate import SeparateEverything
 
-__all__ = ['MissingMediaPlan', 'get_plan', 'get_for_context']
+__all__ = ['MissingMediaPlan', 'get_plan', 'plan_options', 'get_for_context']
 __plan_cache = {}
 
 def get_plan(module, attr):
@@ -12,6 +13,9 @@ def get_plan(module, attr):
 
     return getattr(plans, attr)
 get_plan = memoize(get_plan, __plan_cache, 2)
+
+def plan_options(**kwargs):
+    BasePlan.set_options(**kwargs)
 
 class MissingMediaPlan(Exception):
     pass

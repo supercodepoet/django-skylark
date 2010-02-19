@@ -13,11 +13,13 @@ import logging
 from urlparse import urljoin
 from collections import deque
 
-from django.template import Template, TemplateDoesNotExist, loader
+from django.template import Template, TemplateDoesNotExist
+from django.template import loader as djangoloader
 from django.utils.functional import memoize
 from crunchyfrog.conf import settings
 from crunchyfrog.processor import clevercss
-from crunchyfrog import ribt
+from crunchyfrog import loader as cfloader
+from crunchyfrog import ribt, time_started
 
 class CssFormatError(Exception):
     pass
@@ -69,6 +71,10 @@ class BasePlan(object):
 
     __media_source_cache = {}
 
+    options = {
+        'unroll_recently_modified': False,
+    }
+
     """
     These are a set of special functions that can be used to manipulate the
     source of the page.  The way these get triggered is through the attribute
@@ -88,36 +94,6 @@ class BasePlan(object):
     make_css_urls_absolute = False
 
     cache_prefix = None
-
-    def _find_template_source(self, name, dirs=None):
-        """
-        This is a copy paste job from django.template.loader.
-
-        The reason you find this here is that in DEBUG mode, Django will not
-        return the origin, which is imporant to us since we are trying to mirror
-        the directory structure and also copy some of the files inside of any 
-        media directory into the cache as well.
-
-        So, we have to implement our own so that we are always able to
-        determining the origin.
-        """
-        # Calculate template_source_loaders the first time the function is executed
-        # because putting this logic in the module-level namespace may cause
-        # circular import errors. See Django ticket #1292.
-        assert loader.template_source_loaders, (''
-            'The template loader has not initialized the '
-            'template_source_loader, this is very unusual'
-        )
-
-        for djangoloader in loader.template_source_loaders:
-            try:
-                source, display_name = djangoloader(name, dirs)
-                origin = loader.LoaderOrigin(display_name, djangoloader, name, dirs)
-                return (source, origin)
-            except TemplateDoesNotExist:
-                pass
-
-        raise TemplateDoesNotExist, name
 
     def __init__(self, context, render_full_page):
         self._prepare_assets_cache = {}
@@ -141,6 +117,24 @@ class BasePlan(object):
         if not os.path.exists(self.cache_root):
             os.makedirs(self.cache_root)
 
+    @classmethod
+    def set_options(*args, **kwargs):
+        """
+        Various options for how the plans behave
+        """
+        BasePlan.options.update(kwargs)
+
+    def _get_media_stat(self, template_name):
+        """
+        Performs a os.stat on template_name, raising TemplatePathDoesNotExist
+        if the template_name is not file based.
+        """
+        try:
+            path = cfloader.find_template_path(template_name)
+            return os.stat(path)
+        except cfloader.TemplatePathDoesNotExist:
+            return None
+
     def _get_media_source(self, template_name, process_func=None, context=None):
         """
         Responsible for taking a template and generating the contents.
@@ -155,7 +149,7 @@ class BasePlan(object):
             source = cache[mem_args]
             is_cached = True
         else:
-            source, origin = self._find_template_source(template_name)
+            source, origin = cfloader.find_template_source(template_name)
 
             if context:
                 template = Template(source)
@@ -355,7 +349,7 @@ class BasePlan(object):
 
         for yaml in page_instructions.yaml:
             # yaml = app/page/page.yaml
-            source, origin = self._find_template_source(yaml)
+            source, origin = cfloader.find_template_source(yaml)
             del source # we don't need it
 
             origin = str(origin)
@@ -429,7 +423,7 @@ class BasePlan(object):
         """
         Takes the body section and renders it, storing it in prepared_instructions
         """
-        template = loader.get_template(str(page_instructions.body))
+        template = djangoloader.get_template(str(page_instructions.body))
         self.context['__page_instructions'] = page_instructions
         self.prepared_instructions['body'] = unicode(template.render(self.context))
 
@@ -554,6 +548,10 @@ class RollupPlan(object):
             for req in require:
                 filename = '%s.js' % req.replace('%s.' % namespace, '')
                 req_location = os.path.join(location, filename)
+                if self.options['unroll_recently_modified']:
+                    stat = self._get_media_stat(req_location)
+                    if stat and stat.st_mtime > time_started():
+                        continue
                 source, is_cached = self._get_media_source(req_location)
                 local_modules.append({'name': req, 'static': req_location,
                     'source': source})
