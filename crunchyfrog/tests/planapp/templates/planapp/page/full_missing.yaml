@@ -1,4 +1,4 @@
-title: Full monty of a YAML file
+title: Full monty of a YAML file but a missing dependency
 body: planapp/page/full.html
 
 uses:
@@ -38,6 +38,6 @@ ribt:
       location: planapp/page/media/js
       require: 
         - PlanApp.Page.Controller
-        - PlanApp.Page.View
+        - PlanApp.Page.ViewNotThere
       test:
         - PlanApp.Page.Test

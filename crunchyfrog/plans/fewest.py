@@ -31,6 +31,12 @@ class FewestFiles(BasePlan, RollupPlan):
         rollup, keep, insert_point = self.__split_static_all(
             'js', page_instructions)
 
+        # If there is anything Ribt related, we need to do that here to make it
+        # part of our rollup
+        super(FewestFiles, self).prepare_ribt(page_instructions)
+
+        rollup.extend(self._rollup_ribt(self.prepared_instructions['ribt']))
+
         minifier = jsmin
 
         setattr(page_instructions, 'js', keep)
@@ -52,3 +58,10 @@ class FewestFiles(BasePlan, RollupPlan):
         self._prepare_file('css', page_instructions)
 
         self._prepare_rollup('css', rollup, keep, insert_point)
+
+    def prepare_ribt(self, page_instructions):
+        # We are going to let the prepare_js handle ribt in this case since we
+        # want it to rollup everything JS together.  So there is nothing here to
+        # do
+        pass
+

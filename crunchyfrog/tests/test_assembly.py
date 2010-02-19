@@ -98,7 +98,7 @@ def test_creates_files_in_cache():
 
     from crunchyfrog import clear_media_cache, copy_addons
     clear_media_cache()
-    assert not isdir(cachedir)
+    assert not isdir(join(cachedir, 'se'))
     # And fix the addons since we just dumped them
     copy_addons()
 

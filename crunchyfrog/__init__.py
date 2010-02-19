@@ -46,8 +46,11 @@ __cache_cleared = False
 
 def clear_media_cache():
     cachedir = settings.CRUNCHYFROG_CACHE_ROOT
-    if os.path.isdir(cachedir):
-        shutil.rmtree(cachedir)
+    # Some directories in the cache should not be deleted
+    skip = ['addon']
+    for topdir in os.listdir(cachedir):
+        if topdir in skip: continue
+        shutil.rmtree(os.path.join(cachedir, topdir))
 
 if settings.CRUNCHYFROG_INIT_CLEAR_CACHE and not __cache_cleared:
     """
@@ -75,7 +78,8 @@ def copy_addons():
     """
     addondir = os.path.join(settings.CRUNCHYFROG_CACHE_ROOT, 'addon')
     if os.path.isdir(addondir):
-        shutil.rmtree(addondir)
+        # Don't copy it again, that's silly
+        return
     thisdir = os.path.dirname(__file__)
     mediadir = ['templates', 'ribt', 'media',]
     dojodir = os.path.join(thisdir, *(mediadir + ['dojo']))

@@ -6,9 +6,6 @@ js:
     {% if crunchyfrog_internals.settings.CRUNCHYFROG_DOJO_VIA_URL %}
     - url: {{ crunchyfrog_internals.settings.CRUNCHYFROG_DOJO_VIA_URL }}
     {% endif %}
-    {% if crunchyfrog_internals.settings.CRUNCHYFROG_DOJO_VIA_PATH %}
-    - url: {{ crunchyfrog_internals.settings.CRUNCHYFROG_DOJO_VIA_PATH }}
-    {% endif %}
     {% if not crunchyfrog_internals.settings.CRUNCHYFROG_DOJO_VIA_CDN_AOL and not crunchyfrog_internals.settings.CRUNCHYFROG_DOJO_VIA_URL and not crunchyfrog_internals.settings.CRUNCHYFROG_DOJO_VIA_PATH and crunchyfrog_internals.settings.CRUNCHYFROG_DOJO_VIA_INTERNALBUILD %}
     - url: {{ crunchyfrog_internals.settings.CRUNCHYFROG_CACHE_URL }}addon/dojo/dojo.js.uncompressed.js
     {% endif %}

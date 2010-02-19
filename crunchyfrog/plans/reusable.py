@@ -53,3 +53,13 @@ class ReusableFiles(BasePlan, RollupPlan):
         self._prepare_file('css', page_instructions)
 
         self._prepare_rollup('css', rollup, keep, insert_point)
+
+    def prepare_ribt(self, page_instructions):
+        super(ReusableFiles, self).prepare_ribt(page_instructions)
+
+        rollup = self._rollup_ribt(self.prepared_instructions['ribt'])
+
+        minifier = jsmin
+
+        self._prepare_rollup('js', rollup, page_instructions.js,
+             len(self.prepared_instructions['js']), minifier=minifier)

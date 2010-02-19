@@ -1,5 +1,6 @@
 import copy
 import os
+import re
 import filecmp
 import shutil
 import yaml
@@ -9,10 +10,11 @@ import cssutils
 import functools
 import urllib
 import logging
+from urlparse import urljoin
+from collections import deque
 
 from django.template import Template, TemplateDoesNotExist, loader
 from django.utils.functional import memoize
-from urlparse import urljoin
 from crunchyfrog.conf import settings
 from crunchyfrog.processor import clevercss
 from crunchyfrog import ribt
@@ -402,7 +404,6 @@ class BasePlan(object):
 
                 shutil.copytree(sourcedirectory, cachedirectory)
 
-
     def _assets_are_stale(self, sourcedirectory, cachedirectory):
         """
         Looks through the given directories, determining if they are different
@@ -491,8 +492,12 @@ class RollupPlan(object):
     def _concat_files(self, instructions, fix_css_urls = False):
         source = [] 
         for i in instructions:
-            processed, is_cached = self._get_media_source(
-                i['static'], self._get_processing_function(i.get('process')))
+            processed = ''
+            if i.has_key('source'):
+                processed = i['source']
+            else:
+                processed, is_cached = self._get_media_source(
+                    i['static'], self._get_processing_function(i.get('process')))
             if fix_css_urls:
                 processed = self._fix_css_urls(i, processed)
             source.append(processed)
@@ -511,16 +516,16 @@ class RollupPlan(object):
             [rollup_instruction] + \
             other_instruction[insert_point:]
 
-    def _rollup_static_files(self, instructions, extension, minifier = None):
+    def _rollup_static_files(self, instructions, extension, minifier=None):
+        """
+        Creates one file from a list of others.  It also minifies the source
+        using the appropriate function
+        """
         fix_css_urls = True if 'css' in extension else False
 
         if not minifier:
             def minifier(arg):
                 return arg
-        """
-        Creates one file from a list of others.  It also minifies the source
-        using the appropriate function
-        """
         # Figure out a name
         files = [ i['static'] for i in instructions ]
 
@@ -535,3 +540,78 @@ class RollupPlan(object):
             f.close()
 
         return { 'location': location, }
+
+    def _rollup_ribt(self, ribt_instructions):
+        local_modules = []
+
+        for ribt_module in ribt_instructions:
+            namespace = ribt_module['namespace']
+            location = ribt_module['location']
+            require = ribt_module['require']
+
+            # Figure out the path for each requirement based on namespace and
+            # location
+            for req in require:
+                filename = '%s.js' % req.replace('%s.' % namespace, '')
+                req_location = os.path.join(location, filename)
+                source, is_cached = self._get_media_source(req_location)
+                local_modules.append({'name': req, 'static': req_location,
+                    'source': source})
+
+        self._local_modules = local_modules
+
+        roll_modules = []
+
+        for mod in self._local_modules:
+            self._extract_dojo_requires(roll_modules, mod['name'], mod['static'],
+                mod['source'])
+
+        return roll_modules
+
+    def _extract_dojo_requires(self, roll_modules, name, static, source):
+        if name in [ i['name'] for i in roll_modules ]:
+            return
+
+        req_pattern = re.compile('dojo\.require\((\'|")(?P<mod>[^\'"]+)\\1\)')
+
+        match = req_pattern.findall(source)
+
+        if match == None:
+            return
+        
+        for req_mod in [ i[1] for i in match ]:
+            req_mod_path = self._resolve_dojo_module_path(req_mod)
+            if not req_mod_path:
+                # We couldn't locate it
+                continue
+            req_mod_source, is_cached = self._get_media_source(req_mod_path) 
+            self._extract_dojo_requires(
+                roll_modules, req_mod, req_mod_path, req_mod_source)
+        
+        # Filter this module out of the prepared instructions, we've now set it
+        # to roll in with the other JS
+        self._unprepare_ribt_dojo_module(name)
+
+        roll_modules.append({'name': name, 'static': static, 'source': source})
+
+    def _resolve_dojo_module_path(self, mod):
+        if not settings.CRUNCHYFROG_DOJO_VIA_INTERNALBUILD:
+            # We can only make this work if we use the internal build
+            return None
+
+        # It could be in our local_modules
+        local = [ i['static'] for i in self._local_modules if i['name'] == mod ]
+
+        if local:
+            return local[0]
+
+        mod_parts = mod.split('.')
+        mod_path = '%s.js' % os.path.join('ribt', 'media', *mod_parts)
+
+        return mod_path
+
+    def _unprepare_ribt_dojo_module(self, mod):
+        for ribt_instruction in self.prepared_instructions['ribt']:
+            if mod in ribt_instruction['require']:
+                ribt_instruction['require'].remove(mod)
+                return
