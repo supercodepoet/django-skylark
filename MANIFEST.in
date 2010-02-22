@@ -1,2 +1,3 @@
 include pkginfo.py
 recursive-include crunchyfrog/templates *
+prune demo
