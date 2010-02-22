@@ -1,5 +1,10 @@
 dojo.provide('RibtTools.TestRunner.TestCaseCollector');
 
+dojo.require('RibtTools.Error');
+dojo.require('RibtTools.SyncTimer.Timer');
+dojo.require('RibtTools.TestRunner.Events');
+dojo.require('RibtTools.TestRunner.Logger');
+
 /**
  * Functions within the subject, and collects test cases that should be
  * ran
@@ -131,14 +136,14 @@ dojo.declare('_RibtTools.TestRunner.TestCaseCollector', null, {
                 var cls = dojo.getObject(testCaseName);
 
                 if(!dojo.isFunction(cls)){
-                    throw new RibtToolsError("Could not load test case class '" + className);
+                    throw new RibtTools.Error("Could not load test case class '" + className);
                 }
 
                 this._testCaseObjects.push(new cls(this._testEntryPoint));
             }, this);
             
             // Create a new sync timer with the test cases within
-            var st = new RibtTools.SyncTimer(this._testCaseObjects);
+            var st = new RibtTools.SyncTimer.Timer(this._testCaseObjects);
 
             st.interval(this._interval);
             st.timeout(this._timeout);
@@ -148,6 +153,7 @@ dojo.declare('_RibtTools.TestRunner.TestCaseCollector', null, {
 
             st.start();
         } catch (e) {
+            debugger;
             this._log.info('Exception while collecting test cases: ' + e.message);
         }
     },
@@ -155,7 +161,7 @@ dojo.declare('_RibtTools.TestRunner.TestCaseCollector', null, {
     /**
      * After each test case runs, we arrive here
      *
-     * @param syncTimer Instance of RibtTools.SyncTimer
+     * @param syncTimer Instance of RibtTools.SyncTimer.Timer
      * @param unit The test action that just finished running
      */
     afterRun: function(syncTimer, unit) {
@@ -172,7 +178,7 @@ dojo.declare('_RibtTools.TestRunner.TestCaseCollector', null, {
      * When all of the test cases finish, we provide the units that were ran
      * to the test entry point for later use displaying the results
      *
-     * @param syncTimer Instance of RibtTools.SyncTimer
+     * @param syncTimer Instance of RibtTools.SyncTimer.Timer
      */
     onStop: function(syncTimer) {
         if (this._testEntryPoint) {

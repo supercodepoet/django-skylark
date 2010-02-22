@@ -54,6 +54,8 @@ def clear_media_cache():
     cachedir = settings.CRUNCHYFROG_CACHE_ROOT
     # Some directories in the cache should not be deleted
     skip = ['addon']
+    if not os.path.isdir(cachedir):
+        return
     for topdir in os.listdir(cachedir):
         if topdir in skip: continue
         shutil.rmtree(os.path.join(cachedir, topdir))

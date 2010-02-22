@@ -1,6 +1,10 @@
 dojo.provide('RibtTools.TestRunner.Display.Controller');
 
 dojo.require('RibtTools.Mvc.Controller');
+dojo.require('RibtTools.SyncTimer.Timer');
+dojo.require('RibtTools.TestRunner.Display.View');
+dojo.require('RibtTools.TestRunner.Events');
+dojo.require('RibtTools.TestRunner.Channel');
 
 /**
  * Responsible for starting everything.  Creates the top bar and window where the
@@ -95,7 +99,7 @@ dojo.declare('RibtTools.TestRunner.Display.Controller', RibtTools.Mvc.Controller
      * to run
      */
     kickoffTestEntryPoints: function() {
-        var st = new RibtTools.SyncTimer(this._testEntryPoints);
+        var st = new RibtTools.SyncTimer.Timer(this._testEntryPoints);
 
         st.onStop = dojo.hitch(this, function(syncTimer) {
             var testEntryPoints = syncTimer.getUnitsRan();

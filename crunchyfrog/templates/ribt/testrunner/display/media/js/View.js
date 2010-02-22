@@ -1,6 +1,7 @@
 dojo.provide('RibtTools.TestRunner.Display.View');
 
 dojo.require('RibtTools.Mvc.View');
+dojo.require('RibtTools.TestRunner.Events');
 
 dojo.declare('RibtTools.TestRunner.Display.View', RibtTools.Mvc.View, {
     /**

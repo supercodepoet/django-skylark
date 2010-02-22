@@ -43,7 +43,7 @@ class FewestFiles(BasePlan, RollupPlan):
 
         rollup.extend(self._rollup_ribt(self.prepared_instructions['ribt']))
 
-        minifier = jsmin
+        minifier = jsmin if self.options['minify_javascript'] else None
 
         setattr(page_instructions, 'js', keep)
         self._prepare_file('js', page_instructions)

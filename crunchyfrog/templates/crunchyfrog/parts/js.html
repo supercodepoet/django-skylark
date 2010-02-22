@@ -26,19 +26,22 @@
         {% for requirement in ribt.require %}
             dojo.require('{{ requirement }}');
         {% endfor %}
-        {% if is_instrumented %}
-            (function() {
-                if (RibtTools.TestRunner.TestCaseCollector) {
-                    var collector = RibtTools.TestRunner.TestCaseCollector;
+    {% endfor %}
+    {% if is_instrumented %}
+        dojo.addOnLoad(function() {
+            if (RibtTools.TestRunner.TestCaseCollector) {
+                var collector = RibtTools.TestRunner.TestCaseCollector;
+
+                {% for ribt in prepared_instructions.ribt %}
                     {% for testcase in ribt.tests %}
                         collector.add('{{ testcase }}');
                     {% endfor %}
+                {% endfor %}
 
-                    dojo.addOnLoad(function() { collector.kickoff(); });
-                }
-            })()
-        {% endif %}
-    {% endfor %}
+                dojo.addOnLoad(function() { collector.kickoff(); });
+            }
+        });
+    {% endif %}
     //]]>
     </script>
 {% endif %}

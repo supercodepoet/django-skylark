@@ -10,10 +10,27 @@ js:
     - url: {{ crunchyfrog_internals.settings.CRUNCHYFROG_CACHE_URL }}addon/dojo/dojo.js.uncompressed.js
     {% endif %}
     - static: ribt/media/tools/base.js
-    - static: ribt/media/tools/subscriptioncache.js
-    - static: ribt/media/tools/parser.js
-    - static: ribt/media/tools/synctimer.js
-    - static: ribt/media/tools/events.js
-    - static: ribt/media/tools/controller.js
-    - static: ribt/media/tools/view.js
-    - static: ribt/media/tools/history.js
+
+ribt:
+    - namespace: RibtTools
+      location: ribt/media/tools
+      require:
+        - RibtTools.Error
+
+    - namespace: RibtTools.SyncTimer
+      location: ribt/media/tools/synctimer
+      require:
+        - RibtTools.SyncTimer.Timer
+        - RibtTools.SyncTimer.Unit
+        - RibtTools.SyncTimer.UnitState
+        - RibtTools.SyncTimer.UnitFunction
+
+    - namespace: RibtTools.Mvc
+      location: ribt/media/tools
+      require:
+        - RibtTools.Mvc.Events
+        - RibtTools.Mvc.Parser
+        - RibtTools.Mvc.Controller
+        - RibtTools.Mvc.View
+        - RibtTools.Mvc.History
+        - RibtTools.Mvc.SubscriptionCache

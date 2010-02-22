@@ -1,5 +1,7 @@
 dojo.provide('Whizzo.Goodies.List.Test');
 
+dojo.require('RibtTools.TestRunner.TestCase');
+
 dojo.declare('Whizzo.Goodies.List.Test', RibtTools.TestRunner.TestCase, {
     testCanSeeJQueryTabs: function() {
         this.exists('div.ui-tabs');

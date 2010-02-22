@@ -1,5 +1,8 @@
 dojo.provide('RibtTools.TestRunner.Display.TestEntryPoint');
 
+dojo.require('RibtTools.SyncTimer.Unit');
+dojo.require('RibtTools.TestRunner.Events');
+
 dojo.declare('RibtTools.TestRunner.Display.TestEntryPoint', RibtTools.SyncTimer.Unit, {
     /**
      * List of test cases collected after the tests run

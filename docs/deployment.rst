@@ -122,3 +122,12 @@ To turn this option on, you might enter the following into your deployment plan.
 
     if settings.DEBUG:
         plan_options(unroll_recently_modified=True) 
+
+``minify_javascript``
+~~~~~~~~~~~~~~~~~~~~~
+
+Default: ``True``
+
+When rolling up Javascript, should we minify it? ::
+
+    plan_options(minify_javascript=True) 

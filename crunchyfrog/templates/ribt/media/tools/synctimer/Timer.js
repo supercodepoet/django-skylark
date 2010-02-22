@@ -1,8 +1,11 @@
-dojo.provide('RibtTools.SyncTimer');
+dojo.provide('RibtTools.SyncTimer.Timer');
 
 dojo.require('dojox.timing');
+dojo.require('RibtTools.Error');
+dojo.require('RibtTools.SyncTimer.Unit');
+dojo.require('RibtTools.SyncTimer.UnitState');
 
-dojo.declare('RibtTools.SyncTimer', null, {
+dojo.declare('RibtTools.SyncTimer.Timer', null, {
     // The amount of time between runs or ticks
     _interval: 50,
 
@@ -51,13 +54,13 @@ dojo.declare('RibtTools.SyncTimer', null, {
      */
     constructor: function(stack) {
         if (!dojo.isArray(stack)) {
-            throw new RibtToolsError('You must provide an array to the RibtTools.SyncTimer constructor');
+            throw new RibtTools.Error('You must provide an array to the RibtTools.SyncTimer.Timer constructor');
         }
 
         // Iterate through the stack, make sure each item is an instance of Unit
         dojo.forEach(stack, function(unit) {
             if (!unit.isInstanceOf || !unit.isInstanceOf(RibtTools.SyncTimer.Unit)) {
-                throw new RibtToolsError('Each instance in the stack must be an RibtTools.SyncTimer.Unit');
+                throw new RibtTools.Error('Each instance in the stack must be an RibtTools.SyncTimer.Unit');
             }
         });
 
@@ -177,81 +180,5 @@ dojo.declare('RibtTools.SyncTimer', null, {
         });
 
         this._internalTimer.start();
-    }
-});
-
-/**
- * States for the Units
- */
-dojo.setObject('RibtTools.SyncTimer.UnitState', {
-    NOT_RUNNING: 0,
-    RUNNING: 1,
-    TIMEOUT: 2
-});
-
-/**
- * Represents one unit of work for the sync timer.
- *
- * The sync timer will not continue until the unit says finished=true
- */
-dojo.declare('RibtTools.SyncTimer.Unit', null, {
-    // We always want this run to run
-    '-chains-': {
-        run: 'after'
-    },
-
-    constructor: function() {
-        this._synctimer_unit_state = RibtTools.SyncTimer.UnitState.NOT_RUNNING;
-        this._synctimer_timeStarted = undefined;
-        this.finished = false;
-    },
-
-    /**
-     *
-     */
-    run: function() {
-        if (this._synctimer_timeStarted == undefined) {
-            this._synctimer_timeStarted = ribt.time();
-        }
-        this._synctimer_unit_state = RibtTools.SyncTimer.UnitState.RUNNING;
-    },
-
-    /**
-     *
-     */
-    timePassed: function() {
-        if (!this._synctimer_timeStarted) {
-            throw new RibtToolsError('Unit run() method has not been called yet');
-        }
-        return ribt.time() - this._synctimer_timeStarted;
-    }
-});
-
-/**
- * A single function that runs immediately, this is a wrapper to make that
- * function into a SyncTimer Unit
- */
-dojo.declare('RibtTools.SyncTimer.UnitFunction', RibtTools.SyncTimer.Unit, {
-    _synctimer_unitfunction_func: undefined,
-
-    _synctimer_unitfunction_scope: undefined,
-
-    constructor: function(func) {
-        this._synctimer_unitfunction_func = func;
-
-        if (arguments.length == 2) {
-            // We have a scope too
-            this._synctimer_unitfunction_scope = arguments[1];
-        }
-    },
-
-    run: function() {
-        if (this._synctimer_unitfunction_scope) {
-            this._synctimer_unitfunction_func.call(
-                this._synctimer_unitfunction_scope);
-        } else {
-            this._synctimer_unitfunction_func();
-        }
-        this.finished = true;
     }
 });

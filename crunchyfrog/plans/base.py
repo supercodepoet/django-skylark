@@ -24,6 +24,12 @@ from crunchyfrog import ribt, time_started
 class CssFormatError(Exception):
     pass
         
+class BadOption(Exception):
+    pass
+
+class DojoModuleResolution(Exception):
+    pass
+
 class CssUtilsLoggingHandler(logging.Handler):
     _records = []
     def emit(self, record):
@@ -73,6 +79,7 @@ class BasePlan(object):
 
     options = {
         'unroll_recently_modified': False,
+        'minify_javascript': True,
     }
 
     """
@@ -122,6 +129,10 @@ class BasePlan(object):
         """
         Various options for how the plans behave
         """
+        for option in kwargs:
+            if option not in BasePlan.options:
+                raise BadOption('%s is not a valid, must be a combination '
+                    'of %s' % (option, ','.join(BasePlan.options.keys(),)))
         BasePlan.options.update(kwargs)
 
     def _get_media_stat(self, template_name):
@@ -581,8 +592,12 @@ class RollupPlan(object):
             req_mod_path = self._resolve_dojo_module_path(req_mod)
             if not req_mod_path:
                 # We couldn't locate it
-                continue
-            req_mod_source, is_cached = self._get_media_source(req_mod_path) 
+                raise DojoModuleResolution('Could not resolve %s' % req_mod)
+            try:
+                req_mod_source, is_cached = self._get_media_source(req_mod_path) 
+            except TemplateDoesNotExist as tdne:
+                raise TemplateDoesNotExist('Trying to find %s at path %s' % (req_mod, req_mod_path,))
+
             self._extract_dojo_requires(
                 roll_modules, req_mod, req_mod_path, req_mod_source)
         

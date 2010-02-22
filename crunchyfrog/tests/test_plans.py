@@ -12,10 +12,14 @@ from crunchyfrog import ribt
 from crunchyfrog import loader
 from crunchyfrog.page import PageAssembly
 from crunchyfrog.plans import *
+from crunchyfrog.plans.base import BadOption
 from crunchyfrog.plans.separate import SeparateEverything
 from crunchyfrog.plans.fewest import FewestFiles
 
 from crunchyfrog.tests import *
+
+def test_plan_options_invalid():
+    py.test.raises(BadOption, plan_options, not_a_valid_option=True)
 
 @with_setup(setup, teardown)
 def test_can_change_deploy_plan_name():
@@ -47,8 +51,8 @@ def test_can_change_deploy_plan_name():
 
 @with_setup(setup, teardown)
 def test_deploy_reusable():
-    hash_js1 = '7d2270900ca4d6a2356a8b2051095915'
-    hash_js2 = '35a4a8c9d027b9f84b18c56f2d67cafc'
+    hash_js1 = '93be07cfe9c81198bb4c549c868ff731'
+    hash_js2 = '17212bc913552069c1aaec0cb91b3869'
     hash_css = 'ee184e5fad8366ee655a090043693c30'
 
     settings.DEBUG = False
@@ -106,7 +110,7 @@ def test_deploy_reusable():
 @with_setup(setup, teardown)
 def test_deploy_fewest():
     hash_css = '9ecd76d6b65856eb899846a6271a527a'
-    hash_js = '2dd6f8490596d58b3828a2b2f9cabc0c'
+    hash_js = '323b64060e8403aa5b99796b3b5efdd9'
 
     settings.CRUNCHYFROG_PLANS = 'mediadeploy_fewest'
 
@@ -169,7 +173,7 @@ def test_deploy_fewest():
 
 @with_setup(setup, teardown)
 def test_deploy_fewest_instrumented():
-    hash_js = '0805d77ef3e7032d061fb8bd171035c9'
+    hash_js = '0b23534654c55bb791f2e1fdefd4cdbb'
 
     ribt.instrument_site(True)
     settings.CRUNCHYFROG_PLANS = 'mediadeploy_fewest'
@@ -245,3 +249,6 @@ def test_deploy_reusable_unroll_updated():
     content = pa.dumps()
 
     assert "dojo.require('PlanApp.Page.Controller');" in content
+
+def test_deploy_reusable_no_js_minifying():
+    raise SkipTest('')

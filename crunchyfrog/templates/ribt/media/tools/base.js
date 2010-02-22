@@ -1,14 +1,20 @@
 dojo.provide('ribt');
 
-dojo.setObject('RibtToolsError', Error);
-
 // These are the utility function that are used a lot throughout the framework
 dojo.setObject('ribt', {
+    /**
+     * Makes events and hooks into dojo.provide to make sure that dependencies
+     * still work as expected.  Use it like this:
+     *
+     *    dojo.provide(ribt.makeEvents('MyProject.AppName.Page.Events', [
+     *        'SomeCrazyEvent']))
+     *
+     */
     makeEvents: function(name, evs) {
         var lower = function(str) { return str.toLowerCase(); }
 
         if (!dojo.isArray(evs)) {
-            throw new RibtToolsError('Second argument to make events is not valid');
+            throw new RibtTools.Error('Second argument to make events is not valid');
         }
 
         var nameParts = name.split('.');
@@ -19,6 +25,8 @@ dojo.setObject('ribt', {
             eventParts = nameParts.concat(e.split('.'));
             dojo.setObject(eventParts.join('.'), dojo.map(eventParts, lower).join('::'));
         }
+
+        return name;
     },
 
     /**

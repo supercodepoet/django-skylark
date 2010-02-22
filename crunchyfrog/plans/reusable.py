@@ -38,7 +38,7 @@ class ReusableFiles(BasePlan, RollupPlan):
         rollup, keep, insert_point = self.__split_static_uses(
             'js', page_instructions)
 
-        minifier = jsmin
+        minifier = jsmin if self.options['minify_javascript'] else None
 
         setattr(page_instructions, 'js', keep)
         self._prepare_file('js', page_instructions)
@@ -65,7 +65,7 @@ class ReusableFiles(BasePlan, RollupPlan):
 
         rollup = self._rollup_ribt(self.prepared_instructions['ribt'])
 
-        minifier = jsmin
+        minifier = jsmin if self.options['minify_javascript'] else None
 
         self._prepare_rollup('js', rollup, page_instructions.js,
              len(self.prepared_instructions['js']), minifier=minifier)

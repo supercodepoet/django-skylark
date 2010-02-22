@@ -1,5 +1,7 @@
 dojo.provide("Whizzo.Goodies.List.Controller");
 
+dojo.require('Whizzo.Goodies.List.View');
+
 dojo.declare("Whizzo.Goodies.List.Controller", RibtTools.Mvc.Controller, {
     favorite: '',
 

@@ -1,5 +1,7 @@
 dojo.provide('RibtTools.TestRunner.SubjectStart.Controller');
 
+dojo.require('RibtTools.TestRunner.Events');
+dojo.require('RibtTools.TestRunner.SubjectStart.View');
 dojo.require('RibtTools.Mvc.Controller');
 
 dojo.declare('RibtTools.TestRunner.SubjectStart.Controller', RibtTools.Mvc.Controller, {
