@@ -67,6 +67,14 @@ def test_issue_19():
 
 @with_setup(setup, teardown)
 def test_issue_23():
+    """
+    Issue #23
+
+    If you are rendering a page with a PageAssembly and that page contains a
+    template tag that renders using SnippetAssembly, the underlying
+    context['page_instructions'] object will be changed causing dependencies to
+    be missed
+    """
     request = get_request_fixture()
     c = RequestContext(request, {})
     pa = PageAssembly('dummyapp/issue23/issue23.yaml', c)

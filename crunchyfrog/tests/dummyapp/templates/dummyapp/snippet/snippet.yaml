@@ -1,5 +1,11 @@
 body: dummyapp/snippet/snippet.html
 
+js:
+    - static: dummyapp/snippet/media/js/base.js
+
+css:
+    - static: dummyapp/snippet/media/css/screen.css
+
 ribt:
     - namespace: DynamicApp.Snippet
       location: dynamicapp/media/js

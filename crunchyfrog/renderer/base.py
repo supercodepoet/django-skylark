@@ -53,13 +53,21 @@ class Renderer(object):
     template_name = 'crunchyfrog/html401.html'
     snippet_template_name = 'crunchyfrog/htmlsnippet.html'
 
-    def __init__(self, page_instructions, context, render_full_page=True):
+    def __init__(self, page_instructions, context, render_full_page=True,
+                 omit_media=False):
         self.page_instructions = page_instructions
-        self.context           = context
-        self.render_full_page  = render_full_page
+        self.context = context
+        self.render_full_page = render_full_page
+        self.omit_media = omit_media
 
         t = self.template_name if render_full_page else self.snippet_template_name
         self.template = loader.get_template(t)
+
+    def __remove_media_instructions(self, page_instructions):
+        cleaned_pi = copy.copy(page_instructions)
+        for key in ('css', 'js', 'ribt',):
+            cleaned_pi[key] = []
+        return cleaned_pi
 
     def render(self):
         """
@@ -69,14 +77,33 @@ class Renderer(object):
         This return a string representing the HTML or similar output
         """
 
-        assert self.page_instructions.body, 'The body has not been specified in the page instructions (body: in your yaml file)'
+        assert self.page_instructions.body, \
+            'The body has not been specified in the page instructions ' + \
+            '(body: in your yaml file)'
 
         if self.render_full_page:
-            assert self.page_instructions.title, 'The title has not been specified in the page instructions (title: in your yaml file)'
+            assert self.page_instructions.title, \
+                'The title has not been specified in the page instructions ' + \
+                '(title: in your yaml file)'
 
         plan = plans.get_for_context(self.context,
             self.page_instructions.render_full_page)
         prepared_instructions = plan.prepare(self.page_instructions)
+
+        if self.omit_media:
+            """
+            This can get flipped to True if we are nested inside another
+            rendering.
+
+            For example, if a snippet assembly is being used in a template tag
+            and we are in the render function as part of that tag, there is
+            going to be another page assembly responsible for actually rendering
+            the page.  It will handle the media for us, so we clean out the
+            media sections of our prepared instructions here to prevent
+            duplication.
+            """
+            prepared_instructions = self.__remove_media_instructions(
+                prepared_instructions)
 
         render_context = copy.copy(self.context)
         render_context['cache_url'] = settings.CRUNCHYFROG_CACHE_URL

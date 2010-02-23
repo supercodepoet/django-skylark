@@ -453,3 +453,16 @@ def test_can_unregister_handlers():
     pa.unregister_handler(handler)
 
     assert len(BaseAssembly._page_assembly_handlers) == 0
+
+@attr('focus')
+@with_setup(setup, teardown)
+def test_handles_snippets_inside_page_assemblies():
+    request = get_request_fixture()
+    c = RequestContext(request)
+    pa = PageAssembly('dummyapp/page/snippetinside.yaml', c)
+
+    content = pa.dumps()
+
+    assert content.count("DynamicApp.Snippet.Controller") == 1
+    assert content.count("dummyapp/snippet/media/js/base.js") == 1
+    assert content.count("dummyapp/page/media/js/sample.js") == 1

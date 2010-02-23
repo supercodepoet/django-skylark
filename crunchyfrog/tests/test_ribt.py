@@ -146,7 +146,9 @@ def test_ribt_testcase_is_included():
     pa = PageAssembly('dummyapp/page/ribt.yaml', c)
     content = pa.dumps()
 
-    assert 'ribt/testrunner/media/js/testcase.js' in content
+    assert 'dojo.require(\'RibtTools.TestRunner' in content
+    assert 'dojo.require(\'RibtTools.Mvc' in content
+    assert 'RibtTools.TestRunner.TestCaseCollector' in content
 
 @with_setup(setup, teardown_ribt)
 def test_ribt_includes_tests():

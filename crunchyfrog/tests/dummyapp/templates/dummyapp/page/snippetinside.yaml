@@ -1,0 +1,9 @@
+body: dummyapp/page/snippetinside.html
+title: Snippet within a Page
+
+js:
+    - static: dummyapp/page/media/js/sample.js
+
+css:
+    - static: dummyapp/page/media/css/sample.css
+      media: screen

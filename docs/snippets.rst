@@ -33,12 +33,8 @@ Here's an example of a SnippetAssembly::
 If you are using a SnippetAssembly in a template tag, you can also call
 :meth:`dumps` ::
 
-    def render(request):
-        c = RequestContext(request, {
-            'confection': "Ram's bladder cup"
-        })
-
-        sa = SnippetAssembly('goodies/ajax.yaml', c)
+    def render(self, context):
+        sa = SnippetAssembly('goodies/ajax.yaml', context)
 
         return sa.dumps()
 

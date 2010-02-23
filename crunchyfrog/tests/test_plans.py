@@ -52,7 +52,7 @@ def test_can_change_deploy_plan_name():
 @with_setup(setup, teardown)
 def test_deploy_reusable():
     hash_js1 = '93be07cfe9c81198bb4c549c868ff731'
-    hash_js2 = '17212bc913552069c1aaec0cb91b3869'
+    hash_js2 = '1ce89799dfc95d689dbba2f39ff84cc5'
     hash_css = 'ee184e5fad8366ee655a090043693c30'
 
     settings.DEBUG = False
@@ -110,7 +110,7 @@ def test_deploy_reusable():
 @with_setup(setup, teardown)
 def test_deploy_fewest():
     hash_css = '9ecd76d6b65856eb899846a6271a527a'
-    hash_js = '323b64060e8403aa5b99796b3b5efdd9'
+    hash_js = '75af0fd1dd1e4ff42eb5af467cd7619d'
 
     settings.CRUNCHYFROG_PLANS = 'mediadeploy_fewest'
 
@@ -173,7 +173,7 @@ def test_deploy_fewest():
 
 @with_setup(setup, teardown)
 def test_deploy_fewest_instrumented():
-    hash_js = '0b23534654c55bb791f2e1fdefd4cdbb'
+    hash_js = '8b08654e90ffc3676f34c843395cd53c'
 
     ribt.instrument_site(True)
     settings.CRUNCHYFROG_PLANS = 'mediadeploy_fewest'
@@ -250,5 +250,26 @@ def test_deploy_reusable_unroll_updated():
 
     assert "dojo.require('PlanApp.Page.Controller');" in content
 
+@attr('focus')
+@with_setup(setup, teardown)
 def test_deploy_reusable_no_js_minifying():
-    raise SkipTest('')
+    hash_js = '3dd295714e3ad47c9212dd7a2f6a1a7d'
+
+    settings.CRUNCHYFROG_PLANS = 'mediadeploy_reusable'
+
+    plan_options(minify_javascript=False)
+
+    request = get_request_fixture()
+    c = RequestContext(request)
+    pa = PageAssembly('planapp/page/full.yaml', c)
+
+    content = pa.dumps()
+
+    jsfile = get_contents(
+        os.path.join(cachedir, 'rf', '%s.js' % hash_js)
+    )
+
+    assert '\n        ' in jsfile
+    assert '//' in jsfile
+    # Should be Dojo documentation in here
+    assert '// summary:' in jsfile

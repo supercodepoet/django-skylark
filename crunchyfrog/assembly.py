@@ -96,6 +96,10 @@ class BaseAssembly(object):
 
         self.context = context
 
+        if not self.context.has_key('__page_assemblies'):
+            self.context['__page_assemblies'] = []
+        self.context['__page_assemblies'].append(self)
+
     @staticmethod
     def register_handler(handler):
         if not callable(handler):
@@ -114,7 +118,7 @@ class BaseAssembly(object):
 
     @staticmethod
     def unregister_all():
-        BaseAssembly._page_assembly_handlers = []
+        del BaseAssembly._page_assembly_handlers[:]
 
     def __create_page_instructions(self):
         """
@@ -182,6 +186,9 @@ class BaseAssembly(object):
                 error['line'],
             )
 
+    def __is_root_assembly(self):
+        pa = self.context['__page_assemblies']
+        return True if pa.index(self) == 0 else False
 
     @check_instrumentation
     def dumps(self):
@@ -189,8 +196,12 @@ class BaseAssembly(object):
 
         doctype = instructions.doctype or 'HTML 4.01 Transitional'
 
+        omit_media = self.__is_root_assembly()
+
         page_renderer = renderer.get(doctype, instructions, self.context,
-                                     self.render_full_page)
+            render_full_page=self.render_full_page,
+            omit_media=not self.__is_root_assembly()
+        )
 
         for handler in BaseAssembly._page_assembly_handlers:
             handler(instructions, page_renderer, self)
