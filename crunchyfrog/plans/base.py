@@ -30,6 +30,9 @@ class BadOption(Exception):
 class DojoModuleResolution(Exception):
     pass
 
+class SkipDojoModule(Exception):
+    pass
+
 class CssUtilsLoggingHandler(logging.Handler):
     _records = []
     def emit(self, record):
@@ -555,6 +558,7 @@ class RollupPlan(object):
 
     def _rollup_ribt(self, ribt_instructions):
         local_modules = []
+        skip_modules = []
 
         for ribt_module in ribt_instructions:
             namespace = ribt_module['namespace']
@@ -569,6 +573,8 @@ class RollupPlan(object):
                 if self.options['unroll_recently_modified']:
                     stat = self._get_media_stat(req_location)
                     if stat and stat.st_mtime > time_started():
+                        skip_modules.append({'name': req,
+                             'static': req_location})
                         continue
                 source, is_cached = self._get_media_source(req_location)
                 # Now we need to add a dojo.registerModulePath to this
@@ -581,6 +587,7 @@ class RollupPlan(object):
                     'source': source})
 
         self._local_modules = local_modules
+        self._skip_modules = skip_modules
 
         roll_modules = []
 
@@ -602,14 +609,17 @@ class RollupPlan(object):
             return
         
         for req_mod in [ i[1] for i in match ]:
-            req_mod_path = self._resolve_dojo_module_path(req_mod)
-            if not req_mod_path:
-                # We couldn't locate it
-                raise DojoModuleResolution('Could not resolve %s' % req_mod)
             try:
-                req_mod_source, is_cached = self._get_media_source(req_mod_path) 
-            except TemplateDoesNotExist as tdne:
-                raise TemplateDoesNotExist('Trying to find %s at path %s' % (req_mod, req_mod_path,))
+                req_mod_path = self._resolve_dojo_module_path(req_mod)
+                if not req_mod_path:
+                    # We couldn't locate it
+                    raise DojoModuleResolution('Could not resolve %s' % req_mod)
+                try:
+                    req_mod_source, is_cached = self._get_media_source(req_mod_path) 
+                except TemplateDoesNotExist as tdne:
+                    raise TemplateDoesNotExist('Trying to find %s at path %s' % (req_mod, req_mod_path,))
+            except SkipDojoModule as sdm:
+                continue
 
             self._extract_dojo_requires(
                 roll_modules, req_mod, req_mod_path, req_mod_source)
@@ -625,9 +635,13 @@ class RollupPlan(object):
             # We can only make this work if we use the internal build
             return None
 
+        # Are we supposed to skip this one?
+        skip = [ i['static'] for i in self._skip_modules if i['name'] == mod ]
+        if skip:
+            raise SkipDojoModule()
+
         # It could be in our local_modules
         local = [ i['static'] for i in self._local_modules if i['name'] == mod ]
-
         if local:
             return local[0]
 
