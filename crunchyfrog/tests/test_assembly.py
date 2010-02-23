@@ -454,7 +454,6 @@ def test_can_unregister_handlers():
 
     assert len(BaseAssembly._page_assembly_handlers) == 0
 
-@attr('focus')
 @with_setup(setup, teardown)
 def test_handles_snippets_inside_page_assemblies():
     request = get_request_fixture()

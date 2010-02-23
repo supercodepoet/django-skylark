@@ -76,6 +76,9 @@ def test_deploy_reusable():
         jsfile.find('dojo.provide("dojox.timing")')
     assert jsfile.find("dojo.provide('PlanApp.Page.View')") < \
         jsfile.find("dojo.provide('PlanApp.Page.Controller')")
+    assert jsfile.find("dojo.registerModulePath('RibtTools'") < \
+        jsfile.find("dojo.provide('RibtTools.Error')")
+    assert "dojo.registerModulePath('RibtTools" not in content
 
     cssfile = get_contents(
         os.path.join(cachedir, 'rf', '%s.css' % hash_css)
@@ -250,7 +253,6 @@ def test_deploy_reusable_unroll_updated():
 
     assert "dojo.require('PlanApp.Page.Controller');" in content
 
-@attr('focus')
 @with_setup(setup, teardown)
 def test_deploy_reusable_no_js_minifying():
     hash_js = '3dd295714e3ad47c9212dd7a2f6a1a7d'

@@ -22,7 +22,11 @@
     <script type="text/javascript">
     //<![CDATA[
     {% for ribt in prepared_instructions.ribt %}
-    dojo.registerModulePath('{{ ribt.namespace }}', '{{ cache_url }}{{ prepared_instructions.cache_prefix }}{{ ribt.location }}');
+        {% if ribt.needs_registration %}
+            dojo.registerModulePath('{{ ribt.namespace }}', '{{ cache_url }}{{ prepared_instructions.cache_prefix }}{{ ribt.location }}');
+        {% else %}
+            // {{ ribt.namespace }} module registration rolled up
+        {% endif %}
         {% for requirement in ribt.require %}
             dojo.require('{{ requirement }}');
         {% endfor %}

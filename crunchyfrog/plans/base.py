@@ -460,6 +460,7 @@ class BasePlan(object):
             namespace = ribt_module['namespace']
             location = ribt_module['location']
             require = ribt_module['require']
+            ribt_module['needs_registration'] = True
 
             tests = []
             if ribt.is_instrumented():
@@ -546,6 +547,12 @@ class RollupPlan(object):
 
         return { 'location': location, }
 
+
+    def __dojo_register_module_path(self, namespace, basename):
+        location = urljoin(self.cache_url, basename)
+        js_template= "dojo.registerModulePath('%(namespace)s', '%(location)s');"
+        return js_template % {'namespace': namespace, 'location': location}
+
     def _rollup_ribt(self, ribt_instructions):
         local_modules = []
 
@@ -564,6 +571,12 @@ class RollupPlan(object):
                     if stat and stat.st_mtime > time_started():
                         continue
                 source, is_cached = self._get_media_source(req_location)
+                # Now we need to add a dojo.registerModulePath to this
+                source = '%s\n' % self.__dojo_register_module_path(
+                    namespace, location) + source
+                # And tell the instructions it no longer needs to worry about
+                # the registration of this module
+                ribt_module['needs_registration'] = False
                 local_modules.append({'name': req, 'static': req_location,
                     'source': source})
 
