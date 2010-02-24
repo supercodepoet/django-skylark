@@ -167,8 +167,8 @@ dojo.declare('RibtTools.Mvc.Parser', null, {
             // get pointer to widget class
             var cls = dojo.getObject(className);
             if(!dojo.isFunction(cls)){
-                throw new RibtTools.Error("Could not load class '" + className +
-                    "'. Did you spell the name correctly and use a full path, like 'dijit.form.Button'?");
+                throw new RibtTools.Error("Could not retrieve object '" + className +
+                    "'. It's possible an error prevented it from loading");
             }
             var proto = cls.prototype;
 

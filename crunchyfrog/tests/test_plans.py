@@ -275,3 +275,30 @@ def test_deploy_reusable_no_js_minifying():
     assert '//' in jsfile
     # Should be Dojo documentation in here
     assert '// summary:' in jsfile
+
+@with_setup(setup, teardown)
+def test_will_not_needlessly_rollup():
+    settings.CRUNCHYFROG_PLANS = 'mediadeploy_reusable'
+
+    hash_js1 = '3dd295714e3ad47c9212dd7a2f6a1a7d'
+    filename = os.path.join(cachedir, 'rf', '%s.js' % hash_js1)
+
+    request = get_request_fixture()
+    c = RequestContext(request)
+    pa = PageAssembly('planapp/page/full.yaml', c)
+
+    content = pa.dumps()
+
+    first_time = os.stat(filename).st_mtime
+    first_listing = os.listdir(os.path.join(cachedir, 'rf'))
+
+    sleep(1.0) 
+
+    request = get_request_fixture()
+    c = RequestContext(request)
+    pa = PageAssembly('planapp/page/full.yaml', c)
+
+    content = pa.dumps()
+
+    assert first_time == os.stat(filename).st_mtime
+    assert first_listing == os.listdir(os.path.join(cachedir, 'rf'))

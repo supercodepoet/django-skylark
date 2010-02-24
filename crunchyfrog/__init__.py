@@ -58,7 +58,9 @@ def clear_media_cache():
         return
     for topdir in os.listdir(cachedir):
         if topdir in skip: continue
-        shutil.rmtree(os.path.join(cachedir, topdir))
+        d = os.path.join(cachedir, topdir)
+        if os.path.isdir(d):
+            shutil.rmtree(d)
 
 if settings.CRUNCHYFROG_INIT_CLEAR_CACHE and not __cache_cleared:
     """

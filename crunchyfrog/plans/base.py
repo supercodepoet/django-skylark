@@ -493,6 +493,8 @@ class BasePlan(object):
         return self.prepared_instructions
 
 class RollupPlan(object):
+    __rollup_last_modifieds = {}
+
     """
     These are extra methods that are needed for rolling up files
 
@@ -517,6 +519,8 @@ class RollupPlan(object):
         return hashlib.md5(pickle.dumps(files)).hexdigest()
 
     def _prepare_rollup(self, attr, rollup, keep, insert_point, **kwargs):
+        if not self.prepared_instructions[attr]:
+            return
         rollup_instruction = self._rollup_static_files(
             rollup, attr, kwargs.get('minifier', None))
         other_instruction = self.prepared_instructions[attr]
@@ -541,6 +545,19 @@ class RollupPlan(object):
         basename = '%s.%s' % (self._make_filename(files), extension,)
         filename = os.path.join(self.cache_root, basename)
         location = urljoin(self.cache_url, basename)
+        retval = { 'location': location, } 
+
+        if not files:
+            return retval
+
+        lastmod = max([ self._get_media_stat(i).st_mtime for i in files ])
+
+        if os.path.isfile(filename) and \
+           self.__rollup_last_modifieds.has_key(filename) and \
+           self.__rollup_last_modifieds[filename] == lastmod:
+            # Nothing has changed since we last saw this instruction set
+            return retval
+        self.__rollup_last_modifieds[filename] = lastmod
 
         if not os.path.isfile(filename) or settings.DEBUG:
             f = open(filename, 'w')
@@ -548,8 +565,7 @@ class RollupPlan(object):
             f.write(source)
             f.close()
 
-        return { 'location': location, }
-
+        return retval
 
     def __dojo_register_module_path(self, namespace, basename):
         location = urljoin(self.cache_url, basename)
