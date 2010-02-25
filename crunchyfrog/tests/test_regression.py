@@ -80,3 +80,40 @@ def test_issue_23():
     pa = PageAssembly('dummyapp/issue23/issue23.yaml', c)
 
     assert 'dummyapp/issue23/media/js/tt_after_sa.js' in pa.dumps()
+
+@with_setup(setup, teardown)
+def test_issue_25():
+    """
+    Issue #25
+
+    Joe, while debugging a dojo.require problem commented out the line but the
+    regular expression does not respect commented sections.
+    This test needs to include both commenting styles:
+
+    /**
+    dojo.require('something')
+    */
+
+    // dojo.require('something')
+    """
+    # TODO Need to still write a test for block comments
+    settings.CRUNCHYFROG_PLANS = 'mediadeploy_reusable'
+
+    hash_js = '9ac70f5f9343cdc9c13d54809b2ddaf5'
+
+    request = get_request_fixture()
+    c = RequestContext(request, {})
+    pa = PageAssembly('dummyapp/issue25/issue25.yaml', c)
+
+    content = pa.dumps()
+
+    assert content
+
+    jsfile = get_contents(
+        os.path.join(cachedir, 'rf', '%s.js' % hash_js)
+    )
+
+    assert "dojo.registerModulePath('RibtTools'" in jsfile
+    assert "dojo.provide('RibtTools.Error')" in jsfile
+    assert "dojo.registerModulePath('DummyApp.Issue25'" in jsfile
+    assert "dojo.provide('DummyApp.Issue25.TestFile')" in jsfile

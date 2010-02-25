@@ -636,7 +636,8 @@ class RollupPlan(object):
         if name in [ i['name'] for i in roll_modules ]:
             return
 
-        req_pattern = re.compile('dojo\.require\((\'|")(?P<mod>[^\'"]+)\\1\)')
+        req_pattern = re.compile(
+            r'^\s*dojo\.require\((\'|")(?P<mod>[^\'"])+\1\)')
 
         match = req_pattern.findall(source)
 
