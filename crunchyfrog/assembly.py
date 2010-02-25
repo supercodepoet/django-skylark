@@ -64,8 +64,8 @@ class BaseAssembly(object):
                 'or False on the subclass of BaseAssembly')
 
         if not isinstance(context, RequestContext):
-            raise ValueError('%r must be of type RequestContext, you provided '
-                '%s' % (context, type(context),))
+            raise ValueError('%r must be of type crunchyfrog.RequestContext, '
+                'you provided %s' % (context, type(context),))
 
         if not yamlfiles:
             raise ValueError('%r argument must not be empty or None' %

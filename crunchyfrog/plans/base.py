@@ -120,7 +120,13 @@ class BasePlan(object):
         As we process the page instructions, we gather the output we need to
         convert this into an html page inside this dictionary
         """
-        self.prepared_instructions = {}
+        self.prepared_instructions = {
+            'meta': [],
+            'js': [],
+            'css': [],
+            'ribt': [],
+        }
+
         self.prepared_instructions['render_full_page'] = self.render_full_page
         self.prepared_instructions['cache_prefix'] = '%s/' % self.cache_prefix
 
@@ -480,15 +486,28 @@ class BasePlan(object):
             """
             self._prepare_assets(page_instructions, (location,))
 
-    def prepare(self, page_instructions):
+    def prepare(self, page_instructions, omit_media=False):
         self.page_instructions = page_instructions
 
         self.prepare_title(page_instructions)
         self.prepare_body(page_instructions)
-        self.prepare_js(page_instructions)
-        self.prepare_css(page_instructions)
         self.prepare_meta(page_instructions)
-        self.prepare_ribt(page_instructions)
+
+        if not omit_media:
+            """
+            This can get flipped to True if we are nested inside another
+            rendering.
+
+            For example, if a snippet assembly is being used in a template tag
+            and we are in the render function as part of that tag, there is
+            going to be another page assembly responsible for actually rendering
+            the page.  It will handle the media for us, so we clean out the
+            media sections of our prepared instructions here to prevent
+            duplication.
+            """
+            self.prepare_js(page_instructions)
+            self.prepare_css(page_instructions)
+            self.prepare_ribt(page_instructions)
 
         return self.prepared_instructions
 
@@ -523,7 +542,10 @@ class RollupPlan(object):
             return
         rollup_instruction = self._rollup_static_files(
             rollup, attr, kwargs.get('minifier', None))
+        if not rollup_instruction:
+            return
         other_instruction = self.prepared_instructions[attr]
+
         self.prepared_instructions[attr] = \
             other_instruction[:insert_point] + \
             [rollup_instruction] + \
@@ -548,7 +570,7 @@ class RollupPlan(object):
         retval = { 'location': location, } 
 
         if not files:
-            return retval
+            return None
 
         lastmod = max([ self._get_media_stat(i).st_mtime for i in files ])
 
@@ -633,7 +655,9 @@ class RollupPlan(object):
                 try:
                     req_mod_source, is_cached = self._get_media_source(req_mod_path) 
                 except TemplateDoesNotExist as tdne:
-                    raise TemplateDoesNotExist('Trying to find %s at path %s' % (req_mod, req_mod_path,))
+                    raise TemplateDoesNotExist('Trying to find %s at path %s '
+                       'while processing dojo.requires for %s' % (
+                            req_mod, req_mod_path, name))
             except SkipDojoModule as sdm:
                 continue
 
@@ -662,6 +686,15 @@ class RollupPlan(object):
             return local[0]
 
         mod_parts = mod.split('.')
+        if mod_parts[0].lower() != 'dojo' and mod_parts[0].lower() != 'dojox':
+            # We have a problem Houston, this thing is not a Dojo module but
+            # it's not included in the local modules
+            local = [ i['static'] for i in self._local_modules ]
+            raise DojoModuleResolution('Module %s was not found, are you '
+               'requiring a module that has not been included in your Page '
+               'or Snippet assembly? (we know about %s)' % 
+               (mod, ', '.join(local)))
+        # Perhaps it's a dojo or dojox module
         mod_path = '%s.js' % os.path.join('ribt', 'media', *mod_parts)
 
         return mod_path
