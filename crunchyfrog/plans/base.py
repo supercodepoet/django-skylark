@@ -149,11 +149,8 @@ class BasePlan(object):
         Performs a os.stat on template_name, raising TemplatePathDoesNotExist
         if the template_name is not file based.
         """
-        try:
-            path = cfloader.find_template_path(template_name)
-            return os.stat(path)
-        except cfloader.TemplatePathDoesNotExist:
-            return None
+        path = cfloader.find_template_path(template_name)
+        return os.stat(path)
 
     def _get_media_source(self, template_name, process_func=None, context=None):
         """

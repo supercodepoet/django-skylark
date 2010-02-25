@@ -70,7 +70,6 @@ class Renderer(object):
 
         This return a string representing the HTML or similar output
         """
-
         assert self.page_instructions.body, \
             'The body has not been specified in the page instructions ' + \
             '(body: in your yaml file)'
