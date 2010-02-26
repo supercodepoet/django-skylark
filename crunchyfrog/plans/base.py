@@ -637,14 +637,16 @@ class RollupPlan(object):
             return
 
         req_pattern = re.compile(
-            r'^\s*dojo\.require\((\'|")(?P<mod>[^\'"])+\1\)')
+            r'\s*dojo\.require\((\'|")(?P<mod>[^\'"]+)(\'|")\)')
 
-        match = req_pattern.findall(source)
+        matches = []
+        lines = source.splitlines()
+        for line in lines:
+            match = req_pattern.match(line)
+            if match:
+                matches.append(match.groupdict()['mod'])
 
-        if match == None:
-            return
-        
-        for req_mod in [ i[1] for i in match ]:
+        for req_mod in matches:
             try:
                 req_mod_path = self._resolve_dojo_module_path(req_mod)
                 if not req_mod_path:

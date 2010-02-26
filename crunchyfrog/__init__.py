@@ -7,7 +7,7 @@ from django.core.cache import cache
 from django.conf import UserSettingsHolder
 from crunchyfrog.conf import settings
 
-__all__ = ['clear_media_cache', 'HttpResponse', 'RequestContext']
+__all__ = ['clear_media_cache', 'time_started', 'HttpResponse', 'RequestContext']
 
 __time_started = time.time()
 

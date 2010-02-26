@@ -207,51 +207,59 @@ def test_missing_rollup_requirement():
 
     py.test.raises(TemplateDoesNotExist, pa.dumps)
 
+@attr('focus')
 @with_setup(setup, teardown)
-def test_deploy_reusable_unroll_updated():
-    settings.CRUNCHYFROG_PLANS = 'mediadeploy_reusable'
+def test_deploy_unroll_updated():
+    def render_full():
+        request = get_request_fixture()
+        c = RequestContext(request)
+        pa = PageAssembly('planapp/page/full.yaml', c)
 
-    request = get_request_fixture()
-    c = RequestContext(request)
-    pa = PageAssembly('planapp/page/full.yaml', c)
+        return pa.dumps()
 
-    content = pa.dumps()
+    time_newer = (time_started() + 10, time_started() + 10,)
+    time_older = (time_started() - 1000, time_started() - 1000,)
 
-    assert 'planapp/page/media/js/static_uses1.js' not in content
+    def make_them(to_time):
+        os.utime(loader.find_template_path('planapp/page/media/js/static_uses1.js'),
+            to_time)
+        os.utime(loader.find_template_path('planapp/page/media/js/Controller.js'),
+            to_time)
 
-    sleep(1.0) 
-    os.utime(loader.find_template_path('planapp/page/media/js/static_uses1.js'),
-        None)
+    # Check both plans, they should behave the same here
+    for cfplan_setting in ('mediadeploy_reusable', 'mediadeploy_fewest',):
+        # Let's make them older than when CF started
+        make_them(time_older)
+        plan_options(unroll_recently_modified=False)
 
-    request = get_request_fixture()
-    c = RequestContext(request)
-    pa = PageAssembly('planapp/page/full.yaml', c)
+        settings.CRUNCHYFROG_PLANS = cfplan_setting
 
-    content = pa.dumps()
+        content = render_full()
 
-    assert 'planapp/page/media/js/static_uses1.js' not in content
+        # Both of these should be rolled up
+        assert 'planapp/page/media/js/static_uses1.js' not in content
+        assert "dojo.require('PlanApp.Page.Controller');" not in content
 
-    plan_options(unroll_recently_modified=True)
+        # Now let's fake modify our files
+        #sleep(1.0) 
+        make_them(time_newer)
 
-    request = get_request_fixture()
-    c = RequestContext(request)
-    pa = PageAssembly('planapp/page/full.yaml', c)
+        content = render_full()
 
-    content = pa.dumps()
+        # We haven't told our plan to unroll anything, they should still be
+        # rolled up
+        assert 'planapp/page/media/js/static_uses1.js' not in content
+        assert "dojo.require('PlanApp.Page.Controller');" not in content
 
-    assert 'planapp/page/media/js/static_uses1.js' in content
+        # Now, we'll tell our plan to unroll recently modified
+        plan_options(unroll_recently_modified=True)
 
-    sleep(1.0) 
-    os.utime(loader.find_template_path('planapp/page/media/js/Controller.js'),
-        None)
+        content = render_full()
 
-    request = get_request_fixture()
-    c = RequestContext(request)
-    pa = PageAssembly('planapp/page/full.yaml', c)
-
-    content = pa.dumps()
-
-    assert "dojo.require('PlanApp.Page.Controller');" in content
+        # This should still unrolled, we don't unroll static JS
+        assert 'planapp/page/media/js/static_uses1.js' not in content
+        # And this should be unrolled now
+        assert "dojo.require('PlanApp.Page.Controller');" in content
 
 @with_setup(setup, teardown)
 def test_deploy_reusable_no_js_minifying():

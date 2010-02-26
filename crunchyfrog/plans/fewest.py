@@ -15,11 +15,6 @@ class FewestFiles(BasePlan, RollupPlan):
             if not item.has_key('ieversion') and \
                item.get('include', True) and \
                item.has_key('static'):
-                stat = self._get_media_stat(item['static'])
-                if stat and stat.st_mtime > time_started() and \
-                   self.options['unroll_recently_modified']:
-                    keep.append(item)
-                    continue
                 rollup.append(item)
                 if not insert_point:
                     insert_point = len(keep)

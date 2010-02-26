@@ -99,7 +99,7 @@ def test_issue_25():
     # TODO Need to still write a test for block comments
     settings.CRUNCHYFROG_PLANS = 'mediadeploy_reusable'
 
-    hash_js = '9ac70f5f9343cdc9c13d54809b2ddaf5'
+    hash_js = '2a89c79723ce8d1d558232e113afcae8'
 
     request = get_request_fixture()
     c = RequestContext(request, {})
@@ -115,5 +115,10 @@ def test_issue_25():
 
     assert "dojo.registerModulePath('RibtTools'" in jsfile
     assert "dojo.provide('RibtTools.Error')" in jsfile
+    assert 'dojo.provide("dojox.timing._base")' in jsfile
+    assert 'dojo.provide("dojox.timing")' in jsfile
+    assert "dojo.provide('RibtTools.SyncTimer.Timer')" in jsfile
+    assert 'dojo.provide("dojo.back")' in jsfile
+    assert 'dojo.provide("dojo.NodeList-traverse")' in jsfile
     assert "dojo.registerModulePath('DummyApp.Issue25'" in jsfile
     assert "dojo.provide('DummyApp.Issue25.TestFile')" in jsfile
