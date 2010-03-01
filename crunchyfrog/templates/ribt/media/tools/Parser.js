@@ -58,24 +58,22 @@ dojo.declare('RibtTools.Mvc.Parser', null, {
             node = node.charAt(0) == "<" ? dojo._toDom(node, refNode.ownerDocument) : dojo.byId(node);
         }
 
-        // Remove references to the controller so gc can happen
+        var toParse = node;
+
+        var needsGc = []; // list of elements needing their controller destroyed
         position = position.toLowerCase();
         if (position == 'replace' || position == 'only') {
             dojo.query('*[ribtType]', refNode).forEach(function(element) {
                 if (element._controller) {
-                    element._controller.destroy();
-                    delete element._controller;
+                    needsGc.push(element);
                 }
             })
 
             // Do we have one on the refNode itself
             if (position == 'replace' && refNode._controller) {
-                refNode._controller.destroy();
-                delete refNode._controller;
+                needsGc.push(refNode);
             }
         }
-
-        var toParse = node;
 
         if (node.nodeType == this.DOCUMENT_FRAGMENT_NODE) {
             toParse = [];
@@ -86,6 +84,14 @@ dojo.declare('RibtTools.Mvc.Parser', null, {
 
         dojo.place(node, refNode, position);
         this.parse(toParse);
+        
+        // Remove references to the controller so gc can happen
+        dojo.forEach(needsGc, function(element) {
+            if (element && element._controller) {
+                element._controller.destroy();
+                delete element._controller;
+            }
+        })
     },
 
     /**
