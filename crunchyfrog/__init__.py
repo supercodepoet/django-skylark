@@ -41,12 +41,18 @@ class RequestContext(template.RequestContext):
     def __init__(self, request, dict=None, processors=None):
         from django.conf import settings as django_settings
         super(RequestContext, self).__init__(request, dict, processors)
-        cf_internals = {
-            'request': request,
-            'settings': copy_then_filter_settings(
-                django_settings, 'CRUNCHYFROG')
-        }
-        self['crunchyfrog_internals'] = cf_internals
+        if hasattr(request, 'crunchyfrog_internals'):
+            internals = request.crunchyfrog_internals
+        else:
+            internals = {
+                'request': request,
+                'settings': copy_then_filter_settings(
+                    django_settings, 'CRUNCHYFROG')
+            }
+            # Hook the request object
+            setattr(request, 'crunchyfrog_internals', internals)
+
+        self['crunchyfrog_internals'] = internals
 
 __cache_cleared = False
 

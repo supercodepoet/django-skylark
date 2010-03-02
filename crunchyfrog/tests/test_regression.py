@@ -122,3 +122,58 @@ def test_issue_25():
     assert 'dojo.provide("dojo.NodeList-traverse")' in jsfile
     assert "dojo.registerModulePath('DummyApp.Issue25'" in jsfile
     assert "dojo.provide('DummyApp.Issue25.TestFile')" in jsfile
+
+@with_setup(setup, teardown)
+def test_issue27():
+    """
+    Issue #27
+
+    Because we tack extra information on a context object (namely the page
+    instructions and page assemblies that are involving that context) we are
+    forced to use the context that is passed into a render method in a template
+    tag.
+
+    This is not ideal, because we may overwrite or clog the context with
+    variables that don't belong there.
+
+    The template tag needs to be able to create a new RequestContext based on
+    the request and have things work out correctly.
+
+    Behind the scenes, CF needs to do whatever is necessary to keep the page
+    instructions and page assemblies hooked to the context. This can be done by
+    placing a hook on the request itself.
+    """
+    request = get_request_fixture()
+
+    assert not hasattr(request, 'crunchyfrog_internals')
+
+    from django.core import context_processors
+    # Add the request object to our contexts
+    processors = (
+        context_processors.request,
+    )
+
+    context = RequestContext(request,
+        { 'foo': 'bar' },
+        processors)
+
+    assert context.has_key('crunchyfrog_internals')
+    assert hasattr(request, 'crunchyfrog_internals')
+
+    sa_context = RequestContext(context['request'],
+        { 'bob': 'slob' },
+        processors)
+
+    assert sa_context['crunchyfrog_internals'] is request.crunchyfrog_internals
+    assert sa_context.has_key('bob')
+    # Make sure that we aren't inheriting variables
+    assert not sa_context.has_key('foo')
+
+    not_hooked_request = get_request_fixture()
+    not_hooked_context = RequestContext(not_hooked_request,
+        { 'ted': 'sled' },
+        processors)
+
+    # Make sure that we aren't reusing request's crunchyfrog internals
+    assert not_hooked_context['crunchyfrog_internals'] is not \
+        request.crunchyfrog_internals
