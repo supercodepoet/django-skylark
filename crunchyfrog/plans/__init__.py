@@ -36,7 +36,11 @@ def get_for_context(context, render_full_page):
             raise ValueError('Do not set the plan to an instance of %s, pass '
                  'us the actual class object itself' % plan)
 
-        return plan(context, render_full_page)
+        if not render_full_page:
+            # Only supported plan for snippets is separating everything
+            return SeparateEverything(context, render_full_page)
+        else:
+            return plan(context, render_full_page)
     except ImportError:
         if settings.DEBUG:
             return SeparateEverything(context, render_full_page)

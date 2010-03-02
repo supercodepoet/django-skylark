@@ -24,7 +24,7 @@ def test_plan_options_invalid():
 @with_setup(setup, teardown)
 def test_can_change_deploy_plan_name():
     context = {}
-    render_full_page = False
+    render_full_page = True
 
     plan = get_for_context(context, render_full_page)
     assert isinstance(plan, SeparateEverything)
@@ -40,6 +40,10 @@ def test_can_change_deploy_plan_name():
     settings.CRUNCHYFROG_PLANS_DEFAULT = 'alternative'
     plan = get_for_context(context, render_full_page)
     assert isinstance(plan, FewestFiles)
+
+    # If we aren't rendering a full page, it should be SeparateEverything
+    plan = get_for_context(context, False)
+    assert isinstance(plan, SeparateEverything)
 
     settings.CRUNCHYFROG_PLANS = 'mediadeploy_bad'
     settings.CRUNCHYFROG_PLANS_DEFAULT = 'default'

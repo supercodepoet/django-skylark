@@ -196,8 +196,6 @@ class BaseAssembly(object):
 
         doctype = instructions.doctype or 'HTML 4.01 Transitional'
 
-        omit_media = self.__is_root_assembly()
-
         page_renderer = renderer.get(doctype, instructions, self.context,
             render_full_page=self.render_full_page,
             omit_media=not self.__is_root_assembly()
