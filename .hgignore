@@ -17,3 +17,4 @@ crunchyfrog/tests/media/cfcache
 
 syntax: regexp
 ^parts/.*
+.idea/*
