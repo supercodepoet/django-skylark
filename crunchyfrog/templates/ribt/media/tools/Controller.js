@@ -253,6 +253,8 @@ dojo.declare('RibtTools.Mvc.Controller', null, {
             this.deleteDelegate(this._delegates[0]);
         }
 
-        this.view.destroy();
+        if (this.view) {
+            this.view.destroy();
+        }
     }
 });
