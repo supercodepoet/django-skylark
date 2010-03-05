@@ -638,9 +638,14 @@ class RollupPlan(object):
                     namespace, location) + source
                 # And tell the instructions it no longer needs to worry about
                 # the registration of this module
-                ribt_module['needs_registration'] = False
                 local_modules.append({'name': req, 'static': req_location,
                     'source': source})
+
+            if len(skip_modules) > 0:
+                # Well, we decided to skip some modules
+                ribt_module['needs_registration'] = True
+            else:
+                ribt_module['needs_registration'] = False
 
         self._local_modules = local_modules
         self._skip_modules = skip_modules

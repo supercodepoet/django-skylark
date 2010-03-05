@@ -262,6 +262,7 @@ def test_deploy_unroll_updated():
         # This should still unrolled, we don't unroll static JS
         assert 'planapp/page/media/js/static_uses1.js' not in content
         # And this should be unrolled now
+        assert "dojo.registerModulePath('PlanApp.Page'" in content
         assert "dojo.require('PlanApp.Page.Controller');" in content
 
 @with_setup(setup, teardown)
