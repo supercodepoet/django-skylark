@@ -3,6 +3,7 @@ import yaml
 
 from django import template
 
+
 class StringWithSourcefile(object):
     """
     A string that include the source file from whence it came
@@ -16,7 +17,8 @@ class StringWithSourcefile(object):
 
     def __call__(self, f):
         return self.value.__call__(f)
-        
+
+
 class PageInstructions(object):
     """
     Object to contain the page instructions that come from our YAML files
@@ -29,23 +31,23 @@ class PageInstructions(object):
         These are the ones we expect, these are all the possible kinds of
         instructions that can be handled
         """
-        self.root_yaml  = None
-        self.doctype    = None
-        self.body       = None
-        self.title      = None
-        self.uses_yaml  = []
+        self.root_yaml = None
+        self.doctype = None
+        self.body = None
+        self.title = None
+        self.uses_yaml = []
         self.other_yaml = []
         self.piped_yaml = []
-        self.js         = []
-        self.css        = []
-        self.meta       = []
-        self.ribt       = []
+        self.js = []
+        self.css = []
+        self.meta = []
+        self.ribt = []
 
     def part_exists(self, part):
         """
-        Withing our existing page instruction for javascript and css, we look to see
-        if the part already has been added.  There is no reason to duplicate either
-        one of these.
+        Withing our existing page instruction for javascript and css, we look
+        to see if the part already has been added.  There is no reason to
+        duplicate either one of these.
         """
         instructions = []
         instructions.extend(self.js)
@@ -53,14 +55,16 @@ class PageInstructions(object):
         instructions.extend(self.ribt)
 
         for instruction in instructions:
-            if self._get_source_attribute(instruction) == self._get_source_attribute(part):
+            if self._get_source_attribute(instruction) == \
+               self._get_source_attribute(part):
                 return True
 
         return False
 
     def _get_source_attribute(self, part):
         """
-        Looks through a part of the yaml file and pulls out the location it references.
+        Looks through a part of the yaml file and pulls out the location it
+        references.
 
         Since the parts can have a variety of keys (url, render, static,
         namespace) this method is used to get whichever of the keys is set
@@ -89,7 +93,8 @@ class PageInstructions(object):
                 if destination_instructions.part_exists(part):
                     continue
                 if part['sourcefile'] not in destination_instructions.yaml:
-                    destination_instructions.piped_yaml.append(part['sourcefile'])
+                    destination_instructions.piped_yaml.append(
+                        part['sourcefile'])
                 dest_media.append(part)
 
             for part in to_remove:
@@ -102,7 +107,7 @@ class PageInstructions(object):
 
         for uses in self.uses_yaml:
             yield uses
-            
+
         for other in self.other_yaml:
             yield other
 
@@ -111,7 +116,8 @@ class PageInstructions(object):
 
     def __get_object(self, yamlfile, context):
         source, origin = template.loader.find_template_source(yamlfile)
-        assert source, 'The template loader found the template but it is completely empty'
+        assert source, 'The template loader found the template but it is ' + \
+            'completely empty'
 
         sourcerendered = template.Template(source).render(context)
         assert sourcerendered, 'yamlfile needs to contain something'
@@ -136,29 +142,29 @@ class PageInstructions(object):
         Adds the instructions from one YAML file to this object, combining
         it with what's already here
         """
-        if not isinstance(instructions, list) or not isinstance(instructions, tuple):
+        if not isinstance(instructions, list) or not \
+           isinstance(instructions, tuple):
             instructions = (instructions, )
 
         for instruction in instructions:
-            if instruction.has_key('uses'):
+            if 'uses' in instruction:
                 for uses in instruction['uses']:
                     if uses['file'] == self.root_yaml or \
                        uses['file'] in self.other_yaml or \
                        uses['file'] in self.uses_yaml:
-                        # We've already seen this guy, there is no reason to add
-                        # this YAML again
+                        # We've already seen this guy, there is no reason to
+                        # add this YAML again
                         continue
                     self.uses_yaml.append(uses['file'])
                     self.add(
                         self.__get_object(uses['file'], self.context),
-                        uses['file']
-                    )
+                        uses['file'])
 
             for attr in ('doctype', 'js', 'css', 'body', 'title', 'meta',
                          'ribt'):
-                if instruction.has_key(attr):
+                if attr in instruction:
                     pi_object = getattr(self, attr)
-                    i_object  = instruction[attr]
+                    i_object = instruction[attr]
 
                     if isinstance(pi_object, list):
                         for part in i_object:

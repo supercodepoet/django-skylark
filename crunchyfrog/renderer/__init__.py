@@ -12,4 +12,5 @@ renderers = {
 }
     
 def get(doctype, instructions, context, **kwargs):
-    return renderers[str(doctype)](instructions, context, **kwargs)
+    return renderers[str(doctype)](
+        instructions, context, **kwargs)

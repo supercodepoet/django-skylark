@@ -3,6 +3,7 @@ from time import time
 from django.utils.importlib import import_module
 from django.conf import settings
 
+
 class RibtError(Exception):
     pass
 
@@ -21,6 +22,7 @@ _time_instrumented = None
 # before everything is in place (namely all the urlpatterns)
 _ribt_modules = []
 
+
 def check_instrumentation(meth):
     """
     Decorator to check the main settings and turn on instrumentation if needed
@@ -36,12 +38,14 @@ def check_instrumentation(meth):
         return meth(*args, **kwargs)
     return check
 
+
 def is_instrumented():
     """
     Is the site currently instrumented for testing?
     """
     global _instrumented
     return _instrumented
+
 
 def page_assembly_testcase_handler(page_instructions, renderer, assembly):
     """
@@ -50,6 +54,7 @@ def page_assembly_testcase_handler(page_instructions, renderer, assembly):
     """
     assembly.add_page_instructions(
         page_instructions, 'ribt/testrunner/testcase.yaml')
+
 
 def instrument_site(on):
     """
@@ -80,6 +85,7 @@ def instrument_site(on):
     # instrumented our site
     for mod in _ribt_modules:
         import_module(mod)
+
 
 def autodiscover():
     """
@@ -122,6 +128,7 @@ class TestEntryPoint(object):
         self.url = kwargs.get('url', None)
         self.name = kwargs.get('name', None)
 
+
 class TestRegistry(object):
     _tests = []
 
@@ -144,8 +151,8 @@ class TestRegistry(object):
             self._tests.remove(test)
 
     def __contains__(self, key):
-        url = key in [ tep.url for tep in self._tests ]
-        name = key in [ tep.name for tep in self._tests ]
+        url = key in [tep.url for tep in self._tests]
+        name = key in [tep.name for tep in self._tests]
         return url | name
 
     def __len__(self):
@@ -153,5 +160,6 @@ class TestRegistry(object):
 
     def list(self):
         return self._tests
+
 
 test_registry = TestRegistry()

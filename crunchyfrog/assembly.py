@@ -29,11 +29,14 @@ except OSError:
     """
     settings.CRUNCHYFROG_ENABLE_TIDY = False
 
+
 class HtmlTidyErrors(Exception):
     pass
 
+
 class HandlerError(Exception):
     pass
+
 
 class BaseAssembly(object):
     """
@@ -74,8 +77,9 @@ class BaseAssembly(object):
         if not len(yamlfiles):
             raise ValueError('%r must not be zero length' % (yamlfiles,))
 
-        # We can get the yamlfiles as a single string or a tuple, but by the time
-        # we set our instance variable it needs to be normalized to a tuple.
+        # We can get the yamlfiles as a single string or a tuple, but by the
+        # time we set our instance variable it needs to be normalized to a
+        # tuple.
 
         # In other words, this needs to happen:
         #     'some/file.yaml'   -->  ('some/file.yaml',)
@@ -84,8 +88,8 @@ class BaseAssembly(object):
 
         self.yamlfiles = yamlfiles
 
-        # It's important for our context to have the media root and url included,
-        # if it's not there we are going to add it
+        # It's important for our context to have the media root and url
+        # included, if it's not there we are going to add it
         for var in ('MEDIA_ROOT', 'MEDIA_URL'):
             if not hasattr(context, var):
                 context[var] = getattr(settings, var)
@@ -120,8 +124,8 @@ class BaseAssembly(object):
         return True if self == self.__get_root_assembly() else False
 
     def __get_root_assembly(self):
-        assembly_stack = self.context['crunchyfrog_internals']['assembly_stack']
-        return assembly_stack[0]
+        astack = self.context['crunchyfrog_internals']['assembly_stack']
+        return astack[0]
 
     def __create_page_instructions(self):
         """
@@ -129,8 +133,7 @@ class BaseAssembly(object):
         """
         page_instructions = PageInstructions(
             render_full_page=self.render_full_page,
-            context_instance=self.context
-        )
+            context_instance=self.context)
 
         tried = []
 
@@ -142,18 +145,18 @@ class BaseAssembly(object):
     def __convert_tidy_errors(self, errors_raw, **kwargs):
         """
         The errors we get back from the tidy are formatted for output including
-        newlines in the string.  Each line is a single error, so we split on the
-        line to get a list
+        newlines in the string.  Each line is a single error, so we split on
+        the line to get a list
         """
         filter = kwargs.get('filter', None)
-        line_pattern = '^line\ (?P<l>\d+)\ column\ (?P<c>\d+)\ \-\ (?P<desc>.*)$'
-        line_re = re.compile(line_pattern)
+        pattern = '^line\ (?P<l>\d+)\ column\ (?P<c>\d+)\ \-\ (?P<desc>.*)$'
+        line_re = re.compile(pattern)
 
         errors = []
         for e in errors_raw.split('\n'):
             try:
                 line, column, desc = line_re.match(e).groups()
-                if [ True for i in filter if i in desc]:
+                if [True for i in filter if i in desc]:
                     continue
                 errors.append({
                     'line': int(line),
@@ -177,7 +180,8 @@ class BaseAssembly(object):
 
     def add_page_instructions(self, page_instructions, file):
         source, origin = template.loader.find_template_source(file)
-        assert source, 'The template loader found the template but it is completely empty'
+        assert source, 'The template loader found the template but it is ' + \
+            'completely empty'
 
         sourcerendered = template.Template(source).render(self.context)
         assert sourcerendered, 'yamlfile needs to contain something'
@@ -204,8 +208,7 @@ class BaseAssembly(object):
 
         page_renderer = renderer.get(doctype, self.instructions, self.context,
             render_full_page=self.render_full_page,
-            omit_media=not self.__is_root_assembly()
-        )
+            omit_media=not self.__is_root_assembly())
 
         for handler in BaseAssembly._page_assembly_handlers:
             handler(self.instructions, page_renderer, self)
@@ -224,10 +227,8 @@ class BaseAssembly(object):
                 errors, filter=['proprietary attribute'])
             if errors and settings.CRUNCHYFROG_RAISE_HTML_ERRORS:
                 formatted_errors = self.__format_tidy_errors(content, errors)
-                raise HtmlTidyErrors('We tried to tidy up the document and got '
-                   'these errors: %s' % 
-                   ', '.join(formatted_errors)
-                )
+                raise HtmlTidyErrors('We tried to tidy up the document and '
+                   'got these errors: %s' % ', '.join(formatted_errors))
 
         return unicode(document or content)
 

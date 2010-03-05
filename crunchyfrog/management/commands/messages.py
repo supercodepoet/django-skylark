@@ -1,14 +1,17 @@
-MESSAGE_HELP = """This command will create a CrunchyFrog page and kick start a configuration file for you
+MESSAGE_HELP = \
+"""This command will create a CrunchyFrog page and kick start a configuration
+file for you
 
 Do something like this:
     ./manage.py crunchypage -a goodiesapp -p list
-    
+
 Will create a page called "list" in the goodiesapp"""
 
-MESSAGE_CONFIRM_TEMPLATE_CREATION = """We've found your app but no templates directory.
+MESSAGE_CONFIRM_TEMPLATE_CREATION = \
+"""We've found your app but no templates directory.
 
 We can create this for you and continue from here if you like.
-                                                       
+
 Create %s (yes/no)? """
 
 MESSAGE_CONFIRM_CREATION = """We're about to create these directories:
@@ -21,8 +24,8 @@ And these files
 
 Are you sure you want to do this (yes/no)? """
 
-CONTENT_YAML = """# Put your CrunchyFrog configuration here (and delete this line, it's silly to keep it)
-title: Some title here for %(app)s
+CONTENT_YAML = \
+"""title: Some title here for %(app)s
 body: %(page_directory)s/%(page)s.html
 
 #js:
@@ -48,7 +51,8 @@ css:
 """
 
 CONTENT_HTML = """<body>
-    <h1>Your page is working (using only the finest baby frogs, dew picked and flown in from Iraq)</h1>
+    <h1>Your page is working (using only the finest baby frogs, dew picked and
+    flown in from Iraq)</h1>
 </body>"""
 
 CONTENT_VIEW = """from django.http import HttpResponse

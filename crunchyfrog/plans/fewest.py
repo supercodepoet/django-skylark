@@ -2,19 +2,20 @@ from base import BasePlan, RollupPlan
 from crunchyfrog.utils.jsmin import jsmin
 from crunchyfrog import time_started
 
+
 class FewestFiles(BasePlan, RollupPlan):
     make_css_urls_absolute = True
     cache_prefix = 'ff'
 
     def __split_static_all(self, attr, page_instructions):
-        rollup = [] 
+        rollup = []
         keep = []
         insert_point = 0
 
         for item in getattr(page_instructions, attr):
-            if not item.has_key('ieversion') and \
+            if 'ieversion' not in item and \
                item.get('include', True) and \
-               item.has_key('static'):
+               'static' in item:
                 rollup.append(item)
                 if not insert_point:
                     insert_point = len(keep)
@@ -62,7 +63,6 @@ class FewestFiles(BasePlan, RollupPlan):
 
     def prepare_ribt(self, page_instructions):
         # We are going to let the prepare_js handle ribt in this case since we
-        # want it to rollup everything JS together.  So there is nothing here to
-        # do
+        # want it to rollup everything JS together.  So there is nothing here
+        # to do
         pass
-

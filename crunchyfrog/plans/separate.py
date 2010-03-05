@@ -1,5 +1,6 @@
 from base import BasePlan
 
+
 class SeparateEverything(BasePlan):
     cache_prefix = 'se'
 

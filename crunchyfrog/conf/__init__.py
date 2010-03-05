@@ -2,6 +2,7 @@ import default as default_settings
 from django.conf import settings as django_settings
 from django.utils.functional import LazyObject
 
+
 class CrunchyFrogSettings(LazyObject):
     def _setup(self):
         for name in dir(default_settings):
@@ -11,5 +12,5 @@ class CrunchyFrogSettings(LazyObject):
                 setattr(django_settings, name, value)
 
         self._wrapped = django_settings
-        
+
 settings = CrunchyFrogSettings()

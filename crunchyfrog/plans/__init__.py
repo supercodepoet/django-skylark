@@ -8,25 +8,28 @@ from separate import SeparateEverything
 __all__ = ['MissingMediaPlan', 'get_plan', 'plan_options', 'get_for_context']
 __plan_cache = {}
 
+
 def get_plan(module, attr):
     plans = __import__(module, globals(), locals(), attr)
 
     return getattr(plans, attr)
 get_plan = memoize(get_plan, __plan_cache, 2)
 
+
 def plan_options(**kwargs):
     BasePlan.set_options(**kwargs)
 
+
 class MissingMediaPlan(Exception):
     pass
-        
+
+
 def get_for_context(context, render_full_page):
     try:
         from crunchyfrog.conf import settings
         plan = get_plan(
             settings.CRUNCHYFROG_PLANS,
-            settings.CRUNCHYFROG_PLANS_DEFAULT
-        )
+            settings.CRUNCHYFROG_PLANS_DEFAULT)
 
         from base import BasePlan
         if isinstance(plan, BasePlan):

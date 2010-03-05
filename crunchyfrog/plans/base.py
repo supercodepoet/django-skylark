@@ -21,20 +21,26 @@ from crunchyfrog.processor import clevercss
 from crunchyfrog import loader as cfloader
 from crunchyfrog import ribt, time_started
 
+
 class CssFormatError(Exception):
     pass
-        
+
+
 class BadOption(Exception):
     pass
+
 
 class DojoModuleResolution(Exception):
     pass
 
+
 class SkipDojoModule(Exception):
     pass
 
+
 class CssUtilsLoggingHandler(logging.Handler):
     _records = []
+
     def emit(self, record):
         if 'CSSStyleRule' in record.msg:
             self._records.append(record)
@@ -50,6 +56,7 @@ __log.addHandler(cssutils_handler)
 __log.setLevel(logging.ERROR)
 cssutils.log.setLog(__log)
 
+
 def find_directory_from_loader(page_instructions, asset):
     from django.template.loaders.app_directories import app_template_dirs
     template_dirs = list(settings.TEMPLATE_DIRS) + list(app_template_dirs)
@@ -59,8 +66,9 @@ def find_directory_from_loader(page_instructions, asset):
         if os.path.isdir(asset_dir):
             return asset_dir
 
-    raise TemplateDoesNotExist, ('Unable to find a directory within known '
+    raise TemplateDoesNotExist('Unable to find a directory within known '
         'template directories: %s' % asset)
+
 
 def process_clevercss(source):
     """
@@ -71,6 +79,7 @@ def process_clevercss(source):
     it into normal css.  More info at http://sandbox.pocoo.org/clevercss/
     """
     return clevercss.convert(source)
+
 
 class BasePlan(object):
     """
@@ -98,8 +107,7 @@ class BasePlan(object):
     it to be modified by the function.
     """
     processing_funcs = {
-        'clevercss': process_clevercss
-    }
+        'clevercss': process_clevercss}
 
     make_css_urls_absolute = False
 
@@ -112,7 +120,8 @@ class BasePlan(object):
 
         self.cache_root = os.path.join(
             settings.CRUNCHYFROG_CACHE_ROOT, self.cache_prefix)
-        self.cache_url = urljoin(settings.CRUNCHYFROG_CACHE_URL, '%s/' % self.cache_prefix)
+        self.cache_url = urljoin(settings.CRUNCHYFROG_CACHE_URL,
+            '%s/' % self.cache_prefix)
         self.context = context
         self.render_full_page = render_full_page
 
@@ -152,7 +161,8 @@ class BasePlan(object):
         path = cfloader.find_template_path(template_name)
         return os.stat(path)
 
-    def _get_media_source(self, template_name, process_func=None, context=None):
+    def _get_media_source(self, template_name, process_func=None, \
+        context=None):
         """
         Responsible for taking a template and generating the contents.
 
@@ -182,17 +192,16 @@ class BasePlan(object):
 
     def _copy_to_media(self, template_name, source=''):
         """
-        Part of our goal here is to make the placement of media a transparent deal.
-        Django does not currently make this easy, you typically have to handle your
-        media in a pretty manual fashion.
+        Part of our goal here is to make the placement of media a transparent
+        deal.  Django does not currently make this easy, you typically have to
+        handle your media in a pretty manual fashion.
 
         This method takes a file that is somewhere in your template path (for
-        example /blog/templates/blog/list/media/css/screen.css and copies it
-        to the cache.  It ends up having the same directory structure, so in the
+        example /blog/templates/blog/list/media/css/screen.css and copies it to
+        the cache.  It ends up having the same directory structure, so in the
         end gets copied to MEDIA_ROOT/cfcache/blog/media/css/screen.css.
-
         """
-        dirpath  = os.path.join(self.cache_root, os.path.dirname(template_name))
+        dirpath = os.path.join(self.cache_root, os.path.dirname(template_name))
         filename = os.path.basename(template_name)
         fullpath = os.path.join(dirpath, filename)
 
@@ -210,7 +219,7 @@ class BasePlan(object):
         """
         Retrieves one of the processing functions that can transform our source
         into something else
-        
+
         An example here is using CleverCSS:
 
             css:
@@ -220,10 +229,11 @@ class BasePlan(object):
         if not process_func:
             return None
 
-        if self.processing_funcs.has_key(process_func):
+        if process_func in self.processing_funcs:
             return self.processing_funcs[process_func]
         else:
-            raise AttributeError('Could not find a process function matching %s, available ones are: %s' % 
+            raise AttributeError('Could not find a process function matching '
+                '%s, available ones are: %s' %
                 (process_func, ', '.join(self.processing_funcs.keys()),))
 
     def __format_css_errors(self, document_raw, errors):
@@ -253,12 +263,11 @@ class BasePlan(object):
         if errors and settings.CRUNCHYFROG_RAISE_CSS_ERRORS:
             formatted_errors = self.__format_css_errors(css_source, errors)
             raise CssFormatError(
-                ', '.join(formatted_errors)
-            )
+                ', '.join(formatted_errors))
 
-        if page_instruction.has_key('static'):
+        if 'static' in page_instruction:
             template_name = page_instruction['static']
-        elif page_instruction.has_key('inline'):
+        elif 'inline' in page_instruction:
             template_name = page_instruction['inline']
         cssutils.replaceUrls(sheet, functools.partial(replacer,
             relative_path=os.path.dirname(template_name),
@@ -280,17 +289,17 @@ class BasePlan(object):
 
         This method is a factored out version of prepare_css and prepare_js.
         """
-        if not self.prepared_instructions.has_key(item_name):
+        if item_name not in self.prepared_instructions:
             self.prepared_instructions[item_name] = []
 
         for instruction in getattr(page_instructions, item_name):
-            if instruction.has_key('url'):
+            if 'url' in instruction:
                 self.prepared_instructions[item_name].append(
-                    { 'location': instruction['url'] })
+                    {'location': instruction['url']})
             else:
                 template_name = context = process_func = None
 
-                if instruction.has_key('process'):
+                if 'process' in instruction:
                     process_func = self._get_processing_function(
                         instruction.get('process'))
 
@@ -301,28 +310,30 @@ class BasePlan(object):
 
                 assert template_name, (
                     'You must provide either "static" or "inline" properties '
-                    'that point to a file, provided object was %r' % instruction
-                )
+                    'that point to a file, provided object was %r'
+                    % instruction)
 
-                if instruction.has_key('inline'):
+                if 'inline' in instruction:
                     context = self.context
                 else:
                     context = None
 
-                source, is_cached = self._get_media_source(template_name, process_func, context)
+                source, is_cached = self._get_media_source(
+                    template_name, process_func, context)
                 if 'css' in item_name and self.make_css_urls_absolute \
                    and not is_cached:
                     source = self._fix_css_urls(instruction, source)
 
-                if instruction.has_key('static'):
+                if 'static' in instruction:
                     location, filename = self._copy_to_media(
                         template_name, source)
                     item['location'] = location
-                elif instruction.has_key('inline'):
+                elif 'inline' in instruction:
                     item['source'] = source
 
-                if instruction.has_key('include') and not instruction['include']:
-                    if instruction.has_key('inline'):
+                if 'include' in instruction and not \
+                   instruction['include']:
+                    if 'inline' in instruction:
                         raise AttributeError('You have specified inline and '
                             'include: false, these really don\'t make sense '
                             'together')
@@ -340,19 +351,20 @@ class BasePlan(object):
 
             background-image: url(../img/header/background.png)
 
-        CSS authors are used to referencing images this way.  Since we cache css files
-        from within the app to the MEDIA_ROOT, we need to also copy images that may be
-        used.  We do this by looking for media/img relative to the yaml file that was
-        used to generate the page instructions and copy this entire directory to the
-        cache.
+        CSS authors are used to referencing images this way.  Since we cache
+        css files from within the app to the MEDIA_ROOT, we need to also copy
+        images that may be used.  We do this by looking for media/img relative
+        to the yaml file that was used to generate the page instructions and
+        copy this entire directory to the cache.
 
-        The same thing goes for Javascript templates.  They are not a widely used
-        item, but we've included them because it's part of what our original goal
-        was when developing this app.
+        The same thing goes for Javascript templates.  They are not a widely
+        used item, but we've included them because it's part of what our
+        original goal was when developing this app.
 
-        You can put HTML files in media/js/templates and the entire templates directory
-        will be copied into the MEDIA_ROOT in the appropriate spot.  This way your
-        javascript files can utilize them without having to worry about where they are.
+        You can put HTML files in media/js/templates and the entire templates
+        directory will be copied into the MEDIA_ROOT in the appropriate spot.
+        This way your javascript files can utilize them without having to worry
+        about where they are.
 
         This method will work with directories that are relative to the YAML
         file or the app's templates directory.  The following will essentially
@@ -367,22 +379,22 @@ class BasePlan(object):
         for yaml in page_instructions.yaml:
             # yaml = app/page/page.yaml
             source, origin = cfloader.find_template_source(yaml)
-            del source # we don't need it
+            del source  # we don't need it
 
             origin = str(origin)
             # /Users/me/Development/app/templates/app/page/page.yaml
 
             yaml_basedir = os.path.dirname(yaml)
             # app/page
-            template_basedir = origin[:origin.find(yaml)] 
+            template_basedir = origin[:origin.find(yaml)]
             # /Users/me/Development/app/templates
 
             for asset in assets:
                 # directory = /media/js/templates
                 if not yaml_basedir in asset:
-                    # The user might be specifying the directory relative to the
-                    # yaml file itself, so we'll add it for them if they gave us
-                    # something like 'media/js/templates'
+                    # The user might be specifying the directory relative to
+                    # the yaml file itself, so we'll add it for them if they
+                    # gave us something like 'media/js/templates'
                     directory = os.path.join(yaml_basedir, asset)
                 else:
                     directory = asset
@@ -396,14 +408,16 @@ class BasePlan(object):
                     # This is quite possible if the yaml file is processing a
                     # "ribt:" attribute.
                     try:
-                        sourcedirectory = find_directory_from_loader(page_instructions, asset)
+                        sourcedirectory = find_directory_from_loader(
+                            page_instructions, asset)
                         # We need to reset this, it has the yaml_basedir on it
                         # at this point
                         directory = asset
                     except TemplateDoesNotExist:
                         continue
 
-                if not os.path.isdir(sourcedirectory): continue
+                if not os.path.isdir(sourcedirectory):
+                    continue
 
                 cachedirectory = os.path.join(self.cache_root, directory)
 
@@ -434,14 +448,17 @@ class BasePlan(object):
         Prepares the title for the page
         """
         template = Template(str(page_instructions.title))
-        self.prepared_instructions['title'] = unicode(template.render(self.context))
+        self.prepared_instructions['title'] = unicode(
+            template.render(self.context))
 
     def prepare_body(self, page_instructions):
         """
-        Takes the body section and renders it, storing it in prepared_instructions
+        Takes the body section and renders it, storing it in
+        prepared_instructions
         """
         template = djangoloader.get_template(str(page_instructions.body))
-        self.prepared_instructions['body'] = unicode(template.render(self.context))
+        self.prepared_instructions['body'] = unicode(
+            template.render(self.context))
 
     def prepare_meta(self, page_instructions):
         """
@@ -477,8 +494,8 @@ class BasePlan(object):
             We're going to copy all the files that are in this directory to the
             cache.  This is not ideal, as not all the files may be used but the
             alternative is we ask the user specifically which ones they need.
-            Since this is within the context of Dojo, that may not make the most
-            sense.
+            Since this is within the context of Dojo, that may not make the
+            most sense.
             """
             self._prepare_assets(page_instructions, (location,))
 
@@ -496,9 +513,9 @@ class BasePlan(object):
 
             For example, if a snippet assembly is being used in a template tag
             and we are in the render function as part of that tag, there is
-            going to be another page assembly responsible for actually rendering
-            the page.  It will handle the media for us, so we clean out the
-            media sections of our prepared instructions here to prevent
+            going to be another page assembly responsible for actually
+            rendering the page.  It will handle the media for us, so we clean
+            out the media sections of our prepared instructions here to prevent
             duplication.
             """
             self.prepare_js(page_instructions)
@@ -506,6 +523,7 @@ class BasePlan(object):
             self.prepare_ribt(page_instructions)
 
         return self.prepared_instructions
+
 
 class RollupPlan(object):
     __rollup_last_modifieds = {}
@@ -515,15 +533,16 @@ class RollupPlan(object):
 
     A rollup is when you take multiple files and concatenate them into one.
     """
-    def _concat_files(self, instructions, fix_css_urls = False):
-        source = [] 
+    def _concat_files(self, instructions, fix_css_urls=False):
+        source = []
         for i in instructions:
             processed = ''
-            if i.has_key('source'):
+            if 'source' in i:
                 processed = i['source']
             else:
+                process_func = self._get_processing_function(i.get('process'))
                 processed, is_cached = self._get_media_source(
-                    i['static'], self._get_processing_function(i.get('process')))
+                    i['static'], process_func)
             if fix_css_urls:
                 processed = self._fix_css_urls(i, processed)
             source.append(processed)
@@ -555,23 +574,24 @@ class RollupPlan(object):
         fix_css_urls = True if 'css' in extension else False
 
         if not minifier:
+
             def minifier(arg):
                 return arg
         # Figure out a name
-        files = [ i['static'] for i in instructions ]
+        files = [i['static'] for i in instructions]
 
         basename = '%s.%s' % (self._make_filename(files), extension,)
         filename = os.path.join(self.cache_root, basename)
         location = urljoin(self.cache_url, basename)
-        retval = { 'location': location, } 
+        retval = {'location': location}
 
         if not files:
             return None
 
-        lastmod = max([ self._get_media_stat(i).st_mtime for i in files ])
+        lastmod = max([self._get_media_stat(i).st_mtime for i in files])
 
         if os.path.isfile(filename) and \
-           self.__rollup_last_modifieds.has_key(filename) and \
+           filename in self.__rollup_last_modifieds and \
            self.__rollup_last_modifieds[filename] == lastmod:
             # Nothing has changed since we last saw this instruction set
             return retval
@@ -587,15 +607,15 @@ class RollupPlan(object):
 
     def __dojo_register_module_path(self, namespace, basename):
         location = urljoin(self.cache_url, basename)
-        js_template= "dojo.registerModulePath('%(namespace)s', '%(location)s');"
-        return js_template % {'namespace': namespace, 'location': location}
+        js_tmp= "dojo.registerModulePath('%(namespace)s', '%(location)s');"
+        return js_tmp % {'namespace': namespace, 'location': location}
 
     def _rollup_ribt(self, ribt_instructions):
         local_modules = []
         skip_modules = []
 
         for ribt_module in ribt_instructions:
-            if not ribt_module.has_key('require'):
+            if 'require' not in ribt_module:
                 continue
             namespace = ribt_module['namespace']
             location = ribt_module['location']
@@ -628,13 +648,13 @@ class RollupPlan(object):
         roll_modules = []
 
         for mod in self._local_modules:
-            self._extract_dojo_requires(roll_modules, mod['name'], mod['static'],
-                mod['source'])
+            self._extract_dojo_requires(roll_modules, mod['name'],
+                mod['static'], mod['source'])
 
         return roll_modules
 
     def _extract_dojo_requires(self, roll_modules, name, static, source):
-        if name in [ i['name'] for i in roll_modules ]:
+        if name in [i['name'] for i in roll_modules]:
             return
 
         req_pattern = re.compile(
@@ -652,9 +672,11 @@ class RollupPlan(object):
                 req_mod_path = self._resolve_dojo_module_path(req_mod)
                 if not req_mod_path:
                     # We couldn't locate it
-                    raise DojoModuleResolution('Could not resolve %s' % req_mod)
+                    raise DojoModuleResolution(
+                        'Could not resolve %s' % req_mod)
                 try:
-                    req_mod_source, is_cached = self._get_media_source(req_mod_path) 
+                    req_mod_source, is_cached = self._get_media_source(
+                        req_mod_path)
                 except TemplateDoesNotExist as tdne:
                     raise TemplateDoesNotExist('Trying to find %s at path %s '
                        'while processing dojo.requires for %s' % (
@@ -664,7 +686,7 @@ class RollupPlan(object):
 
             self._extract_dojo_requires(
                 roll_modules, req_mod, req_mod_path, req_mod_source)
-        
+
         # Filter this module out of the prepared instructions, we've now set it
         # to roll in with the other JS
         self._unprepare_ribt_dojo_module(name)
@@ -677,12 +699,12 @@ class RollupPlan(object):
             return None
 
         # Are we supposed to skip this one?
-        skip = [ i['static'] for i in self._skip_modules if i['name'] == mod ]
+        skip = [i['static'] for i in self._skip_modules if i['name'] == mod]
         if skip:
             raise SkipDojoModule()
 
         # It could be in our local_modules
-        local = [ i['static'] for i in self._local_modules if i['name'] == mod ]
+        local = [i['static'] for i in self._local_modules if i['name'] == mod]
         if local:
             return local[0]
 
@@ -690,10 +712,10 @@ class RollupPlan(object):
         if mod_parts[0].lower() != 'dojo' and mod_parts[0].lower() != 'dojox':
             # We have a problem Houston, this thing is not a Dojo module but
             # it's not included in the local modules
-            local = [ i['static'] for i in self._local_modules ]
+            local = [i['static'] for i in self._local_modules]
             raise DojoModuleResolution('Module %s was not found, are you '
                'requiring a module that has not been included in your Page '
-               'or Snippet assembly? (we know about %s)' % 
+               'or Snippet assembly? (we know about %s)' %
                (mod, ', '.join(local)))
         # Perhaps it's a dojo or dojox module
         mod_path = '%s.js' % os.path.join('ribt', 'media', *mod_parts)
@@ -702,7 +724,7 @@ class RollupPlan(object):
 
     def _unprepare_ribt_dojo_module(self, mod):
         for ribt_instruction in self.prepared_instructions['ribt']:
-            if not ribt_instruction.has_key('require'):
+            if 'require' not in ribt_instruction:
                 continue
             if mod in ribt_instruction['require']:
                 ribt_instruction['require'].remove(mod)
