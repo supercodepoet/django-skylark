@@ -441,7 +441,6 @@ class BasePlan(object):
         Takes the body section and renders it, storing it in prepared_instructions
         """
         template = djangoloader.get_template(str(page_instructions.body))
-        self.context['__page_instructions'] = page_instructions
         self.prepared_instructions['body'] = unicode(template.render(self.context))
 
     def prepare_meta(self, page_instructions):
@@ -460,12 +459,12 @@ class BasePlan(object):
                 'namespace attribute for this item')
             assert 'location' in ribt_module, ('You are missing the '
                  'location attribute for this item')
-            assert 'require' in ribt_module, ('You are missing the '
-                 'require list for this item')
+            assert 'require' in ribt_module or 'tests' in ribt_module, (
+                 'You are missing the require list for this item')
 
             namespace = ribt_module['namespace']
             location = ribt_module['location']
-            require = ribt_module['require']
+            require = ribt_module.get('require', [])
             ribt_module['needs_registration'] = True
 
             tests = []
@@ -535,7 +534,7 @@ class RollupPlan(object):
         return hashlib.md5(pickle.dumps(files)).hexdigest()
 
     def _prepare_rollup(self, attr, rollup, keep, insert_point, **kwargs):
-        if not self.prepared_instructions[attr]:
+        if not keep and not rollup:
             return
         rollup_instruction = self._rollup_static_files(
             rollup, attr, kwargs.get('minifier', None))
@@ -596,6 +595,8 @@ class RollupPlan(object):
         skip_modules = []
 
         for ribt_module in ribt_instructions:
+            if not ribt_module.has_key('require'):
+                continue
             namespace = ribt_module['namespace']
             location = ribt_module['location']
             require = ribt_module['require']
@@ -701,6 +702,8 @@ class RollupPlan(object):
 
     def _unprepare_ribt_dojo_module(self, mod):
         for ribt_instruction in self.prepared_instructions['ribt']:
+            if not ribt_instruction.has_key('require'):
+                continue
             if mod in ribt_instruction['require']:
                 ribt_instruction['require'].remove(mod)
                 return

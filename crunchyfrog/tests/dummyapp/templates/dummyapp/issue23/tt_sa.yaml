@@ -2,3 +2,10 @@ body: dummyapp/issue23/tt_sa.html
 
 js:
     - static: dummyapp/issue23/media/js/tt_sa.js
+
+ribt:
+    - namespace: DummyApp.Issue23.TTSa
+      location: dummyapp/issue23/media/js
+      require:
+        - DummyApp.Issue23.TTSa.Controller
+        - DummyApp.Issue23.TTSa.View

@@ -211,7 +211,6 @@ def test_missing_rollup_requirement():
 
     py.test.raises(TemplateDoesNotExist, pa.dumps)
 
-@attr('focus')
 @with_setup(setup, teardown)
 def test_deploy_unroll_updated():
     def render_full():

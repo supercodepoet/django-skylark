@@ -74,31 +74,27 @@ class BaseAssembly(object):
         if not len(yamlfiles):
             raise ValueError('%r must not be zero length' % (yamlfiles,))
 
-        """
-        We can get the yamlfiles as a single string or a tuple, but by the time
-        we set our instance variable it needs to be normalized to a tuple.
+        # We can get the yamlfiles as a single string or a tuple, but by the time
+        # we set our instance variable it needs to be normalized to a tuple.
 
-        In other words, this needs to happen:
-            'some/file.yaml'   -->  ('some/file.yaml',)
-        """
+        # In other words, this needs to happen:
+        #     'some/file.yaml'   -->  ('some/file.yaml',)
         if isinstance(yamlfiles, str):
             yamlfiles = (yamlfiles,)
 
         self.yamlfiles = yamlfiles
 
-        """
-        It's important for our context to have the media root and url included,
-        if it's not there we are going to add it
-        """
+        # It's important for our context to have the media root and url included,
+        # if it's not there we are going to add it
         for var in ('MEDIA_ROOT', 'MEDIA_URL'):
             if not hasattr(context, var):
                 context[var] = getattr(settings, var)
 
         self.context = context
 
-        if not self.context.has_key('__page_assemblies'):
-            self.context['__page_assemblies'] = []
-        self.context['__page_assemblies'].append(self)
+        # We keep track of the stack of assemblies that we process, so add this
+        # one to the stack
+        self.context['crunchyfrog_internals']['assembly_stack'].append(self)
 
     @staticmethod
     def register_handler(handler):
@@ -120,17 +116,21 @@ class BaseAssembly(object):
     def unregister_all():
         del BaseAssembly._page_assembly_handlers[:]
 
+    def __is_root_assembly(self):
+        return True if self == self.__get_root_assembly() else False
+
+    def __get_root_assembly(self):
+        assembly_stack = self.context['crunchyfrog_internals']['assembly_stack']
+        return assembly_stack[0]
+
     def __create_page_instructions(self):
         """
         Combines all the files and instructions into one object
         """
-        if self.context.has_key('__page_instructions'):
-            page_instructions = self.context['__page_instructions']
-        else:
-            page_instructions = PageInstructions(
-                render_full_page=self.render_full_page,
-                context_instance=self.context
-            )
+        page_instructions = PageInstructions(
+            render_full_page=self.render_full_page,
+            context_instance=self.context
+        )
 
         tried = []
 
@@ -138,17 +138,6 @@ class BaseAssembly(object):
             self.add_page_instructions(page_instructions, file)
 
         return page_instructions
-
-    def add_page_instructions(self, page_instructions, file):
-        source, origin = template.loader.find_template_source(file)
-        assert source, 'The template loader found the template but it is completely empty'
-
-        sourcerendered = template.Template(source).render(self.context)
-        assert sourcerendered, 'yamlfile needs to contain something'
-
-        instructions = yaml.load(sourcerendered)
-
-        page_instructions.add(instructions, file)
 
     def __convert_tidy_errors(self, errors_raw, **kwargs):
         """
@@ -186,23 +175,40 @@ class BaseAssembly(object):
                 error['line'],
             )
 
-    def __is_root_assembly(self):
-        pa = self.context['__page_assemblies']
-        return True if pa.index(self) == 0 else False
+    def add_page_instructions(self, page_instructions, file):
+        source, origin = template.loader.find_template_source(file)
+        assert source, 'The template loader found the template but it is completely empty'
+
+        sourcerendered = template.Template(source).render(self.context)
+        assert sourcerendered, 'yamlfile needs to contain something'
+
+        instructions = yaml.load(sourcerendered)
+
+        page_instructions.add(instructions, file)
 
     @check_instrumentation
     def dumps(self):
-        instructions = self.__create_page_instructions()
+        self.instructions = self.__create_page_instructions()
 
-        doctype = instructions.doctype or 'HTML 4.01 Transitional'
+        if not self.__is_root_assembly():
+            # We are not the root assembly, it's a good bet that we are a
+            # SnippetAssembly being rendered within
+            root_pa = self.__get_root_assembly()
 
-        page_renderer = renderer.get(doctype, instructions, self.context,
+            # Our media needs to be piped to the root page instructions, we
+            # don't want to render media with the SnippetAssembly, the
+            # PageAssembly should handle this for us
+            self.instructions.pipe_media_to(root_pa.instructions)
+
+        doctype = self.instructions.doctype or 'HTML 4.01 Transitional'
+
+        page_renderer = renderer.get(doctype, self.instructions, self.context,
             render_full_page=self.render_full_page,
             omit_media=not self.__is_root_assembly()
         )
 
         for handler in BaseAssembly._page_assembly_handlers:
-            handler(instructions, page_renderer, self)
+            handler(self.instructions, page_renderer, self)
 
         content = page_renderer.render()
 

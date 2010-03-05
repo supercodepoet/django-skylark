@@ -2,3 +2,10 @@ body: dummyapp/issue23/tt_after_sa.html
 
 js:
     - static: dummyapp/issue23/media/js/tt_after_sa.js
+
+ribt:
+    - namespace: DummyApp.Issue23.TTAfterSa
+      location: dummyapp/issue23/media/js
+      require:
+        - DummyApp.Issue23.TTAfterSa.Controller
+        - DummyApp.Issue23.TTAfterSa.View

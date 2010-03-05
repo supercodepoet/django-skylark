@@ -10,26 +10,9 @@ def add_yaml(yamlfile):
     """
     Decorator that can be used to add crunchy dependencies out side the normal PageAssembly
     """
-    def render_yaml(yamlfile, page_instructions, context):
-        source, origin = loader.find_template_source(yamlfile)
-        sourcerendered = Template(source).render(context)
-
-        instructions = yaml.load(sourcerendered)
-
-        page_instructions.add(instructions, yamlfile)
-
-    def process_yaml(func):
-        def wrapper(*args, **kwargs):
-            context = args[1]
-
-            if context.has_key('__page_instructions'):
-                page_instructions = context['__page_instructions']
-                render_yaml(yamlfile, page_instructions, context)
-
-            return func(*args, **kwargs)
-        return wrapper
-
-    return process_yaml
+    # This is now a deprecated method, totally remove it when we hit 1.0
+    raise DeprecationWarning('add_yaml is deprecated, your YAML file will not '
+                             'be processed')
 
 class Renderer(object):
     """

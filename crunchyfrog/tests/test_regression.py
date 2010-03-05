@@ -5,6 +5,7 @@ from os.path import join
 from nose.tools import with_setup
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
+from django.template import TemplateSyntaxError
 from crunchyfrog import *
 from crunchyfrog.assembly import *
 from crunchyfrog.page import PageAssembly
@@ -79,7 +80,37 @@ def test_issue_23():
     c = RequestContext(request, {})
     pa = PageAssembly('dummyapp/issue23/issue23.yaml', c)
 
-    assert 'dummyapp/issue23/media/js/tt_after_sa.js' in pa.dumps()
+    content = pa.dumps()
+    stuff = (
+        'dummyapp/issue23/media/js/tt_after_sa.js',
+        "dojo.registerModulePath('DummyApp.Issue23.TTSa'",
+        "dojo.require('DummyApp.Issue23.TTSa.Controller');",
+        "dojo.require('DummyApp.Issue23.TTSa.View');",
+        "dojo.registerModulePath('DummyApp.Issue23.TTAfterSa'",
+        "dojo.require('DummyApp.Issue23.TTAfterSa.Controller');",
+        "dojo.require('DummyApp.Issue23.TTAfterSa.View');",
+    )
+    for item in stuff:
+        assert item in stuff
+        assert content.find(item) < content.find("<body>")
+        assert content.count(item) == 1
+
+@with_setup(setup, teardown)
+def test_issue_24():
+    """
+    Issue #24
+
+    If the YAML file the SnippetAssembly is rendering does not contain a body, it
+    will inherit from the PageAssembly.
+
+    This can cause an infinite loop if there is a templatetag inside the main
+    page that is causing the SnippetAssembly to be rendered in the first place.
+    """
+    request = get_request_fixture()
+    c = RequestContext(request, {})
+    pa = PageAssembly('dummyapp/issue24/issue24.yaml', c)
+
+    py.test.raises(TemplateSyntaxError, pa.dumps)
 
 @with_setup(setup, teardown)
 def test_issue_25():

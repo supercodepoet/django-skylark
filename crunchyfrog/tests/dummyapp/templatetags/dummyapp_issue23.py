@@ -6,21 +6,20 @@ from crunchyfrog.snippet import SnippetAssembly, RequestContext
 
 register = template.Library()
 
-@register.tag(name="tt_snippet_assembly")
-def do_overview(parser, token):
-    return TtSnippetAssembly()
+@register.tag
+def tt_snippet_assembly(parser, token):
+    return TtSnippetAssemblyNode()
 
-class TtSnippetAssembly(template.Node):
-    @add_yaml('dummyapp/issue23/tt_sa.yaml')
+class TtSnippetAssemblyNode(template.Node):
     def render(self, context):
         sa = SnippetAssembly("dummyapp/issue23/tt_sa.yaml", context)
         return sa.dumps();
 
-@register.tag(name="tt_after_snippet_assembly")
-def do_overview(parser, token):
-    return TtAfterSnippetAssembly()
+@register.tag
+def tt_after_snippet_assembly(parser, token):
+    return TtAfterSnippetAssemblyNode()
 
-class TtAfterSnippetAssembly(template.Node):
-    @add_yaml('dummyapp/issue23/tt_after_sa.yaml')
+class TtAfterSnippetAssemblyNode(template.Node):
     def render(self, context):
-        return render_to_string("dummyapp/issue23/tt_after_sa.html", context_instance=context)
+        sa = SnippetAssembly("dummyapp/issue23/tt_after_sa.yaml", context)
+        return sa.dumps();

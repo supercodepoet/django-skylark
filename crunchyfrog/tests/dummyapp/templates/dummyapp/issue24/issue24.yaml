@@ -1,0 +1,25 @@
+title: Testing fix for issue #24
+body: dummyapp/issue24/issue24.html
+
+js:
+    - static: dummyapp/page/media/js/sample.js
+    - url: http://localhost:8000/media/files.js
+    - static: dummyapp/page/media/js/notreferenced.js
+      include: false
+
+css:
+    - url: http://cdn.google.com/site.com/handheld.css
+      media: screen
+    - static: dummyapp/page/media/css/sample.css
+      media: screen
+    - inline: dummyapp/page/media/css/dynamic.css
+      media: screen
+    - inline: dummyapp/page/media/css/notreferenced.css
+      media: screen
+    
+ribt:
+    - namespace: DummyApp.Issue24
+      location: dummyapp/issue24/media/js
+      require:
+        - DummyApp.Issue24.Controller
+        - DummyApp.Issue24.View

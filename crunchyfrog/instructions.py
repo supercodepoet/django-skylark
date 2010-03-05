@@ -35,12 +35,13 @@ class PageInstructions(object):
         self.title      = None
         self.uses_yaml  = []
         self.other_yaml = []
+        self.piped_yaml = []
         self.js         = []
         self.css        = []
         self.meta       = []
         self.ribt       = []
 
-    def _part_exists(self, part):
+    def part_exists(self, part):
         """
         Withing our existing page instruction for javascript and css, we look to see
         if the part already has been added.  There is no reason to duplicate either
@@ -70,6 +71,30 @@ class PageInstructions(object):
 
         return None
 
+    def pipe_media_to(self, destination_instructions):
+        """
+        Push all the media into the destination_instructions
+        """
+        for attr in ('js', 'css', 'ribt',):
+            media = getattr(self, attr)
+            to_remove = []
+            dest_media = getattr(destination_instructions, attr)
+
+            if not media:
+                continue
+
+            for part in media:
+                # We are piping all the media, so remove it from this one
+                to_remove.append(part)
+                if destination_instructions.part_exists(part):
+                    continue
+                if part['sourcefile'] not in destination_instructions.yaml:
+                    destination_instructions.piped_yaml.append(part['sourcefile'])
+                dest_media.append(part)
+
+            for part in to_remove:
+                media.remove(part)
+
     @property
     def yaml(self):
         if self.root_yaml:
@@ -78,8 +103,11 @@ class PageInstructions(object):
         for uses in self.uses_yaml:
             yield uses
             
-        for uses in self.other_yaml:
-            yield uses
+        for other in self.other_yaml:
+            yield other
+
+        for piped in self.piped_yaml:
+            yield piped
 
     def __get_object(self, yamlfile, context):
         source, origin = template.loader.find_template_source(yamlfile)
@@ -135,7 +163,7 @@ class PageInstructions(object):
                     if isinstance(pi_object, list):
                         for part in i_object:
                             if attr in ('js', 'css', 'ribt',):
-                                if self._part_exists(part):
+                                if self.part_exists(part):
                                     continue
 
                             part['sourcefile'] = sourcefile
