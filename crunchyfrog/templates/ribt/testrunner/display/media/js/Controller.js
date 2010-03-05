@@ -32,6 +32,11 @@ dojo.declare('RibtTools.TestRunner.Display.Controller', RibtTools.Mvc.Controller
     initialUrl: '',
 
     /**
+     * What URL do we POST to when we wish to de-instrument the site
+     */
+    urlDeinstrument: '',
+
+    /**
      * Instances of test entry points
      */
     _testEntryPoints: [],
@@ -45,6 +50,11 @@ dojo.declare('RibtTools.TestRunner.Display.Controller', RibtTools.Mvc.Controller
      * The ran test entry points
      */
     _ranTestEntryPoints: [],
+
+    /**
+     * Has this been deinstrumented already?
+     */
+    _isDeinstrumented: false,
 
     /**
      * @constructor
@@ -61,6 +71,7 @@ dojo.declare('RibtTools.TestRunner.Display.Controller', RibtTools.Mvc.Controller
 
         // We need to wait until the subject frame is ready before we talk to it
         dojo.subscribe(RibtTools.TestRunner.Events.SubjectFrame.Ready, this, this.notifyTestCount);
+        dojo.addOnUnload(this, this.deinstrumentSite);
 
         // Our entry points are interned in the page as the following object
         // We initialize our test entry points, creating new instances of the specififed item
@@ -95,6 +106,23 @@ dojo.declare('RibtTools.TestRunner.Display.Controller', RibtTools.Mvc.Controller
     },
 
     /**
+     * When we are done testing, or when we leave the test runner, we need to
+     * de-instrument (take it out of testing mode).  This URL will do that for us
+     */
+    deinstrumentSite: function() {
+        if (this.isDeinstrumented) {
+            // No need to do it twice
+            return;
+        }
+
+        dojo.xhrPost({
+            url: this.urlDeinstrument,
+            sync: true
+        });
+        this.isDeinstrumented = true;
+    },
+
+    /**
      * Starts the process of navigating to each url and allowing the tests
      * to run
      */
@@ -120,6 +148,8 @@ dojo.declare('RibtTools.TestRunner.Display.Controller', RibtTools.Mvc.Controller
             }));
 
             this.view.displayResults(results);
+
+            this.deinstrumentSite();
         });
 
         st.interval(this._waitInterval);

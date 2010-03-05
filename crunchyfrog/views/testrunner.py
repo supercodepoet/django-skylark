@@ -3,7 +3,8 @@ import time
 from django.conf import settings
 from django.template import loader, TemplateDoesNotExist
 from django.http import HttpResponse
-from django.utils import simplejson
+from django.core.urlresolvers import reverse
+from django.utils import simplejson 
 
 from crunchyfrog import RequestContext
 from crunchyfrog.page import PageAssembly
@@ -25,16 +26,18 @@ def interface_start(request):
     context = RequestContext(request, {
         'test_count': len(test_registry),
         'test_entry_points_json': simplejson.dumps(teps),
+        'url_deinstrument': reverse(deinstrument),
     })
 
     pa = PageAssembly('ribt/testrunner/display/display.yaml', context)
     return pa.get_http_response()
 
-def interface_shutdown(request):
+def deinstrument(request):
     """
     Called at the end of the test run, de-instuments the site for testing
     """
     instrument_site(False)
+    return HttpResponse()
 
 def subject_start(request):
     """
