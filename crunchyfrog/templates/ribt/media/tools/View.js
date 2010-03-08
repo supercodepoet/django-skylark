@@ -46,7 +46,13 @@ dojo.declare('RibtTools.Mvc.View', null, {
 
             var attr = dojo.attr(element, 'ribtBind') || dojo.attr(element, 'ribtBindGroup');
 
-            this[attr] = element;
+            if (dojo.attr(element, 'ribtBind')) {
+                this[attr] = element;
+            } else {
+                this[attr] = this[attr] || []
+                this[attr].push(element);
+            }
+
             this._bindNames[attr] = element;
 
             var handlers = this._getHandlersForName(attr);
