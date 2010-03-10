@@ -38,6 +38,17 @@ dojo.setObject('ribt', {
         };
 
         return time();
+    },
+
+    /**
+     * Uses the MVC template manager to create and register a template for use with a given
+     * view
+     */
+    makeTemplate: function() {
+        dojo.require('RibtTools.Mvc.TemplateManager');
+
+        RibtTools.Mvc.TemplateManager.makeTemplate.apply(
+            RibtTools.Mvc.TemplateManager, arguments);
     }
 });
 

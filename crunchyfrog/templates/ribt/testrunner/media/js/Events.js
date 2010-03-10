@@ -6,6 +6,7 @@ ribt.makeEvents('RibtTools.TestRunner.Events', [
     'Channel.RemoteReady',
     'SubjectFrame.Ready',
     'Display.RunClick',
+    'Display.RunOneClick',
     'Running',
     'Navigate'
 ]);

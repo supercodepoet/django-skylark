@@ -34,3 +34,4 @@ ribt:
         - RibtTools.Mvc.View
         - RibtTools.Mvc.History
         - RibtTools.Mvc.SubscriptionCache
+        - RibtTools.Mvc.TemplateManager

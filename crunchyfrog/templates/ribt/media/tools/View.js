@@ -2,6 +2,7 @@ dojo.provide('RibtTools.Mvc.View');
 
 dojo.require('dojo.NodeList-traverse');
 dojo.require('RibtTools.Error');
+dojo.require('RibtTools.Mvc.TemplateManager');
 
 /**
  * Base View
@@ -19,6 +20,8 @@ dojo.declare('RibtTools.Mvc.View', null, {
         if (domNode) {
             this._setDomNode(domNode);
         }
+
+        this.templates = RibtTools.Mvc.TemplateManager.getTemplatesFor(this.declaredClass);
     },
 
     /**

@@ -44,9 +44,20 @@ dojo.declare('RibtTools.TestRunner.Display.View', RibtTools.Mvc.View, {
      */
     showTestEntryPoints: function(teps) {
         dojo.forEach(teps, function(tep) {
-            node = dojo.create('li', { innerHTML: tep.name }, this.testEntryPoints, 'last');
+            node = dojo.create('li', {
+                innerHTML: tep.name,
+                ribtBindGroup: 'testEntryPoint'
+            }, this.testEntryPointList, 'last');
+            play = dojo.create('a', {
+                innerHTML: 'Run',
+                ribtBindGroup: 'testEntryPointRun',
+                href: '#'
+            }, node, 'first');
             tep.setNode(node);
+            node._tep = tep;
         }, this);
+
+        this._bind(this.domNode);
     },
 
     /**
@@ -67,5 +78,14 @@ dojo.declare('RibtTools.TestRunner.Display.View', RibtTools.Mvc.View, {
      */
     runOnClick: function(event) {
         this.publish(RibtTools.TestRunner.Events.Display.RunClick);
+    },
+
+    /**
+     * When just one test is being ran
+     */
+    testEntryPointRunOnClick: function(event) {
+        var tep = event.currentTarget.parentNode._tep;
+
+        this.publish(RibtTools.TestRunner.Events.Display.RunOneClick, [ tep ]);
     }
 });

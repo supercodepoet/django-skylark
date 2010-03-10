@@ -83,6 +83,7 @@ dojo.declare('RibtTools.TestRunner.Display.Controller', RibtTools.Mvc.Controller
         // Events from the test runners top section
         // These are the controls that adjust test execution
         this.subscribe(RibtTools.TestRunner.Events.Display.RunClick, this, this.kickoffTestEntryPoints);
+        this.subscribe(RibtTools.TestRunner.Events.Display.RunOneClick, this, this.kickoffTestEntryPoints);
 
         // And finally, let's show something in the subject frame
         this.channel.navigate(this.initialUrl);
@@ -127,7 +128,14 @@ dojo.declare('RibtTools.TestRunner.Display.Controller', RibtTools.Mvc.Controller
      * to run
      */
     kickoffTestEntryPoints: function() {
-        var st = new RibtTools.SyncTimer.Timer(this._testEntryPoints);
+        if (arguments.length > 1) {
+            // If argument passed in, it will be just one TEP to run
+            var toRun = [ arguments[0] ];
+        } else {
+            var toRun = this._testEntryPoints;
+        }
+
+        var st = new RibtTools.SyncTimer.Timer(toRun);
 
         st.onStop = dojo.hitch(this, function(syncTimer) {
             var testEntryPoints = syncTimer.getUnitsRan();
