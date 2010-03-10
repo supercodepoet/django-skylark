@@ -1,4 +1,4 @@
-from base import BasePlan, RollupPlan
+from base import BasePlan, RollupPlan, BadPlanSituation
 from crunchyfrog.utils.jsmin import jsmin
 from crunchyfrog import time_started
 
@@ -38,6 +38,15 @@ class FewestFiles(BasePlan, RollupPlan):
         super(FewestFiles, self).prepare_ribt(page_instructions)
 
         rollup.extend(self._rollup_ribt(self.prepared_instructions['ribt']))
+
+        # If there is anything left in the ribt instructions, this plan does
+        # not support that situation
+        pi_ribt = self.prepared_instructions['ribt']
+        if [i['require'] for i in pi_ribt if i['require']]:
+            raise BadPlanSituation('Tried to rollup the Javascript into one '
+                'file, but there are still separate files from a "ribt:" '
+                'instruction.  It may have been unrolled because it was '
+                'recently modifined')
 
         minifier = jsmin if self.options['minify_javascript'] else None
 

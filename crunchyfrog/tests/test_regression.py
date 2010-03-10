@@ -130,7 +130,7 @@ def test_issue_25():
     # TODO Need to still write a test for block comments
     settings.CRUNCHYFROG_PLANS = 'mediadeploy_reusable'
 
-    hash_js = '2a89c79723ce8d1d558232e113afcae8'
+    hash_js = '387bedd8f9249c3696f0f7f318b72461'
 
     request = get_request_fixture()
     c = RequestContext(request, {})

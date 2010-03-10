@@ -61,7 +61,16 @@ class ReusableFiles(BasePlan, RollupPlan):
 
         rollup = self._rollup_ribt(self.prepared_instructions['ribt'])
 
+        # If there is anything left in the ribt instructions, we need to wrap
+        # our rolled up ribt content with a dojo.addOnLoad()
+        pi_ribt = self.prepared_instructions['ribt']
+        if [i['require'] for i in pi_ribt if i['require']]:
+            wrap_source = ('dojo.addOnLoad(function() {', '});',)
+        else:
+            wrap_source = ('', '',)
+
         minifier = jsmin if self.options['minify_javascript'] else None
 
         self._prepare_rollup('js', rollup, page_instructions.js,
-             len(self.prepared_instructions['js']), minifier=minifier)
+             len(self.prepared_instructions['js']), minifier=minifier,
+             wrap_source=wrap_source)

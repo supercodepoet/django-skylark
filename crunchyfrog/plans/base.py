@@ -23,18 +23,43 @@ from crunchyfrog import ribt, time_started
 
 
 class CssFormatError(Exception):
+    """
+    While parsing a CSS file, something wrong with the syntax is keeping us
+    from finishing the processing.
+    """
     pass
 
 
 class BadOption(Exception):
+    """
+    If a plan option is being specified that is not supported.
+    """
+    pass
+
+
+class BadPlanSituation(Exception):
+    """
+    Used to indicate that some condition is causing the plan to fail.  These
+    typically cannot be resolved until the developer changes some condition to
+    fix it.
+    """
     pass
 
 
 class DojoModuleResolution(Exception):
+    """
+    We extract "dojo.require" method calls from the Javascript source code and
+    try to find the files they refer to.  If for one reason or another we
+    cannot find it, this is raised.
+    """
     pass
 
 
 class SkipDojoModule(Exception):
+    """
+    Used to indicate the module should not be located and parsed for other dojo
+    requirements.
+    """
     pass
 
 
@@ -479,10 +504,13 @@ class BasePlan(object):
             assert 'require' in ribt_module or 'tests' in ribt_module, (
                  'You are missing the require list for this item')
 
+            if not 'require' in ribt_module:
+                ribt_module['require'] = []
+            ribt_module['needs_registration'] = True
+
             namespace = ribt_module['namespace']
             location = ribt_module['location']
-            require = ribt_module.get('require', [])
-            ribt_module['needs_registration'] = True
+            require = ribt_module['require']
 
             tests = []
             if ribt.is_instrumented():
@@ -556,7 +584,8 @@ class RollupPlan(object):
         if not keep and not rollup:
             return
         rollup_instruction = self._rollup_static_files(
-            rollup, attr, kwargs.get('minifier', None))
+            rollup, attr, kwargs.get('minifier', None),
+            kwargs.get('wrap_source', None))
         if not rollup_instruction:
             return
         other_instruction = self.prepared_instructions[attr]
@@ -566,10 +595,17 @@ class RollupPlan(object):
             [rollup_instruction] + \
             other_instruction[insert_point:]
 
-    def _rollup_static_files(self, instructions, extension, minifier=None):
+    def _rollup_static_files(self, instructions, extension, minifier=None,
+        wrap_source=None):
         """
         Creates one file from a list of others.  It also minifies the source
         using the appropriate function
+
+        wrap_source is a tuple with a length of 2.  It can be used to prepend
+        and append content to the rolled up file.  For example the following
+        tuple would wrap the entire source in a dojo.addOnLoad().
+
+        wrap_source = ('dojo.addOnLoad(function(){', '})',)
         """
         fix_css_urls = True if 'css' in extension else False
 
@@ -597,10 +633,13 @@ class RollupPlan(object):
             return retval
         self.__rollup_last_modifieds[filename] = lastmod
 
+        if not wrap_source:
+            wrap_source = ('', '',)
+
         if not os.path.isfile(filename) or settings.DEBUG:
             f = open(filename, 'w')
             source = minifier(self._concat_files(instructions, fix_css_urls))
-            f.write(source)
+            f.write('%s\n%s\n%s' % (wrap_source[0], source, wrap_source[1],))
             f.close()
 
         return retval
@@ -609,6 +648,10 @@ class RollupPlan(object):
         location = urljoin(self.cache_url, basename)
         js_tmp= "dojo.registerModulePath('%(namespace)s', '%(location)s');"
         return js_tmp % {'namespace': namespace, 'location': location}
+
+    def _ribt_needs_registration(self, ribt_instructions, needs_registration):
+        for ribt_module in ribt_instructions:
+            ribt_module['needs_registration'] = needs_registration
 
     def _rollup_ribt(self, ribt_instructions):
         local_modules = []
@@ -641,11 +684,13 @@ class RollupPlan(object):
                 local_modules.append({'name': req, 'static': req_location,
                     'source': source})
 
-            if len(skip_modules) > 0:
-                # Well, we decided to skip some modules
-                ribt_module['needs_registration'] = True
-            else:
-                ribt_module['needs_registration'] = False
+        if len(skip_modules) > 0:
+            # Well, we decided to skip some modules and registration of the
+            # module still needs to be listed in the script block below the
+            # rolled up files
+            self._ribt_needs_registration(ribt_instructions, True)
+        else:
+            self._ribt_needs_registration(ribt_instructions, False)
 
         self._local_modules = local_modules
         self._skip_modules = skip_modules
