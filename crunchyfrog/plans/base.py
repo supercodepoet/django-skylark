@@ -762,11 +762,10 @@ class RollupPlan(object):
         if mod_parts[0].lower() != 'dojo' and mod_parts[0].lower() != 'dojox':
             # We have a problem Houston, this thing is not a Dojo module but
             # it's not included in the local modules
-            local = [i['static'] for i in self._local_modules]
-            raise DojoModuleResolution('Module %s was not found, are you '
-               'requiring a module that has not been included in your Page '
-               'or Snippet assembly? (we know about %s)' %
-               (mod, ', '.join(local)))
+            namespaces = [i['namespace'] for i in self.page_instructions.ribt]
+            raise DojoModuleResolution('While processing %s, dojo module %s '
+               'was not found, the following namespaces are registered: %s' %
+               (self.page_instructions.root_yaml, mod, ', '.join(namespaces)))
         # Perhaps it's a dojo or dojox module
         mod_path = '%s.js' % os.path.join('ribt', 'media', *mod_parts)
 
