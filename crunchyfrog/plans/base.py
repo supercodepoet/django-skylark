@@ -112,6 +112,8 @@ class BasePlan(object):
     copying directories, and other fancy pants things like that.
     """
 
+    cache_prefix = 'out'
+
     __media_source_cache = {}
 
     options = {
@@ -135,8 +137,6 @@ class BasePlan(object):
         'clevercss': process_clevercss}
 
     make_css_urls_absolute = False
-
-    cache_prefix = None
 
     def __init__(self, context, render_full_page):
         self._prepare_assets_cache = {}

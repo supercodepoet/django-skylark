@@ -2,8 +2,6 @@ from base import BasePlan
 
 
 class SeparateEverything(BasePlan):
-    cache_prefix = 'se'
-
     def prepare_js(self, page_instructions):
         if not hasattr(page_instructions, 'js'):
             return

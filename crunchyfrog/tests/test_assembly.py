@@ -87,18 +87,18 @@ def test_creates_files_in_cache():
     pa.dumps()
 
     exist(
-        'se/dummyapp/page/media/css/sample.css',
-        'se/dummyapp/page/media/img/notreferenced.png',
-        'se/dummyapp/page/media/img/test.png',
-        'se/dummyapp/page/media/js/notreferenced.js',
-        'se/dummyapp/page/media/js/sample.js',
-        'se/dummyapp/page/media/js/templates/notreferenced.html',
-        'se/dummyapp/page/media/js/templates/sample.js',
+        'out/dummyapp/page/media/css/sample.css',
+        'out/dummyapp/page/media/img/notreferenced.png',
+        'out/dummyapp/page/media/img/test.png',
+        'out/dummyapp/page/media/js/notreferenced.js',
+        'out/dummyapp/page/media/js/sample.js',
+        'out/dummyapp/page/media/js/templates/notreferenced.html',
+        'out/dummyapp/page/media/js/templates/sample.js',
     )
 
     from crunchyfrog import clear_media_cache, copy_addons
     clear_media_cache()
-    assert not isdir(join(cachedir, 'se'))
+    assert not isdir(join(cachedir, 'out'))
     # And fix the addons since we just dumped them
     copy_addons()
 
@@ -111,10 +111,10 @@ def test_can_render_an_asset():
     content = pa.dumps()
 
     exist(
-        'se/dummyapp/page/media/img/notreferenced.png',
-        'se/dummyapp/page/media/img/test.png',
-        'se/dummyapp/page/media/js/templates/notreferenced.html',
-        'se/dummyapp/page/media/js/templates/sample.js',
+        'out/dummyapp/page/media/img/notreferenced.png',
+        'out/dummyapp/page/media/img/test.png',
+        'out/dummyapp/page/media/js/templates/notreferenced.html',
+        'out/dummyapp/page/media/js/templates/sample.js',
     )
 
     assert 'my_favorite_color = "gray"' in content
@@ -136,15 +136,15 @@ def test_can_render_clevercss():
 
     pa.dumps()
 
-    media = (cachedir, 'se', 'dummyapp', 'page', 'media')
+    media = (cachedir, 'out', 'dummyapp', 'page', 'media')
     css = get_contents(join(*media + ('css', 'clevercss.css')))
     assert css == 'body {\n  background-color: gray;\n}'
 
     exist(
-        'se/dummyapp/page/media/img/notreferenced.png',
-        'se/dummyapp/page/media/img/test.png',
-        'se/dummyapp/page/media/js/templates/notreferenced.html',
-        'se/dummyapp/page/media/js/templates/sample.js',
+        'out/dummyapp/page/media/img/notreferenced.png',
+        'out/dummyapp/page/media/img/test.png',
+        'out/dummyapp/page/media/js/templates/notreferenced.html',
+        'out/dummyapp/page/media/js/templates/sample.js',
     )
 
 @with_setup(setup, teardown)
@@ -179,13 +179,13 @@ def test_will_not_duplicate_assets():
     content = pa.dumps()
 
     exist(
-        'se/dummyapp/page/media/css/sample.css',
-        'se/dummyapp/page/media/img/notreferenced.png',
-        'se/dummyapp/page/media/img/test.png',
-        'se/dummyapp/page/media/js/notreferenced.js',
-        'se/dummyapp/page/media/js/sample.js',
-        'se/dummyapp/page/media/js/templates/notreferenced.html',
-        'se/dummyapp/page/media/js/templates/sample.js',
+        'out/dummyapp/page/media/css/sample.css',
+        'out/dummyapp/page/media/img/notreferenced.png',
+        'out/dummyapp/page/media/img/test.png',
+        'out/dummyapp/page/media/js/notreferenced.js',
+        'out/dummyapp/page/media/js/sample.js',
+        'out/dummyapp/page/media/js/templates/notreferenced.html',
+        'out/dummyapp/page/media/js/templates/sample.js',
     )
 
     assert len(re.findall('sample.js', content)) == 1
@@ -210,13 +210,13 @@ def test_will_copy_assets():
     content = pa.dumps()
 
     exist(
-        'se/dummyapp/page/media/css/sample.css',
-        'se/dummyapp/page/media/img/test.png',
-        'se/dummyapp/page/media/img/notreferenced.png',
-        'se/dummyapp/page/media/js/templates/sample.js',
-        'se/dummyapp/page/media/js/notreferenced.js',
-        'se/dummyapp/page/media/js/templates/notreferenced.html',
-        'se/dummyapp/page/media/js/templates/sample.js',
+        'out/dummyapp/page/media/css/sample.css',
+        'out/dummyapp/page/media/img/test.png',
+        'out/dummyapp/page/media/img/notreferenced.png',
+        'out/dummyapp/page/media/js/templates/sample.js',
+        'out/dummyapp/page/media/js/notreferenced.js',
+        'out/dummyapp/page/media/js/templates/notreferenced.html',
+        'out/dummyapp/page/media/js/templates/sample.js',
     )
 
     assert content.find('notreferenced') == -1, 'Found a reference to a file that has been set include: false in the yaml file.  It should not show up in the rendered output'
@@ -230,14 +230,14 @@ def test_references_other_yaml_files():
     content = pa.dumps()
 
     exist(
-        'se/dummyapp/page/media/css/sample.css',
-        'se/dummyapp/page/media/img/notreferenced.png',
-        'se/dummyapp/page/media/img/test.png',
-        'se/dummyapp/page/media/js/notreferenced.js',
-        'se/dummyapp/page/media/js/sample.js',
-        'se/dummyapp/page/media/js/sampleafter.js',
-        'se/dummyapp/page/media/js/templates/notreferenced.html',
-        'se/dummyapp/page/media/js/templates/sample.js',
+        'out/dummyapp/page/media/css/sample.css',
+        'out/dummyapp/page/media/img/notreferenced.png',
+        'out/dummyapp/page/media/img/test.png',
+        'out/dummyapp/page/media/js/notreferenced.js',
+        'out/dummyapp/page/media/js/sample.js',
+        'out/dummyapp/page/media/js/sampleafter.js',
+        'out/dummyapp/page/media/js/templates/notreferenced.html',
+        'out/dummyapp/page/media/js/templates/sample.js',
     )
 
     assert len(re.findall('.*\.css', content)) == 2, 'There should be 2 css files from the sample.yaml in here'
@@ -254,10 +254,10 @@ def test_renders_meta_section():
     content = pa.dumps()
 
     exist(
-        'se/dummyapp/page/media/img/notreferenced.png',
-        'se/dummyapp/page/media/img/test.png',
-        'se/dummyapp/page/media/js/templates/notreferenced.html',
-        'se/dummyapp/page/media/js/templates/sample.js',
+        'out/dummyapp/page/media/img/notreferenced.png',
+        'out/dummyapp/page/media/img/test.png',
+        'out/dummyapp/page/media/js/templates/notreferenced.html',
+        'out/dummyapp/page/media/js/templates/sample.js',
     )
 
     assert '<meta http-equiv="test" content="test-content">' in content
@@ -303,13 +303,13 @@ def test_will_use_correct_doctype():
     assert 'xhtml1-strict.dtd' in content
 
     exist(
-        'se/dummyapp/page/media/css/sample.css',
-        'se/dummyapp/page/media/img/notreferenced.png',
-        'se/dummyapp/page/media/img/test.png',
-        'se/dummyapp/page/media/js/notreferenced.js',
-        'se/dummyapp/page/media/js/sample.js',
-        'se/dummyapp/page/media/js/templates/notreferenced.html',
-        'se/dummyapp/page/media/js/templates/sample.js',
+        'out/dummyapp/page/media/css/sample.css',
+        'out/dummyapp/page/media/img/notreferenced.png',
+        'out/dummyapp/page/media/img/test.png',
+        'out/dummyapp/page/media/js/notreferenced.js',
+        'out/dummyapp/page/media/js/sample.js',
+        'out/dummyapp/page/media/js/templates/notreferenced.html',
+        'out/dummyapp/page/media/js/templates/sample.js',
     )
 
 @with_setup(setup, teardown)
@@ -321,17 +321,17 @@ def test_add_yaml_decorator():
     content = pa.dumps()
 
     exist(
-        'se/dummyapp/page/media/img/notreferenced.png',
-        'se/dummyapp/page/media/img/test.png',
-        'se/dummyapp/page/media/js/templates/notreferenced.html',
-        'se/dummyapp/page/media/js/templates/sample.js',
-        'se/dummyapp/tag/media/css/screen.css',
-        'se/dummyapp/tag/media/img/testimage.png',
-        'se/dummyapp/tag/media/js/templates/test.html',
+        'out/dummyapp/page/media/img/notreferenced.png',
+        'out/dummyapp/page/media/img/test.png',
+        'out/dummyapp/page/media/js/templates/notreferenced.html',
+        'out/dummyapp/page/media/js/templates/sample.js',
+        'out/dummyapp/tag/media/css/screen.css',
+        'out/dummyapp/tag/media/img/testimage.png',
+        'out/dummyapp/tag/media/js/templates/test.html',
     )
 
     assert 'This is my tag test' in content
-    assert '/media/cfcache/se/dummyapp/tag/media/css/screen.css" media="screen"' in content
+    assert '/media/cfcache/out/dummyapp/tag/media/css/screen.css" media="screen"' in content
 
 @with_setup(setup, teardown)
 def test_bad_html():
@@ -378,17 +378,17 @@ def test_cache_in_debug_mode():
     pa.dumps()
 
     exist(
-        'se/dummyapp/page/media/css/sample.css',
-        'se/dummyapp/page/media/img/notreferenced.png',
-        'se/dummyapp/page/media/img/test.png',
-        'se/dummyapp/page/media/js/notreferenced.js',
-        'se/dummyapp/page/media/js/sample.js',
-        'se/dummyapp/page/media/js/templates/notreferenced.html',
-        'se/dummyapp/page/media/js/templates/sample.js',
+        'out/dummyapp/page/media/css/sample.css',
+        'out/dummyapp/page/media/img/notreferenced.png',
+        'out/dummyapp/page/media/img/test.png',
+        'out/dummyapp/page/media/js/notreferenced.js',
+        'out/dummyapp/page/media/js/sample.js',
+        'out/dummyapp/page/media/js/templates/notreferenced.html',
+        'out/dummyapp/page/media/js/templates/sample.js',
     )
 
     content_before = get_contents(join(
-        cachedir, 'se', 'dummyapp', 'page', 'media', 'js', 'sample.js')
+        cachedir, 'out', 'dummyapp', 'page', 'media', 'js', 'sample.js')
     )
 
     # Copy to a temp file and alter the original
@@ -399,7 +399,7 @@ def test_cache_in_debug_mode():
 
     pa.dumps()
     content_after = get_contents(join(
-        cachedir, 'se', 'dummyapp', 'page', 'media', 'js', 'sample.js')
+        cachedir, 'out', 'dummyapp', 'page', 'media', 'js', 'sample.js')
     )
 
     # Restore the file

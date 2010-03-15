@@ -69,12 +69,12 @@ def test_deploy_reusable():
     content = pa.dumps()
 
     jsfile = get_contents(
-        os.path.join(cachedir, 'rf', '%s.js' % hash_js1)
+        os.path.join(cachedir, 'out', '%s.js' % hash_js1)
     )
     assert 'var static_uses2=null;var static_uses1=null;' in jsfile
 
     jsfile = get_contents(
-        os.path.join(cachedir, 'rf', '%s.js' % hash_js2)
+        os.path.join(cachedir, 'out', '%s.js' % hash_js2)
     )
     assert jsfile.find('dojo.provide("dojox.timing._base")') < \
         jsfile.find('dojo.provide("dojox.timing")')
@@ -85,12 +85,12 @@ def test_deploy_reusable():
     assert "dojo.registerModulePath('RibtTools" not in content
 
     cssfile = get_contents(
-        os.path.join(cachedir, 'rf', '%s.css' % hash_css)
+        os.path.join(cachedir, 'out', '%s.css' % hash_css)
     )
     assert '.static_uses2' in cssfile
     assert '.static_uses1' in cssfile
     assert 'url(http://localhost:8000/media/' in cssfile
-    assert 'rf/planapp/page/media/img/uses1.gif' in cssfile
+    assert 'out/planapp/page/media/img/uses1.gif' in cssfile
     
     assert '%s.js' % hash_js1 in content
     assert '%s.js' % hash_js2 in content
@@ -128,24 +128,24 @@ def test_deploy_fewest():
     content = pa.dumps()
 
     exist(
-        'ff/%s.css' % hash_css,
-        'ff/%s.js' % hash_js,
-        'ff/planapp/page/media/css/gte_ie6only.css',
-        'ff/planapp/page/media/img/uses1.gif',
-        'ff/planapp/page/media/img/uses2.gif',
-        'ff/planapp/page/media/js/Controller.js',
-        'ff/planapp/page/media/js/duplicated.js',
-        'ff/planapp/page/media/js/ie7only.js',
-        'ff/planapp/page/media/js/inline.js',
-        'ff/planapp/page/media/js/notreferenced.js',
-        'ff/planapp/page/media/js/static.js',
-        'ff/planapp/page/media/js/static_uses1.js',
-        'ff/planapp/page/media/js/static_uses2.js',
-        'ff/planapp/page/media/js/View.js',
+        'out/%s.css' % hash_css,
+        'out/%s.js' % hash_js,
+        'out/planapp/page/media/css/gte_ie6only.css',
+        'out/planapp/page/media/img/uses1.gif',
+        'out/planapp/page/media/img/uses2.gif',
+        'out/planapp/page/media/js/Controller.js',
+        'out/planapp/page/media/js/duplicated.js',
+        'out/planapp/page/media/js/ie7only.js',
+        'out/planapp/page/media/js/inline.js',
+        'out/planapp/page/media/js/notreferenced.js',
+        'out/planapp/page/media/js/static.js',
+        'out/planapp/page/media/js/static_uses1.js',
+        'out/planapp/page/media/js/static_uses2.js',
+        'out/planapp/page/media/js/View.js',
     )
 
     jsfile = get_contents(
-        os.path.join(cachedir, 'ff', '%s.js' % hash_js)
+        os.path.join(cachedir, 'out', '%s.js' % hash_js)
     )
     assert 'static_uses2' in jsfile
     assert 'static_uses1' in jsfile
@@ -155,7 +155,7 @@ def test_deploy_fewest():
         jsfile.find('dojo.provide("dojox.timing._base")')
 
     cssfile = get_contents(
-        os.path.join(cachedir, 'ff', '%s.css' % hash_css)
+        os.path.join(cachedir, 'out', '%s.css' % hash_css)
     )
 
     assert '.static_uses2' in cssfile
@@ -194,7 +194,7 @@ def test_deploy_fewest_instrumented():
     assert '%s.js' % hash_js in content
 
     jsfile = get_contents(
-        os.path.join(cachedir, 'ff', '%s.js' % hash_js)
+        os.path.join(cachedir, 'out', '%s.js' % hash_js)
     )
 
     assert "dojo.provide('ribt')" in jsfile
@@ -264,7 +264,7 @@ def test_deploy_unroll_updated():
         if 'reusable' in cfplan_setting:
             content = render_full()
             jsfile = get_contents(
-                os.path.join(cachedir, 'rf', '%s.js' %
+                os.path.join(cachedir, 'out', '%s.js' %
                     '0c2267ca8d28d0f207a4cbc5218f0417')
             )
             assert "dojo.registerModulePath('PlanApp.Page'" in content
@@ -289,7 +289,7 @@ def test_deploy_reusable_no_js_minifying():
     content = pa.dumps()
 
     jsfile = get_contents(
-        os.path.join(cachedir, 'rf', '%s.js' % hash_js)
+        os.path.join(cachedir, 'out', '%s.js' % hash_js)
     )
 
     assert '\n        ' in jsfile
@@ -302,7 +302,7 @@ def test_will_not_needlessly_rollup():
     settings.CRUNCHYFROG_PLANS = 'mediadeploy_reusable'
 
     hash_js1 = '0c2267ca8d28d0f207a4cbc5218f0417'
-    filename = os.path.join(cachedir, 'rf', '%s.js' % hash_js1)
+    filename = os.path.join(cachedir, 'out', '%s.js' % hash_js1)
 
     request = get_request_fixture()
     c = RequestContext(request)
@@ -311,7 +311,7 @@ def test_will_not_needlessly_rollup():
     content = pa.dumps()
 
     first_time = os.stat(filename).st_mtime
-    first_listing = os.listdir(os.path.join(cachedir, 'rf'))
+    first_listing = os.listdir(os.path.join(cachedir, 'out'))
 
     sleep(1.0) 
 
@@ -322,4 +322,4 @@ def test_will_not_needlessly_rollup():
     content = pa.dumps()
 
     assert first_time == os.stat(filename).st_mtime
-    assert first_listing == os.listdir(os.path.join(cachedir, 'rf'))
+    assert first_listing == os.listdir(os.path.join(cachedir, 'out'))

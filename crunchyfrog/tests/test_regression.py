@@ -32,8 +32,8 @@ def test_issue_07():
     content = sa.dumps()
 
     exist(
-        'se/dummyapp/issue07/media/js/Class.js',
-        'se/dummyapp/issue07/media/js/templates/file.html',
+        'out/dummyapp/issue07/media/js/Class.js',
+        'out/dummyapp/issue07/media/js/templates/file.html',
     )
 
 @with_setup(setup, teardown)
@@ -61,9 +61,9 @@ def test_issue_19():
     content = pa.dumps()
 
     exist(
-        'rf/dummyapp/issue19/media/js/static.js',
-        'rf/dummyapp/issue19/media/js/Class.js',
-        'rf/dummyapp/issue19/media/js/templates/file.html',
+        'out/dummyapp/issue19/media/js/static.js',
+        'out/dummyapp/issue19/media/js/Class.js',
+        'out/dummyapp/issue19/media/js/templates/file.html',
     )
 
 @with_setup(setup, teardown)
@@ -141,7 +141,7 @@ def test_issue_25():
     assert content
 
     jsfile = get_contents(
-        os.path.join(cachedir, 'rf', '%s.js' % hash_js)
+        os.path.join(cachedir, 'out', '%s.js' % hash_js)
     )
 
     assert "dojo.registerModulePath('RibtTools'" in jsfile

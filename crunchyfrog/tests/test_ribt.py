@@ -51,8 +51,8 @@ def test_snippet_render():
     assert "dojo.registerModulePath('DynamicApp.Snippet'" in content
 
     exist(
-        'se/dynamicapp/media/js/ribtloaded.js',
-        'se/dynamicapp/media/js/templates/ribtloaded.html',
+        'out/dynamicapp/media/js/ribtloaded.js',
+        'out/dynamicapp/media/js/templates/ribtloaded.html',
     )
 
     assert 'This is my snippet test' in content
@@ -68,16 +68,16 @@ def test_ribt_renders_in_page():
     exist(
         'addon/dojo/dojo.js',
         'addon/dojox/timing/_base.js',
-        'se/dummyapp/page/media/img/notreferenced.png',
-        'se/dummyapp/page/media/img/test.png',
-        'se/dummyapp/page/media/js/sample.js',
-        'se/dummyapp/page/media/js/templates/notreferenced.html',
-        'se/dummyapp/page/media/js/templates/sample.js',
-        'se/dummyapp/tag/media/css/screen.css',
-        'se/dummyapp/tag/media/img/testimage.png',
-        'se/dummyapp/tag/media/js/templates/test.html',
-        'se/dynamicapp/media/js/ribtloaded.js',
-        'se/dynamicapp/media/js/templates/ribtloaded.html',
+        'out/dummyapp/page/media/img/notreferenced.png',
+        'out/dummyapp/page/media/img/test.png',
+        'out/dummyapp/page/media/js/sample.js',
+        'out/dummyapp/page/media/js/templates/notreferenced.html',
+        'out/dummyapp/page/media/js/templates/sample.js',
+        'out/dummyapp/tag/media/css/screen.css',
+        'out/dummyapp/tag/media/img/testimage.png',
+        'out/dummyapp/tag/media/js/templates/test.html',
+        'out/dynamicapp/media/js/ribtloaded.js',
+        'out/dynamicapp/media/js/templates/ribtloaded.html',
     )
 
     assert "dojo.registerModulePath('DynamicApp.Page'" in content
@@ -85,7 +85,7 @@ def test_ribt_renders_in_page():
     assert "dojo.require('DynamicApp.Page.View');" in content
     assert 'dummyapp/tag/media/css/screen.css' in content
     assert 'dummyapp/page/media/js/sample.js' in content
-    assert 'media/cfcache/se/dynamicapp' in content
+    assert 'media/cfcache/out/dynamicapp' in content
     assert 'addon/dojo/dojo.js' in content
 
 @with_setup(setup, teardown_ribt)
