@@ -28,6 +28,63 @@ dojo.setObject('ribt', {
 
         return name;
     },
+    
+    /**
+     * Piggybacking on the dojo.publish method to ensure we have a valid topic to publish to
+     */
+    publish: function(/*String*/ topic, /*Array*/ args) {
+        if (topic != undefined) {
+            dojo.publish(topic, args);
+        } else {
+            
+            try {
+                throw new Error();
+            } catch (err) {
+                if (err.stack) {
+                    var trace = err.stack;
+                }
+            }
+            
+            var initialMsg = 'It appears you are trying to publish to an undefined topic'
+            
+            if (trace) {
+                errorMsg = initialMsg + ', stack trace is\n' + trace;
+            } else {
+                errorMsg = initialMsg;
+            }
+            
+            throw new RibtTools.Error(errorMsg);
+        }
+        
+    },
+    
+    /**
+     * Piggybacking on the dojo.subscribe method to ensure we have a valid topic to subscribe to
+     */
+    subscribe: function(/*String*/ topic, /*Object|null*/ context, /*String|Function*/ method) {
+        if (topic != undefined) {
+            dojo.subscribe(topic, context, method);
+        } else {
+            
+            try {
+                throw new Error();
+            } catch (err) {
+                if (err.stack) {
+                    var trace = err.stack;
+                }
+            }
+            
+            var initialMsg = 'It appears you are trying to subscribe to an undefined topic'
+            
+            if (trace) {
+                errorMsg = initialMsg + ', stack trace is\n' + trace;
+            } else {
+                errorMsg = initialMsg;
+            }
+            
+            throw new RibtTools.Error(errorMsg);
+        }
+    },
 
     /**
      * Get the current timestamp in milliseconds
