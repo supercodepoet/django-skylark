@@ -3,6 +3,7 @@ dojo.provide('RibtTools.Mvc.View');
 dojo.require('dojo.NodeList-traverse');
 dojo.require('RibtTools.Error');
 dojo.require('RibtTools.Mvc.TemplateManager');
+dojo.require('RibtTools.Mvc.Dom');
 
 /**
  * Base View
@@ -15,7 +16,7 @@ dojo.declare('RibtTools.Mvc.View', null, {
         if ($CF.INSTRUMENTED) {
             dojo.publish(RibtTools.Mvc.Events.New.View, [ this ]);
         }
-        
+
         // Find our view hook
         if (domNode) {
             this._setDomNode(domNode);
@@ -43,6 +44,8 @@ dojo.declare('RibtTools.Mvc.View', null, {
         if (removeExisting) {
             this._unbind();
         }
+
+        this._connectHandlersToView();
 
         dojo.query('*[ribtBind], *[ribtBindGroup]', panel).forEach(function(element) {
             if (!this._bindBelongsTo(element, panel)) { return; }
@@ -91,6 +94,25 @@ dojo.declare('RibtTools.Mvc.View', null, {
     },
 
     /**
+     * Connect root handlers to the domNode
+     */
+    _connectHandlersToView: function() {
+        for (var funcName in this) {
+            var func = this[funcName];
+
+            if (!dojo.isFunction(func) || funcName.indexOf('_') == 0) {
+                continue;
+            }
+
+            if (RibtTools.Mvc.Dom.containsEvent(funcName)) {
+                this._bindHandles[funcName] = [];
+                this._bindHandles[funcName].push(dojo.connect(
+                    this.domNode, funcName.toLowerCase(), this, func));
+            }
+        }
+    },
+
+    /**
      * Looks for view handlers that match the bind name
      */
     _getHandlersForName: function(bindName) {
@@ -100,12 +122,15 @@ dojo.declare('RibtTools.Mvc.View', null, {
 
             if (!dojo.isFunction(func) || funcName.indexOf('_') == 0) {
                 continue
-            };
+            }
 
             var funcPrefix = funcName.substring(0, funcName.toLowerCase().lastIndexOf('on'));
             if (bindName == funcPrefix) {
                 var eventType = funcName.toLowerCase().replace(bindName.toLowerCase(), '');
-                handlers.push({ 'funcName': funcName, 'func': func, 'eventType': eventType });
+                
+                if (RibtTools.Mvc.Dom.containsEvent(eventType)) {
+                    handlers.push({ 'funcName': funcName, 'func': func, 'eventType': eventType });
+                }
             }
         }
 
@@ -150,7 +175,7 @@ dojo.declare('RibtTools.Mvc.View', null, {
      */
     publish: function(topic, args) {
         if (!topic) {
-            throw new RibtTools.Error('Trying to publish a topic from instance of ' + 
+            throw new RibtTools.Error('Trying to publish a topic from instance of ' +
                 this.declaredClass + ' that has no value, did you misspell it?');
         }
 

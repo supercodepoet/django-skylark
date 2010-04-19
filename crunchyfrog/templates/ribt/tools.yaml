@@ -28,6 +28,7 @@ ribt:
     - namespace: RibtTools.Mvc
       location: ribt/media/tools
       require:
+        - RibtTools.Mvc.Dom
         - RibtTools.Mvc.Events
         - RibtTools.Mvc.Parser
         - RibtTools.Mvc.Controller
