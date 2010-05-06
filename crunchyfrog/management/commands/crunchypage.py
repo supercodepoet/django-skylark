@@ -132,7 +132,7 @@ class Command(BaseCommand):
                 "\n".join(files_to_create).replace(cwd, shorthand),
             )))
 
-        if answer == 'yes':
+        if answer.lower.startswith('y'):
             return True
 
         return False

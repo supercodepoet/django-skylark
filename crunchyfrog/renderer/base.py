@@ -1,38 +1,39 @@
 import copy
 import os
 import yaml
+
 from django.template import Template, loader
+
 from crunchyfrog import plans
 from crunchyfrog.conf import settings
 from crunchyfrog import ribt
 
+
 def add_yaml(yamlfile):
     """
-    Decorator that can be used to add crunchy dependencies out side the normal PageAssembly
+    Decorator that can be used to add crunchy dependencies out side the normal
+    PageAssembly
     """
     # This is now a deprecated method, totally remove it when we hit 1.0
     raise DeprecationWarning('add_yaml is deprecated, your YAML file will not '
                              'be processed')
 
+
 class Renderer(object):
     """
     The base class that performs the heavy lifting of taking page instructions
     and rendering them into actual HTML.  This class is not meant to be used by
-    itself but instead extended.  The template_str class variables should
-    contain the template that you wish to use to render whatever kind of page
-    you need.  In other words, check out Xhtml401Transitional for an example.
+    itself but instead extended.  The template_name variables should contain
+    the template that you wish to use to render whatever kind of page you need.
+    In other words, check out Xhtml401Transitional for an example.
     """
-    template_str = None # This is the one that needs to be replaced in the sub class
 
-    """
-    Used to place a doctype at the beginning of a rendered page.  This only
-    applies to html and xhtml pages that are rendered with a PageAssembly.
-    """
-    doctype = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">'
+    # Used to place a doctype at the beginning of a rendered page.  This only
+    # applies to html and xhtml pages that are rendered with a PageAssembly.
+    doctype = ('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 '
+               'Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">')
 
-    """
-    What template do we use to render?
-    """
+    # What template do we use to render?
     template_name = 'crunchyfrog/html401.html'
     snippet_template_name = 'crunchyfrog/htmlsnippet.html'
 
@@ -43,13 +44,10 @@ class Renderer(object):
         self.render_full_page = render_full_page
         self.omit_media = omit_media
 
-        t = self.template_name if render_full_page else self.snippet_template_name
-        self.template = loader.get_template(t)
-
     def render(self):
         """
-        Takes a chunk of page instructions and renders a page according to the rules
-        found within
+        Takes a chunk of page instructions and renders a page according to the
+        rules found within
 
         This return a string representing the HTML or similar output
         """
@@ -59,8 +57,8 @@ class Renderer(object):
 
         if self.render_full_page:
             assert self.page_instructions.title, \
-                'The title has not been specified in the page instructions ' + \
-                '(title: in your yaml file)'
+                'The title has not been specified in the page ' + \
+                'instructions (title: in your yaml file)'
 
         plan = plans.get_for_context(self.context,
             self.page_instructions.render_full_page)
@@ -72,5 +70,11 @@ class Renderer(object):
         render_context['doctype'] = self.doctype
         render_context['prepared_instructions'] = prepared_instructions
         render_context['is_instrumented'] = ribt.is_instrumented()
+
+        if self.render_full_page:
+            t = self.template_name
+        else:
+            t = self.snippet_template_name
+        self.template = loader.get_template(t)
 
         return self.template.render(render_context)
