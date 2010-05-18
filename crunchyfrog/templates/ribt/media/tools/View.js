@@ -173,7 +173,7 @@ dojo.declare('RibtTools.Mvc.View', null, {
      *
      * This is going to include the "this"
      */
-    publish: function(topic, args) {
+    publishLocal: function(topic, args) {
         if (!topic) {
             throw new RibtTools.Error('Trying to publish a topic from instance of ' +
                 this.declaredClass + ' that has no value, did you misspell it?');
@@ -184,6 +184,13 @@ dojo.declare('RibtTools.Mvc.View', null, {
         args.unshift(this);
 
         dojo.publish(topic, args);
+    },
+
+    /**
+     * Convenience method to publish events from the view to the world
+     */
+    publishGlobal: function(topic, args) {
+        ribt.publish(topic, args);
     },
 
     /**

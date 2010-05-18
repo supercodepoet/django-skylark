@@ -202,12 +202,19 @@ dojo.declare('RibtTools.Mvc.Controller', null, {
      *
      * This is going to include the "this"
      */
-    publish: function(topic, args) {
+    publishLocal: function(topic, args) {
         args = args || [];
 
         args.unshift(this);
 
         dojo.publish(topic, args);
+    },
+
+    /**
+     * Convenience method to publish events from the controller to the world
+     */
+    publishGlobal: function(topic, args) {
+        ribt.publish(topic, args);
     },
 
     /**
