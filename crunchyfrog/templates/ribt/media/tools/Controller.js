@@ -25,6 +25,7 @@ dojo.declare('RibtTools.Mvc.Controller', null, {
         this._injectedData      = injectedData || undefined;
         this._subscriptionCache = new RibtTools.Mvc.SubscriptionCache;
         this._delegates         = [];
+        this._topicHandles      = [];
 
         if (domNode) {
             this._originalDomNode = dojo.clone(domNode);
@@ -35,7 +36,7 @@ dojo.declare('RibtTools.Mvc.Controller', null, {
             // We'll do a similar thing we did for the domNode, but the data
             // inside this object overrides everything
             this._params = params;
-            for (name in injectedData) {
+            for (var name in injectedData) {
                 this[name] = injectedData[name];
             }
         }
@@ -159,13 +160,13 @@ dojo.declare('RibtTools.Mvc.Controller', null, {
     /**
      * Subscribe to an event, but tie it to our controller/view pair
      */
-    subscribe: function(topic, context, method) {
+    subscribeLocal: function(topic, context, method) {
         this._subscriptionCache.add(context, method);
 
         var realFunc = dojo.hitch(context, method);
         var wrapperContext = { 'scope': this, 'realFunc': realFunc };
 
-        dojo.subscribe(topic, wrapperContext, function() {
+        this._topicHandles.push(dojo.subscribe(topic, wrapperContext, function() {
             var args = Array.prototype.slice.call(arguments);
             var view = args[0];
 
@@ -184,7 +185,16 @@ dojo.declare('RibtTools.Mvc.Controller', null, {
             }
             args.shift();
             this.realFunc.apply(null, args);
-        });
+        }));
+    },
+
+    /**
+     * Subscribe to a topic fired from outside the view/controller chain
+     * and allow the controller to keep track of its topic handles
+     * for clean up later.
+     */
+    subscribeGlobal: function(topic, context, method) {
+        this._topicHandles.push(ribt.subscribe(topic, context, method));
     },
 
     /**
@@ -255,6 +265,14 @@ dojo.declare('RibtTools.Mvc.Controller', null, {
 
         if (this.view) {
             this.view.destroy();
+        }
+
+        for (var index in this._topicHandles) {
+            dojo.unsubscribe(this._topicHandles[index]);
+        }
+
+        if (this.cleanUp && typeof this.cleanUp == 'function') {
+            this.cleanUp();
         }
     }
 });

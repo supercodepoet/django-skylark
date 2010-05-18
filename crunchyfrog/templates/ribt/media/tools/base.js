@@ -63,7 +63,7 @@ dojo.setObject('ribt', {
      */
     subscribe: function(/*String*/ topic, /*Object|null*/ context, /*String|Function*/ method) {
         if (topic != undefined) {
-            dojo.subscribe(topic, context, method);
+            return dojo.subscribe(topic, context, method);
         } else {
             
             try {
