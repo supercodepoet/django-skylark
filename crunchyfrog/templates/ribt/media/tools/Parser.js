@@ -67,7 +67,7 @@ dojo.declare('RibtTools.Mvc.Parser', null, {
                 if (element._controller) {
                     needsGc.push(element);
                 }
-            })
+            });
 
             // Do we have one on the refNode itself
             if (position == 'replace' && refNode._controller) {
@@ -82,8 +82,10 @@ dojo.declare('RibtTools.Mvc.Parser', null, {
                 toParse.push(node.childNodes.item(i));
         }
 
-        dojo.place(node, refNode, position);
-        this.parse(toParse);
+        var placedNode = dojo.place(node, refNode, position);
+        dojo.ready(placedNode, dojo.hitch(this, function() {
+            this.parse(toParse);
+        }));
         
         // Remove references to the controller so gc can happen
         dojo.forEach(needsGc, function(element) {
