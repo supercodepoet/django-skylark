@@ -38,6 +38,6 @@ dojo.declare('RibtTools.Mvc.SubscriptionCache', null, {
     contains: function(context, method) {
         var func = this._getFunction(context, method);
 
-        return (this._cache.indexOf(func) == -1) ? false : true
+        return dojo.indexOf(this._cache, func) != -1;
     }
 });
