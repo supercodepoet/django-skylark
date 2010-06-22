@@ -152,7 +152,7 @@ dojo.declare('RibtTools.Mvc.Controller', null, {
      * correctly.
      */
     _restoreInitialState: function() {
-        this.publish(RibtTools.Mvc.Events.History.RestoreInitialState,
+        this.publishLocal(RibtTools.Mvc.Events.History.RestoreInitialState,
             [ this._originalDomNode || null ]
         );
     },
