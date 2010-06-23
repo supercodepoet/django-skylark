@@ -56,7 +56,7 @@ def test_can_change_deploy_plan_name():
 @with_setup(setup, teardown)
 def test_deploy_reusable():
     hash_js1 = '93be07cfe9c81198bb4c549c868ff731'
-    hash_js2 = 'c92a36afad9013e45c610a2526494c14'
+    hash_js2 = '48910f6a5624903b57466381e5c44daf'
     hash_css = 'ee184e5fad8366ee655a090043693c30'
 
     settings.DEBUG = False
@@ -117,7 +117,7 @@ def test_deploy_reusable():
 @with_setup(setup, teardown)
 def test_deploy_fewest():
     hash_css = '9ecd76d6b65856eb899846a6271a527a'
-    hash_js = '7dfabc2907e9395459340b85bdac1d7e'
+    hash_js = 'f839268d652274ab20d813c12ec47079'
 
     settings.CRUNCHYFROG_PLANS = 'mediadeploy_fewest'
 
@@ -180,7 +180,7 @@ def test_deploy_fewest():
 
 @with_setup(setup, teardown)
 def test_deploy_fewest_instrumented():
-    hash_js = '02252d03f4d5df1f2647e95e0b1570cd'
+    hash_js = 'f2e1963891fcc6c815b966a436e46ba2'
 
     ribt.instrument_site(True)
     settings.CRUNCHYFROG_PLANS = 'mediadeploy_fewest'
@@ -265,7 +265,7 @@ def test_deploy_unroll_updated():
             content = render_full()
             jsfile = get_contents(
                 os.path.join(cachedir, 'out', '%s.js' %
-                    '0c2267ca8d28d0f207a4cbc5218f0417')
+                    '9ed9abe6dafa91b30bd68d1b854e318f')
             )
             assert "dojo.registerModulePath('PlanApp.Page'" in content
             assert "dojo.require('PlanApp.Page.Controller');" in content
@@ -276,7 +276,7 @@ def test_deploy_unroll_updated():
 
 @with_setup(setup, teardown)
 def test_deploy_reusable_no_js_minifying():
-    hash_js = '0c2267ca8d28d0f207a4cbc5218f0417'
+    hash_js = '9ed9abe6dafa91b30bd68d1b854e318f'
 
     settings.CRUNCHYFROG_PLANS = 'mediadeploy_reusable'
 
@@ -301,7 +301,7 @@ def test_deploy_reusable_no_js_minifying():
 def test_will_not_needlessly_rollup():
     settings.CRUNCHYFROG_PLANS = 'mediadeploy_reusable'
 
-    hash_js1 = '0c2267ca8d28d0f207a4cbc5218f0417'
+    hash_js1 = '9ed9abe6dafa91b30bd68d1b854e318f'
     filename = os.path.join(cachedir, 'out', '%s.js' % hash_js1)
 
     request = get_request_fixture()
