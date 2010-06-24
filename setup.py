@@ -18,7 +18,7 @@ setup(name='django-crunchyfrog',
       include_package_data=True,
       zip_safe=False,
       install_requires=[
-          'pyyaml==3.0.8',
+          'pyyaml==3.09',
           'pytidylib==0.2.1',
           'cssutils==0.9.7b3',
       ],
