@@ -8,7 +8,6 @@ from nose.plugins.skip import SkipTest
 from crunchyfrog import *
 from crunchyfrog.assembly import *
 from crunchyfrog.page import PageAssembly
-from crunchyfrog.plans.base import CssFormatError
 from crunchyfrog.snippet import SnippetAssembly
 from django.http import HttpResponse
 from django.template import TemplateDoesNotExist
@@ -345,22 +344,6 @@ def test_bad_html():
     assert "Warning: <tag> missing '>'" in str(e.value)
 
     settings.CRUNCHYFROG_RAISE_HTML_ERRORS = False
-
-    assert pa.dumps()
-
-@with_setup(setup, teardown)
-def test_bad_css():
-    request = get_request_fixture()
-    c = RequestContext(request, {})
-    pa = PageAssembly('dummyapp/page/badcss.yaml', c)
-
-    settings.CRUNCHYFROG_PLANS = 'mediadeploy_reusable'
-
-    e = py.test.raises(CssFormatError, pa.dumps)
-
-    assert 'CSSStyleRule' in str(e.value)
-
-    settings.CRUNCHYFROG_RAISE_CSS_ERRORS = False
 
     assert pa.dumps()
 

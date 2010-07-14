@@ -102,27 +102,6 @@ Options
 
 The deployment plans can be altered with options.
 
-``unroll_recently_modified``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Default: ``False``
-
-During development, you want files you are working on to be precluded from the
-roll up.  By doing this, you can see the raw source of the file as you debug
-with tools like `Firebug <http://getfirebug.com>`_.
-
-To turn this option on, you might enter the following into your deployment plan.
-
-::
-
-    from crunchyfrog import plans, plan_options
-    from django.conf import settings
-
-    default = plans.ReusableFiles
-
-    if settings.DEBUG:
-        plan_options(unroll_recently_modified=True) 
-
 ``minify_javascript``
 ~~~~~~~~~~~~~~~~~~~~~
 

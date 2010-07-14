@@ -49,28 +49,3 @@ If you want to turn off the confirmation messages, you can add a ``-n`` or
 ``--noconfirm`` to your command. ::
 
     python manage.py crunchypage -a goodies -p list -n
-
-Clearing the cache for a specific view
---------------------------------------
-
-Django CrunchyFrog caches all the files that you reference in the YAML files
-into the folder that specify in ``MEDIA_ROOT``.  TODO: How to override this.
-
-With this command you need two things:
-
-TODO due to a bug, this isn't working just yet
-
-Copying media manually
-----------------------
-
-Django CrunchyFrog automatically copies things into the cache for you.  But for
-some reason, if you need to do this manuall we have an inteface for that.
-
-You need to know:
-
-- The location of the media file
-
-Here's how you manually copy the files into the CrunchyFrog cache::
-
-    python manage.py crunchycopymedia -f goodies/list/list.yaml
-

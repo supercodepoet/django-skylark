@@ -211,72 +211,9 @@ def test_missing_rollup_requirement():
 
     py.test.raises(TemplateDoesNotExist, pa.dumps)
 
-@attr('focus')
-@with_setup(setup, teardown)
-def test_deploy_unroll_updated():
-    def render_full():
-        request = get_request_fixture()
-        c = RequestContext(request)
-        pa = PageAssembly('planapp/page/full.yaml', c)
-
-        return pa.dumps()
-
-    time_newer = (time_started() + 10, time_started() + 10,)
-    time_older = (time_started() - 1000, time_started() - 1000,)
-
-    def make_them(to_time):
-        os.utime(loader.find_template_path('planapp/page/media/js/static_uses1.js'),
-            to_time)
-        os.utime(loader.find_template_path('planapp/page/media/js/Controller.js'),
-            to_time)
-
-    # Check both plans, they should behave the same here
-    for cfplan_setting in ('mediadeploy_reusable', 'mediadeploy_fewest',):
-        # Let's make them older than when CF started
-        make_them(time_older)
-        plan_options(unroll_recently_modified=False)
-
-        settings.CRUNCHYFROG_PLANS = cfplan_setting
-
-        content = render_full()
-
-        # Both of these should be rolled up
-        assert 'planapp/page/media/js/static_uses1.js' not in content
-        assert "dojo.require('PlanApp.Page.Controller');" not in content
-
-        # Now let's fake modify our files
-        #sleep(1.0) 
-        make_them(time_newer)
-
-        content = render_full()
-
-        # We haven't told our plan to unroll anything, they should still be
-        # rolled up
-        assert 'planapp/page/media/js/static_uses1.js' not in content
-        assert "dojo.require('PlanApp.Page.Controller');" not in content
-
-        # Now, we'll tell our plan to unroll recently modified
-        plan_options(unroll_recently_modified=True)
-
-        # This should still unrolled, we don't unroll static JS
-        assert 'planapp/page/media/js/static_uses1.js' not in content
-        # And this should be unrolled now if it's a reusable plan
-        if 'reusable' in cfplan_setting:
-            content = render_full()
-            jsfile = get_contents(
-                os.path.join(cachedir, 'out', '%s.js' %
-                    '9ed9abe6dafa91b30bd68d1b854e318f')
-            )
-            assert "dojo.registerModulePath('PlanApp.Page'" in content
-            assert "dojo.require('PlanApp.Page.Controller');" in content
-            assert jsfile.find("dojo.addOnLoad(function() {") == 0
-            assert jsfile[-3:] == '});'
-        else:
-            py.test.raises(BadPlanSituation, render_full)
-
 @with_setup(setup, teardown)
 def test_deploy_reusable_no_js_minifying():
-    hash_js = '9ed9abe6dafa91b30bd68d1b854e318f'
+    hash_js = '48910f6a5624903b57466381e5c44daf'
 
     settings.CRUNCHYFROG_PLANS = 'mediadeploy_reusable'
 
@@ -301,7 +238,7 @@ def test_deploy_reusable_no_js_minifying():
 def test_will_not_needlessly_rollup():
     settings.CRUNCHYFROG_PLANS = 'mediadeploy_reusable'
 
-    hash_js1 = '9ed9abe6dafa91b30bd68d1b854e318f'
+    hash_js1 = '48910f6a5624903b57466381e5c44daf'
     filename = os.path.join(cachedir, 'out', '%s.js' % hash_js1)
 
     request = get_request_fixture()

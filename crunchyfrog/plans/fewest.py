@@ -44,8 +44,7 @@ class FewestFiles(BasePlan, RollupPlan):
         if [i['require'] for i in pi_ribt if i['require']]:
             raise BadPlanSituation('Tried to rollup the Javascript into one '
                 'file, but there are still separate files from a "ribt:" '
-                'instruction.  It may have been unrolled because it was '
-                'recently modifined')
+                'instruction.')
 
         minifier = jsmin if self.options['minify_javascript'] else None
 

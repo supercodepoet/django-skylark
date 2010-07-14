@@ -6,12 +6,10 @@ import shutil
 import yaml
 import hashlib
 import pickle
-import cssutils
 import functools
 import urllib
 import logging
 from urlparse import urljoin
-from collections import deque
 
 from django.template import Template, TemplateDoesNotExist
 from django.template import loader as djangoloader
@@ -20,14 +18,7 @@ from crunchyfrog.conf import settings
 from crunchyfrog.processor import clevercss
 from crunchyfrog import loader as cfloader
 from crunchyfrog import ribt, time_started
-
-
-class CssFormatError(Exception):
-    """
-    While parsing a CSS file, something wrong with the syntax is keeping us
-    from finishing the processing.
-    """
-    pass
+from crunchyfrog import cssimgreplace
 
 
 class BadOption(Exception):
@@ -61,25 +52,6 @@ class SkipDojoModule(Exception):
     requirements.
     """
     pass
-
-
-class CssUtilsLoggingHandler(logging.Handler):
-    _records = []
-
-    def emit(self, record):
-        if 'CSSStyleRule' in record.msg:
-            self._records.append(record)
-
-    def get_errors(self):
-        records = self._records
-        self._records = []
-        return records
-
-cssutils_handler = CssUtilsLoggingHandler()
-__log = logging.getLogger('CssUtilsLogging')
-__log.addHandler(cssutils_handler)
-__log.setLevel(logging.ERROR)
-cssutils.log.setLog(__log)
 
 
 def find_directory_from_loader(page_instructions, asset):
@@ -117,7 +89,6 @@ class BasePlan(object):
     __media_source_cache = {}
 
     options = {
-        'unroll_recently_modified': False,
         'minify_javascript': True,
     }
 
@@ -261,43 +232,23 @@ class BasePlan(object):
                 '%s, available ones are: %s' %
                 (process_func, ', '.join(self.processing_funcs.keys()),))
 
-    def __format_css_errors(self, document_raw, errors):
-        document = document_raw.split('\n')
-        for error in errors:
-            yield '%s' % error.getMessage()
-
     def _fix_css_urls(self, page_instruction, css_source):
-        def replacer(url, **kwargs):
-            if url.startswith('http') or url.startswith('/'):
-                return url
+        """
+        When we are rolling CSS files up the are placed in the root of the
+        cache directory.  This breaks url values like url(../img/logo.gif).
 
-            cache_url = kwargs.get('cache_url')
-            relative_path = kwargs.get('relative_path')
-            path = os.path.join(relative_path, urllib.url2pathname(url))
-
-            return urljoin(cache_url, urllib.pathname2url(path))
-
-        if not settings.DEBUG:
-            cssutils.ser.prefs.useMinified()
-        else:
-            cssutils.ser.prefs.useDefaults()
-
-        parser = cssutils.CSSParser()
-        sheet = parser.parseString(css_source)
-        errors = cssutils_handler.get_errors()
-        if errors and settings.CRUNCHYFROG_RAISE_CSS_ERRORS:
-            formatted_errors = self.__format_css_errors(css_source, errors)
-            raise CssFormatError(
-                ', '.join(formatted_errors))
-
+        To fix this, we need to manipulate the url values and provide a
+        corrected URL.
+        """
         if 'static' in page_instruction:
             template_name = page_instruction['static']
         elif 'inline' in page_instruction:
             template_name = page_instruction['inline']
-        cssutils.replaceUrls(sheet, functools.partial(replacer,
-            relative_path=os.path.dirname(template_name),
-            cache_url=self.cache_url))
-        return sheet.cssText
+
+        return cssimgreplace.relative_replace(
+            css_source,
+            os.path.dirname(template_name),
+            self.cache_url)
 
     def _prepare_file(self, item_name, page_instructions):
         """
@@ -669,12 +620,6 @@ class RollupPlan(object):
             for req in require:
                 filename = '%s.js' % req.replace('%s.' % namespace, '')
                 req_location = os.path.join(location, filename)
-                if self.options['unroll_recently_modified']:
-                    stat = self._get_media_stat(req_location)
-                    if stat and stat.st_mtime > time_started():
-                        skip_modules.append({'name': req,
-                             'static': req_location})
-                        continue
                 source, is_cached = self._get_media_source(req_location)
                 # Now we need to add a dojo.registerModulePath to this
                 source = '%s\n' % self.__dojo_register_module_path(
