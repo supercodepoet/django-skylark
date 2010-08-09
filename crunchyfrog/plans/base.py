@@ -529,7 +529,8 @@ class RollupPlan(object):
 
     def _make_filename(self, files):
         files.sort()
-        return hashlib.md5(pickle.dumps(files)).hexdigest()
+        return hashlib.md5('%s%s' % (settings.CRUNCHYFROG_PLANS_ROLLUP_SALT,
+            pickle.dumps(files))).hexdigest()
 
     def _prepare_rollup(self, attr, rollup, keep, insert_point, **kwargs):
         if not keep and not rollup:

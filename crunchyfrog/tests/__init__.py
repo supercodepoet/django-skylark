@@ -1,21 +1,22 @@
 import os
 import shutil
 from time import time
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest
 from django.core.management import setup_environ
 
 import settings as settings_module
 setup_environ(settings_module)
 from django.conf import settings
-from crunchyfrog import copy_addons
 
 projectdir = os.path.join(os.path.dirname(__file__))
 
 cachedir = settings.CRUNCHYFROG_CACHE_ROOT
 
+
 def exist(*filelist):
     for file in filelist:
         assert os.path.isfile(os.path.join(cachedir, file))
+
 
 def get_one_file_in(path):
     started = time()
@@ -27,13 +28,21 @@ def get_one_file_in(path):
 
     raise Exception, 'Could not find a file in %s' % path
 
+
 def get_contents(filename):
-    f = open(filename, 'r')
+    try:
+        f = open(filename, 'r')
 
-    content = f.read()
-    f.close()
+        content = f.read()
+        f.close()
 
-    return content
+        return content
+    except IOError:
+        from pprint import PrettyPrinter
+        pformat = PrettyPrinter(indent=4).pformat
+        raise Exception('Could not file %s, options are\n%s' % (filename,
+            pformat(os.listdir(os.path.dirname(filename)))))
+
 
 def get_request_fixture():
     request = HttpRequest()
@@ -41,10 +50,13 @@ def get_request_fixture():
     request.META = { 'REMOTE_ADDR': '127.0.0.1', 'SERVER_NAME': '127.0.0.1', 'SERVER_PORT': '8000' }
     return request
 
+
 def setup():
     settings.DEBUG = True
     settings.CRUNCHYFROG_PLANS = 'mediadeploy'
     settings.CRUNCHYFROG_PLANS_DEFAULT = 'default'
+    settings.CRUNCHYFROG_PLANS_ROLLUP_SALT = 'aaaaaaaaaaaaaaaa'
+
 
 def teardown():
     # Remove everything but the addons

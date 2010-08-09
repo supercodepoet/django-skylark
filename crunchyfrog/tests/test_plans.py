@@ -55,9 +55,9 @@ def test_can_change_deploy_plan_name():
 
 @with_setup(setup, teardown)
 def test_deploy_reusable():
-    hash_js1 = '93be07cfe9c81198bb4c549c868ff731'
-    hash_js2 = '48910f6a5624903b57466381e5c44daf'
-    hash_css = 'ee184e5fad8366ee655a090043693c30'
+    hash_js1 = 'c33650950234f497a5b78e9d23ee1b59'
+    hash_js2 = 'dc3591c55de520ec5deb5c0cd85686be'
+    hash_css = 'f27f963509901f608889f688b1e39f72'
 
     settings.DEBUG = False
     settings.CRUNCHYFROG_PLANS = 'mediadeploy_reusable'
@@ -116,8 +116,8 @@ def test_deploy_reusable():
 
 @with_setup(setup, teardown)
 def test_deploy_fewest():
-    hash_css = '9ecd76d6b65856eb899846a6271a527a'
-    hash_js = 'f839268d652274ab20d813c12ec47079'
+    hash_css = 'a30e20a6a1d62976266b612a7e5d634a'
+    hash_js = '0006e47a5dca47f5f3e46c45d852ad09'
 
     settings.CRUNCHYFROG_PLANS = 'mediadeploy_fewest'
 
@@ -180,7 +180,7 @@ def test_deploy_fewest():
 
 @with_setup(setup, teardown)
 def test_deploy_fewest_instrumented():
-    hash_js = 'f2e1963891fcc6c815b966a436e46ba2'
+    hash_js = '157bee29e2605105eff447aeef28b1d8'
 
     ribt.instrument_site(True)
     settings.CRUNCHYFROG_PLANS = 'mediadeploy_fewest'
@@ -213,7 +213,7 @@ def test_missing_rollup_requirement():
 
 @with_setup(setup, teardown)
 def test_deploy_reusable_no_js_minifying():
-    hash_js = '48910f6a5624903b57466381e5c44daf'
+    hash_js = 'dc3591c55de520ec5deb5c0cd85686be'
 
     settings.CRUNCHYFROG_PLANS = 'mediadeploy_reusable'
 
@@ -238,7 +238,7 @@ def test_deploy_reusable_no_js_minifying():
 def test_will_not_needlessly_rollup():
     settings.CRUNCHYFROG_PLANS = 'mediadeploy_reusable'
 
-    hash_js1 = '48910f6a5624903b57466381e5c44daf'
+    hash_js1 = 'dc3591c55de520ec5deb5c0cd85686be'
     filename = os.path.join(cachedir, 'out', '%s.js' % hash_js1)
 
     request = get_request_fixture()
