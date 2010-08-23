@@ -26,7 +26,7 @@ try:
         'django.template.loaders.app_directories.loader': \
             'django.template.loaders.app_directories.loader.get_template_sources',
     }
-except:
+except ImportError:
 # Else fall back to Djanog 1.1- loaders
     LOADER_REPLACEMENTS = {
         'django.template.loaders.filesystem.load_template_source': \

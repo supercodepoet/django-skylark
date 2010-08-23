@@ -64,7 +64,7 @@ try:
     #     'django.template.loaders.eggs.load_template_source',
     )
 # If not available, use the Django 1.1- template loaders
-except Exception, e:
+except ImportError:
     TEMPLATE_LOADERS = (
         'django.template.loaders.filesystem.load_template_source',
         'django.template.loaders.app_directories.load_template_source',
