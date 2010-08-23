@@ -16,12 +16,24 @@ class TemplatePathDoesNotExist(TemplateDoesNotExist):
 # To save time, we know of some different method that can be used to get just
 # the filename of a template and bypass getting the source, here is how we do
 # that
-LOADER_REPLACEMENTS = {
-    'django.template.loaders.filesystem.load_template_source': \
-        'django.template.loaders.filesystem.get_template_sources',
-    'django.template.loaders.app_directories.load_template_source': \
-        'django.template.loaders.app_directories.get_template_sources',
-}
+
+# Try using Django 1.2+ loaders
+try:
+    from django.template.loaders.filesystem import Loader
+    LOADER_REPLACEMENTS = {
+        'django.template.loaders.filesystem.loader': \
+            'django.template.loaders.filesystem.loader.get_template_sources',
+        'django.template.loaders.app_directories.loader': \
+            'django.template.loaders.app_directories.loader.get_template_sources',
+    }
+except:
+# Else fall back to Djanog 1.1- loaders
+    LOADER_REPLACEMENTS = {
+        'django.template.loaders.filesystem.load_template_source': \
+            'django.template.loaders.filesystem.get_template_sources',
+        'django.template.loaders.app_directories.load_template_source': \
+            'django.template.loaders.app_directories.get_template_sources',
+    }
 
 
 def _make_loader_replacements(loaders):

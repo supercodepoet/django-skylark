@@ -4,6 +4,7 @@
 .coverage
 .DS_Store
 .installed.cfg
+.idea
 
 bin
 build

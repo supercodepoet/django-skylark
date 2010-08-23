@@ -30,12 +30,13 @@ Let's bootstrap buildout::
 
 Now run buildout::
 
-    ./bin/buildout
+    ./bin/buildout --distribute
 
 It will take a bit, downloading all the dependencies it needs.  Once it's
 finished try running the tests::
 
-    ./bin/test
+    ./bin/test-11 (for testing Django 1.1)
+    ./bin/test-12 (for testing with Django 1.2)
 
 Documentation
 =============
