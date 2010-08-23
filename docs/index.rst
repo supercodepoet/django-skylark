@@ -30,6 +30,7 @@ Contents:
    CleverCSS syntax reference <clevercssref>
    deployment
    handlers
+   hacking
 
 Indices and tables
 ==================
