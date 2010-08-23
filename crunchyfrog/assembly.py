@@ -179,11 +179,12 @@ class BaseAssembly(object):
             )
 
     def add_page_instructions(self, page_instructions, file):
-        source, origin = template.loader.find_template_source(file)
+        source, origin = template.loader.find_template(file)
+
         assert source, 'The template loader found the template but it is ' + \
             'completely empty'
-
-        sourcerendered = template.Template(source).render(self.context)
+        
+        sourcerendered = source.render(self.context)
         assert sourcerendered, 'yamlfile needs to contain something'
 
         instructions = yaml.load(sourcerendered)

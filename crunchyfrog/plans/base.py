@@ -19,6 +19,7 @@ from crunchyfrog.processor import clevercss
 from crunchyfrog import loader as cfloader
 from crunchyfrog import ribt, time_started
 from crunchyfrog import cssimgreplace
+from django.template.context import RenderContext, Context
 
 
 class BadOption(Exception):
@@ -172,14 +173,15 @@ class BasePlan(object):
             source = cache[mem_args]
             is_cached = True
         else:
-            source, origin = cfloader.find_template_source(template_name)
+            source, origin = cfloader.find_template(template_name)
 
             if context:
-                template = Template(source)
-                return template.render(context), False
+                return source.render(context), False
 
             if process_func:
-                source = process_func(source)
+                source = process_func(source.render(Context({})))
+            else:
+                source = source.render(Context({}))
 
             cache[mem_args] = source
             is_cached = False
@@ -354,10 +356,9 @@ class BasePlan(object):
 
         for yaml in page_instructions.yaml:
             # yaml = app/page/page.yaml
-            source, origin = cfloader.find_template_source(yaml)
+            source, origin = cfloader.find_template(yaml)
             del source  # we don't need it
-
-            origin = str(origin)
+            origin = str(origin.loader.get_template_sources(origin.loadname).next())
             # /Users/me/Development/app/templates/app/page/page.yaml
 
             yaml_basedir = os.path.dirname(yaml)
