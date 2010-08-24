@@ -11,7 +11,7 @@ import urllib
 import logging
 from urlparse import urljoin
 
-from django.template import Template, TemplateDoesNotExist
+from django.template import Template, TemplateDoesNotExist, TemplateSyntaxError
 from django.template import loader as djangoloader
 from django.utils.functional import memoize
 from crunchyfrog.conf import settings
@@ -19,7 +19,7 @@ from crunchyfrog.processor import clevercss
 from crunchyfrog import loader as cfloader
 from crunchyfrog import ribt, time_started
 from crunchyfrog import cssimgreplace
-from django.template.context import RenderContext, Context
+from django.template.context import Context
 
 
 class BadOption(Exception):
@@ -155,7 +155,7 @@ class BasePlan(object):
         Performs a os.stat on template_name, raising TemplatePathDoesNotExist
         if the template_name is not file based.
         """
-        path = cfloader.find_template_path(template_name)
+        path = cfloader.find_template_path(template_name)[1]
         return os.stat(path)
 
     def _get_media_source(self, template_name, process_func=None, \
@@ -173,15 +173,24 @@ class BasePlan(object):
             source = cache[mem_args]
             is_cached = True
         else:
-            source, origin = cfloader.find_template(template_name)
+            try:
+                source, origin = cfloader.get_template(template_name)
+            except TemplateSyntaxError:
+                source = cfloader.find_template(template_name)[0]
 
-            if context:
+            if context and hasattr(source, 'render'):
                 return source.render(context), False
 
+            if isinstance(source, Template):
+                # Get raw text
+                if hasattr(origin.loader, 'func_name'):
+                    source = origin.loader(template_name)[0]
+                else:
+                    source = origin.loader.load_template_source( \
+                        template_name)[0]
+                
             if process_func:
-                source = process_func(source.render(Context({})))
-            else:
-                source = source.render(Context({}))
+                source = process_func(source)
 
             cache[mem_args] = source
             is_cached = False
@@ -298,6 +307,7 @@ class BasePlan(object):
 
                 source, is_cached = self._get_media_source(
                     template_name, process_func, context)
+
                 if 'css' in item_name and self.make_css_urls_absolute \
                    and not is_cached:
                     source = self._fix_css_urls(instruction, source)
@@ -357,10 +367,13 @@ class BasePlan(object):
         for yaml in page_instructions.yaml:
             # yaml = app/page/page.yaml
             source, origin = cfloader.find_template(yaml)
-            del source  # we don't need it
-            origin = str(origin.loader.get_template_sources(origin.loadname).next())
-            # /Users/me/Development/app/templates/app/page/page.yaml
 
+            if hasattr(origin.loader, 'func_name'):
+                source, origin = origin.loader(yaml)
+            else:
+                origin = str(origin.loader.get_template_sources(origin.loadname).next())
+
+            # /Users/me/Development/app/templates/app/page/page.yaml
             yaml_basedir = os.path.dirname(yaml)
             # app/page
             template_basedir = origin[:origin.find(yaml)]
@@ -525,7 +538,10 @@ class RollupPlan(object):
                     i['static'], process_func)
             if fix_css_urls:
                 processed = self._fix_css_urls(i, processed)
-            source.append(processed)
+            if isinstance(processed, basestring):
+                source.append(processed)
+            else:
+                source.extend(processed)
         return "\n".join(source)
 
     def _make_filename(self, files):
@@ -623,6 +639,7 @@ class RollupPlan(object):
                 filename = '%s.js' % req.replace('%s.' % namespace, '')
                 req_location = os.path.join(location, filename)
                 source, is_cached = self._get_media_source(req_location)
+
                 # Now we need to add a dojo.registerModulePath to this
                 source = '%s\n' % self.__dojo_register_module_path(
                     namespace, location) + source

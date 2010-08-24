@@ -115,7 +115,7 @@ class PageInstructions(object):
             yield piped
 
     def __get_object(self, yamlfile, context):
-        source, origin = template.loader.find_template(yamlfile)
+        source = template.loader.get_template(yamlfile)
         assert source, 'The template loader found the template but it is ' + \
             'completely empty'
 

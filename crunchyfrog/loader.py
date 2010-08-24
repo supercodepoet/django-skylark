@@ -6,6 +6,7 @@ from django.utils.importlib import import_module
 from django.template import TemplateDoesNotExist
 from django.template import loader as djangoloader
 from django.conf import settings
+from django.template.loader import get_template_from_string
 
 template_path_loaders = None
 
@@ -17,18 +18,14 @@ def find_template_path(name, dirs=None):
     for loader in djangoloader.template_source_loaders:
         try:
             source, display_name = loader(name, dirs)
-            del source
             origin = djangoloader.LoaderOrigin(display_name, loader, name, dirs)
-            loader_result = origin.loader.get_template_sources(origin.loadname)
-            if type(loader_result) == tuple and len(loader_result) == 2:
-                # This is probably a tuple of (source, display_name)
-                return loader_result[1]
-            elif type(loader_result) == GeneratorType:
-                # Means we probably have a list of locations for this template
-                # in a generator object, grab the first one and return it
-                for path in loader_result:
-                    if os.path.isfile(path):
-                        return path
+            if hasattr(origin.loader, 'func_name'):
+                loader_result = origin.loader(name)
+            else:
+                loader_result = origin.loader.load_template_source( \
+                    origin.loadname)
+
+            return loader_result
         except TemplateDoesNotExist:
             pass
     raise TemplateDoesNotExist(name)
@@ -43,7 +40,7 @@ def find_template(name, dirs=None):
             loader = djangoloader.find_template_loader(loader_name)
             if loader is not None:
                 loaders.append(loader)
-        template_source_loaders = tuple(loaders)
+        djangoloader.template_source_loaders = tuple(loaders)
     for loader in djangoloader.template_source_loaders:
         try:
             source, display_name = loader(name, dirs)
@@ -52,3 +49,19 @@ def find_template(name, dirs=None):
         except TemplateDoesNotExist:
             pass
     raise TemplateDoesNotExist(name)
+
+
+def get_template(template_name):
+    """
+    This is a slight variation of Django's own get_template method,
+    returning instead a tuple of the template and the origin for that
+    template.
+
+    Returns a compiled Template object for the given template name,
+    and the origin of that template, handling template inheritance recursively.
+    """
+    template, origin = find_template(template_name)
+    if not hasattr(template, 'render'):
+        # template needs to be compiled
+        template = get_template_from_string(template, origin, template_name)
+    return (template, origin, )

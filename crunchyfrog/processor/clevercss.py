@@ -1204,6 +1204,7 @@ class Parser(object):
         rule_stack = [rule]
         root_rules = rule[1]
         new_state = None
+
         lineiter = LineIterator(source, emit_endmarker=True)
 
         def fail(msg):

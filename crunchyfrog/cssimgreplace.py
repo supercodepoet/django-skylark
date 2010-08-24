@@ -57,7 +57,6 @@ url_value_re = re.compile(r"""
 def relative_replace(source, css_path, cache_base_url):
     urls_replaced = []   # List of urls we've already replaced so we can skip
     replacement = source
-
     for match in url_value_re.finditer(source):
         url_value = match.group()
         if url_value in urls_replaced:
