@@ -347,15 +347,16 @@ def test_bad_html():
 
     assert pa.dumps()
 
+@attr('focus')
 @with_setup(setup, teardown)
 def test_cache_in_debug_mode():
     request = get_request_fixture()
     c = RequestContext(request, {})
     pa = PageAssembly('dummyapp/page/sample.yaml', c)
 
-    sample_path = str(template.loader.find_template_source(
-        'dummyapp/page/media/js/sample.js'
-    )[1])
+    tmp = template.loader.get_template(
+        'dummyapp/page/media/js/sample.js')
+    sample_path = tmp.origin.name
     temp_path = '%s_temp' % sample_path
 
     pa.dumps()

@@ -3,9 +3,10 @@ import time
 import shutil
 
 from django import http, template
-from django.core.cache import cache
 from django.conf import UserSettingsHolder
+
 from crunchyfrog.conf import settings
+from crunchyfrog import templatepatch
 
 __all__ = ['clear_media_cache', 'time_started',
            'HttpResponse', 'RequestContext']

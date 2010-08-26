@@ -1,0 +1,11 @@
+title: GitHub Issue 01
+body: dummyapp/issue_gh_01/issue_gh_01.html
+
+uses:
+    - file: ribt/tools.yaml
+
+ribt:
+    - namespace: DummyApp.GH.Issue01
+      location: dummyapp/issue_gh_01/media/js
+      require: 
+        - DummyApp.GH.Issue01.Class

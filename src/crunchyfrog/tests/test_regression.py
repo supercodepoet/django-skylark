@@ -14,7 +14,7 @@ from crunchyfrog.snippet import SnippetAssembly
 from crunchyfrog.tests import *
 
 @with_setup(setup, teardown)
-def test_issue_07():
+def test_bb_issue_07():
     """
     Issue #7
 
@@ -27,17 +27,17 @@ def test_issue_07():
     """
     request = get_request_fixture()
     c = RequestContext(request, {})
-    sa = SnippetAssembly('dummyapp/issue07/issue07.yaml', c)
+    sa = SnippetAssembly('dummyapp/issue_bb_07/issue_bb_07.yaml', c)
 
     content = sa.dumps()
 
     exist(
-        'out/dummyapp/issue07/media/js/Class.js',
-        'out/dummyapp/issue07/media/js/templates/file.html',
+        'out/dummyapp/issue_bb_07/media/js/Class.js',
+        'out/dummyapp/issue_bb_07/media/js/templates/file.html',
     )
 
 @with_setup(setup, teardown)
-def test_issue_19():
+def test_bb_issue_19():
     """
     Issue #19
 
@@ -56,18 +56,18 @@ def test_issue_19():
 
     request = get_request_fixture()
     c = RequestContext(request, {})
-    pa = PageAssembly('dummyapp/issue19/issue19.yaml', c)
+    pa = PageAssembly('dummyapp/issue_bb_19/issue_bb_19.yaml', c)
 
     content = pa.dumps()
 
     exist(
-        'out/dummyapp/issue19/media/js/static.js',
-        'out/dummyapp/issue19/media/js/Class.js',
-        'out/dummyapp/issue19/media/js/templates/file.html',
+        'out/dummyapp/issue_bb_19/media/js/static.js',
+        'out/dummyapp/issue_bb_19/media/js/Class.js',
+        'out/dummyapp/issue_bb_19/media/js/templates/file.html',
     )
 
 @with_setup(setup, teardown)
-def test_issue_23():
+def test_bb_issue_23():
     """
     Issue #23
 
@@ -78,17 +78,17 @@ def test_issue_23():
     """
     request = get_request_fixture()
     c = RequestContext(request, {})
-    pa = PageAssembly('dummyapp/issue23/issue23.yaml', c)
+    pa = PageAssembly('dummyapp/issue_bb_23/issue_bb_23.yaml', c)
 
     content = pa.dumps()
     stuff = (
-        'dummyapp/issue23/media/js/tt_after_sa.js',
-        "dojo.registerModulePath('DummyApp.Issue23.TTSa'",
-        "dojo.require('DummyApp.Issue23.TTSa.Controller');",
-        "dojo.require('DummyApp.Issue23.TTSa.View');",
-        "dojo.registerModulePath('DummyApp.Issue23.TTAfterSa'",
-        "dojo.require('DummyApp.Issue23.TTAfterSa.Controller');",
-        "dojo.require('DummyApp.Issue23.TTAfterSa.View');",
+        'dummyapp/issue_bb_23/media/js/tt_after_sa.js',
+        "dojo.registerModulePath('DummyApp.BB.Issue23.TTSa'",
+        "dojo.require('DummyApp.BB.Issue23.TTSa.Controller');",
+        "dojo.require('DummyApp.BB.Issue23.TTSa.View');",
+        "dojo.registerModulePath('DummyApp.BB.Issue23.TTAfterSa'",
+        "dojo.require('DummyApp.BB.Issue23.TTAfterSa.Controller');",
+        "dojo.require('DummyApp.BB.Issue23.TTAfterSa.View');",
     )
     for item in stuff:
         assert item in stuff
@@ -96,7 +96,7 @@ def test_issue_23():
         assert content.count(item) == 1
 
 @with_setup(setup, teardown)
-def test_issue_24():
+def test_bb_issue_24():
     """
     Issue #24
 
@@ -108,12 +108,12 @@ def test_issue_24():
     """
     request = get_request_fixture()
     c = RequestContext(request, {})
-    pa = PageAssembly('dummyapp/issue24/issue24.yaml', c)
+    pa = PageAssembly('dummyapp/issue_bb_24/issue_bb_24.yaml', c)
 
     py.test.raises(TemplateSyntaxError, pa.dumps)
 
 @with_setup(setup, teardown)
-def test_issue_25():
+def test_bb_issue_25():
     """
     Issue #25
 
@@ -130,11 +130,11 @@ def test_issue_25():
     # TODO Need to still write a test for block comments
     settings.CRUNCHYFROG_PLANS = 'mediadeploy_reusable'
 
-    hash_js = 'b6067a59c3b6e2955ea02187d9807956'
+    hash_js = '3f46c49944ed3463a6ed211a9b6af5d0'
 
     request = get_request_fixture()
     c = RequestContext(request, {})
-    pa = PageAssembly('dummyapp/issue25/issue25.yaml', c)
+    pa = PageAssembly('dummyapp/issue_bb_25/issue_bb_25.yaml', c)
 
     content = pa.dumps()
 
@@ -151,11 +151,11 @@ def test_issue_25():
     assert "dojo.provide('RibtTools.SyncTimer.Timer')" in jsfile
     assert 'dojo.provide("dojo.back")' in jsfile
     assert 'dojo.provide("dojo.NodeList-traverse")' in jsfile
-    assert "dojo.registerModulePath('DummyApp.Issue25'" in jsfile
-    assert "dojo.provide('DummyApp.Issue25.TestFile')" in jsfile
+    assert "dojo.registerModulePath('DummyApp.BB.Issue25'" in jsfile
+    assert "dojo.provide('DummyApp.BB.Issue25.TestFile')" in jsfile
 
 @with_setup(setup, teardown)
-def test_issue27():
+def test_bb_issue_27():
     """
     Issue #27
 
@@ -208,3 +208,15 @@ def test_issue27():
     # Make sure that we aren't reusing request's crunchyfrog internals
     assert not_hooked_context['crunchyfrog_internals'] is not \
         request.crunchyfrog_internals
+
+@attr('focus')
+@with_setup(setup, teardown)
+def test_gh_issue_01():
+    settings.CRUNCHYFROG_PLANS = 'mediadeploy_reusable'
+
+    request = get_request_fixture()
+    c = RequestContext(request, {})
+    pa = PageAssembly('dummyapp/issue_gh_01/issue_gh_01.yaml', c)
+
+    content = pa.dumps()
+    assert content

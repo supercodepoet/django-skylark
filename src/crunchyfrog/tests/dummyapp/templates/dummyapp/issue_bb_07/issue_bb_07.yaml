@@ -1,0 +1,7 @@
+body: dummyapp/issue_bb_07/issue_bb_07.html
+
+ribt:
+    - namespace: DummyApp.BB.Issue07
+      location: dummyapp/issue_bb_07/media/js
+      require: 
+        - DummyApp.BB.Issue07.Class

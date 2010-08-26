@@ -1,4 +1,4 @@
-dojo.provide('DummyApp.Issue25.TestFile');
+dojo.provide('DummyApp.BB.Issue25.TestFile');
 
 dojo.require('RibtTools.Mvc.Controller');
 

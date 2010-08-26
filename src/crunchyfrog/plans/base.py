@@ -3,23 +3,20 @@ import os
 import re
 import filecmp
 import shutil
-import yaml
 import hashlib
 import pickle
-import functools
-import urllib
-import logging
 from urlparse import urljoin
 
-from django.template import Template, TemplateDoesNotExist, TemplateSyntaxError
-from django.template import loader as djangoloader
+from django.template import Template, TemplateDoesNotExist
+from django.template import loader
+from django.template.loaders import filesystem
+from django.template.loaders import app_directories
 from django.utils.functional import memoize
+
 from crunchyfrog.conf import settings
 from crunchyfrog.processor import clevercss
-from crunchyfrog import loader as cfloader
-from crunchyfrog import ribt, time_started
+from crunchyfrog import ribt
 from crunchyfrog import cssimgreplace
-from django.template.context import Context
 
 
 class BadOption(Exception):
@@ -155,11 +152,28 @@ class BasePlan(object):
         Performs a os.stat on template_name, raising TemplatePathDoesNotExist
         if the template_name is not file based.
         """
-        path = cfloader.find_template_path(template_name)[1]
-        return os.stat(path)
+        source, filepath = self._get_source_filepath(template_name)
+        return os.stat(filepath)
+
+    def _get_source_filepath(self, template_name):
+        """
+        Utilizes some of Django's internals to retrive the source code and
+        filepath for a template while bypassing the normal compile behavior
+        """
+        # FIXME: we are using the Django file system loader here, this API
+        # might change in the future.  Should we isolate this into a
+        # functional programming style section instead of deep in this
+        # class?
+        try:
+            source, filepath = \
+                filesystem._loader.load_template_source(template_name)
+        except TemplateDoesNotExist:
+            source, filepath = \
+                app_directories._loader.load_template_source(template_name)
+        return source, filepath
 
     def _get_media_source(self, template_name, process_func=None, \
-        context=None):
+        context=None, no_render=False):
         """
         Responsible for taking a template and generating the contents.
 
@@ -173,22 +187,12 @@ class BasePlan(object):
             source = cache[mem_args]
             is_cached = True
         else:
-            try:
-                source, origin = cfloader.get_template(template_name)
-            except TemplateSyntaxError:
-                source = cfloader.find_template(template_name)[0]
+            if context and not no_render:
+                template = loader.get_template(template_name)
+                return template.render(context), False
 
-            if context and hasattr(source, 'render'):
-                return source.render(context), False
+            source, filepath = self._get_source_filepath(template_name)
 
-            if isinstance(source, Template):
-                # Get raw text
-                if hasattr(origin.loader, 'func_name'):
-                    source = origin.loader(template_name)[0]
-                else:
-                    source = origin.loader.load_template_source( \
-                        template_name)[0]
-                
             if process_func:
                 source = process_func(source)
 
@@ -366,17 +370,13 @@ class BasePlan(object):
 
         for yaml in page_instructions.yaml:
             # yaml = app/page/page.yaml
-            source, origin = cfloader.find_template(yaml)
-
-            if hasattr(origin.loader, 'func_name'):
-                source, origin = origin.loader(yaml)
-            else:
-                origin = str(origin.loader.get_template_sources(origin.loadname).next())
+            template, origin = loader.find_template(yaml)
+            filepath = template.origin.name
 
             # /Users/me/Development/app/templates/app/page/page.yaml
             yaml_basedir = os.path.dirname(yaml)
             # app/page
-            template_basedir = origin[:origin.find(yaml)]
+            template_basedir = filepath[:filepath.find(yaml)]
             # /Users/me/Development/app/templates
 
             for asset in assets:
@@ -446,7 +446,7 @@ class BasePlan(object):
         Takes the body section and renders it, storing it in
         prepared_instructions
         """
-        template = djangoloader.get_template(str(page_instructions.body))
+        template = loader.get_template(str(page_instructions.body))
         self.prepared_instructions['body'] = unicode(
             template.render(self.context))
 
@@ -535,7 +535,7 @@ class RollupPlan(object):
             else:
                 process_func = self._get_processing_function(i.get('process'))
                 processed, is_cached = self._get_media_source(
-                    i['static'], process_func)
+                    i['static'], process_func, no_render=True)
             if fix_css_urls:
                 processed = self._fix_css_urls(i, processed)
             if isinstance(processed, basestring):
@@ -690,7 +690,7 @@ class RollupPlan(object):
                         'Could not resolve %s' % req_mod)
                 try:
                     req_mod_source, is_cached = self._get_media_source(
-                        req_mod_path)
+                        req_mod_path, no_render=True)
                 except TemplateDoesNotExist as tdne:
                     raise TemplateDoesNotExist('Trying to find %s at path %s '
                        'while processing dojo.requires for %s' % (

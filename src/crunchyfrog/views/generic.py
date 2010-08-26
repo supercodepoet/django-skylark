@@ -8,7 +8,7 @@ from crunchyfrog.page import PageAssembly
 def direct_to_yaml(yaml_file, **kwargs):
     if settings.DEBUG:
         # Let's make sure we can grab this
-        loader.find_template_source(yaml_file)
+        loader.find_template(yaml_file)
 
     def render(request, **kwargs):
         response = kwargs.get('response_object')

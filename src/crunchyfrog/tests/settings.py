@@ -54,22 +54,10 @@ ADMIN_MEDIA_PREFIX = '/media/'
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'j3z952)d8-4m44vz=q(y%4riczf^ju(2f4oy8*zzhbexq-r@=n'
 
-# List of callables that know how to import templates from various sources.
-# Try using Django 1.2+ template loader
-try:
-    from django.template.loader.filesystem import Loader
-    TEMPLATE_LOADERS = (
-        'django.template.loaders.filesystem.loader.load_template_source',
-        'django.template.loaders.app_directories.loader.load_template_source',
-    #     'django.template.loaders.eggs.load_template_source',
-    )
-# If not available, use the Django 1.1- template loaders
-except ImportError:
-    TEMPLATE_LOADERS = (
-        'django.template.loaders.filesystem.load_template_source',
-        'django.template.loaders.app_directories.load_template_source',
-    #     'django.template.loaders.eggs.load_template_source',
-    )
+TEMPLATE_LOADERS = (
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+)
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',

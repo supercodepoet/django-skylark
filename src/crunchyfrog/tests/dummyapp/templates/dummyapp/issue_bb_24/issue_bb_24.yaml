@@ -1,5 +1,5 @@
 title: Testing fix for issue #24
-body: dummyapp/issue24/issue24.html
+body: dummyapp/issue_bb_24/issue_bb_24.html
 
 js:
     - static: dummyapp/page/media/js/sample.js
@@ -18,8 +18,8 @@ css:
       media: screen
     
 ribt:
-    - namespace: DummyApp.Issue24
-      location: dummyapp/issue24/media/js
+    - namespace: DummyApp.BB.Issue24
+      location: dummyapp/issue_bb_24/media/js
       require:
-        - DummyApp.Issue24.Controller
-        - DummyApp.Issue24.View
+        - DummyApp.BB.Issue24.Controller
+        - DummyApp.BB.Issue24.View

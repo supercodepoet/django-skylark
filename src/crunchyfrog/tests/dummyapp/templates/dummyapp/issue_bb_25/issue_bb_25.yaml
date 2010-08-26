@@ -1,0 +1,11 @@
+title: Testing fix for issue #25
+body: dummyapp/issue_bb_25/issue_bb_25.html
+
+uses:
+    - file: ribt/tools.yaml
+
+ribt:
+    - namespace: DummyApp.BB.Issue25
+      location: dummyapp/issue_bb_25/media/js
+      require:
+        - DummyApp.BB.Issue25.TestFile

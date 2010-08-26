@@ -12,7 +12,7 @@ def tt_snippet_assembly(parser, token):
 
 class TtSnippetAssemblyNode(template.Node):
     def render(self, context):
-        sa = SnippetAssembly("dummyapp/issue23/tt_sa.yaml", context)
+        sa = SnippetAssembly("dummyapp/issue_bb_23/tt_sa.yaml", context)
         return sa.dumps();
 
 @register.tag
@@ -21,5 +21,5 @@ def tt_after_snippet_assembly(parser, token):
 
 class TtAfterSnippetAssemblyNode(template.Node):
     def render(self, context):
-        sa = SnippetAssembly("dummyapp/issue23/tt_after_sa.yaml", context)
+        sa = SnippetAssembly("dummyapp/issue_bb_23/tt_after_sa.yaml", context)
         return sa.dumps();
