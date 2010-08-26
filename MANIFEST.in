@@ -1,2 +1,4 @@
 include pkginfo.py
+include NEWS.rst
+include README.rst
 recursive-include crunchyfrog/templates *

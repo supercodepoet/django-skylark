@@ -5,7 +5,7 @@ from pkginfo import version
 
 here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.rst')).read()
-NEWS = open(os.path.join(here, 'NEWS.txt')).read()
+NEWS = open(os.path.join(here, 'NEWS.rst')).read()
 
 install_requires = [
     # http://packages.python.org/distribute/setuptools.html#declaring-dependencies
