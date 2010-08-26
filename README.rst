@@ -1,9 +1,9 @@
-Using CrunchyFrog
-=================
+Using Django CrunchyFrog
+========================
 
-CrunchyFrog is a Django app.  You can install it with setup tools::
+CrunchyFrog is a Django app.  You can install it with pip::
 
-    python setup.py install
+    pip install django-crunchyfrog
 
 Inside your settings.py add the following::
 
@@ -29,8 +29,8 @@ finished try running the tests::
 
     ./bin/test
 
-Documentation
-=============
+Building the documentation
+==========================
 
 Docs are in the :file:`docs` directory.  It was written using Sphinx.
 
