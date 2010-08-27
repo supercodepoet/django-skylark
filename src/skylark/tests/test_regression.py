@@ -51,8 +51,8 @@ def test_bb_issue_19():
     will create the directory and the ribt section will then be skipped.
     """
     settings.DEBUG = False
-    settings.CRUNCHYFROG_PLANS = 'mediadeploy'
-    settings.CRUNCHYFROG_PLANS_DEFAULT = 'rf'
+    settings.SKYLARK_PLANS = 'mediadeploy'
+    settings.SKYLARK_PLANS_DEFAULT = 'rf'
 
     request = get_request_fixture()
     c = RequestContext(request, {})
@@ -128,7 +128,7 @@ def test_bb_issue_25():
     // dojo.require('something')
     """
     # TODO Need to still write a test for block comments
-    settings.CRUNCHYFROG_PLANS = 'mediadeploy_reusable'
+    settings.SKYLARK_PLANS = 'mediadeploy_reusable'
 
     hash_js = '3f46c49944ed3463a6ed211a9b6af5d0'
 
@@ -212,7 +212,7 @@ def test_bb_issue_27():
 @attr('focus')
 @with_setup(setup, teardown)
 def test_gh_issue_01():
-    settings.CRUNCHYFROG_PLANS = 'mediadeploy_reusable'
+    settings.SKYLARK_PLANS = 'mediadeploy_reusable'
 
     request = get_request_fixture()
     c = RequestContext(request, {})

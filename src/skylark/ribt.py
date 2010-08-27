@@ -29,7 +29,7 @@ def check_instrumentation(meth):
     """
     def check(*args, **kwargs):
         if settings.DEBUG and \
-           settings.CRUNCHYFROG_RIBT_INSTRUMENTED and \
+           settings.SKYLARK_RIBT_INSTRUMENTED and \
            not is_instrumented():
             # The user has indicated that we need to be instrumented for
             # testing

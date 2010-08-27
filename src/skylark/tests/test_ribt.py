@@ -13,10 +13,12 @@ from django.conf import settings
 from skylark.tests import *
 from skylark import ribt
 
+
 def teardown_ribt():
     teardown()
     ribt.instrument_site(False)
     ribt.test_registry.clear()
+
 
 @with_setup(setup, teardown_ribt)
 def test_instrument():
@@ -26,14 +28,15 @@ def test_instrument():
     assert ribt.is_instrumented()
     ribt.instrument_site(False)
     assert not ribt.is_instrumented()
-    settings.CRUNCHYFROG_RIBT_INSTRUMENTED = True
+    settings.SKYLARK_RIBT_INSTRUMENTED = True
     # This only get's triggered if we render a page, so let's do that
     request = get_request_fixture()
     c = RequestContext(request, {})
     sa = SnippetAssembly('dummyapp/snippet/snippet.yaml', c)
     content = sa.dumps()
     assert ribt.is_instrumented()
-    settings.CRUNCHYFROG_RIBT_INSTRUMENTED = False
+    settings.SKYLARK_RIBT_INSTRUMENTED = False
+
 
 @with_setup(setup, teardown_ribt)
 def test_snippet_render():
@@ -57,6 +60,7 @@ def test_snippet_render():
 
     assert 'This is my snippet test' in content
                               
+
 @with_setup(setup, teardown_ribt)
 def test_ribt_renders_in_page():
     request = get_request_fixture()
@@ -88,9 +92,10 @@ def test_ribt_renders_in_page():
     assert 'media/cfcache/out/dynamicapp' in content
     assert 'addon/dojo/dojo.js' in content
 
+
 @with_setup(setup, teardown_ribt)
 def test_ribt_dojo_settings():
-    settings.CRUNCHYFROG_DOJO_VIA_CDN_AOL = True
+    settings.SKYLARK_DOJO_VIA_CDN_AOL = True
 
     request = get_request_fixture()
     c = RequestContext(request, {})
@@ -98,9 +103,9 @@ def test_ribt_dojo_settings():
     content = pa.dumps()
     assert 'http://o.aolcdn.com/dojo/1.4/dojo/dojo.xd.js' in content
 
-    settings.CRUNCHYFROG_DOJO_VIA_CDN_AOL = None
+    settings.SKYLARK_DOJO_VIA_CDN_AOL = None
 
-    settings.CRUNCHYFROG_DOJO_VIA_URL = 'http://testdojo.com/dojo.js'
+    settings.SKYLARK_DOJO_VIA_URL = 'http://testdojo.com/dojo.js'
 
     request = get_request_fixture()
     c = RequestContext(request, {})
@@ -108,7 +113,8 @@ def test_ribt_dojo_settings():
     content = pa.dumps()
     assert 'http://testdojo.com/dojo.js' in content
 
-    settings.CRUNCHYFROG_DOJO_VIA_URL = None
+    settings.SKYLARK_DOJO_VIA_URL = None
+
 
 @with_setup(setup, teardown_ribt)
 def test_ribt_test_registry_add():
@@ -128,6 +134,7 @@ def test_ribt_test_registry_add():
 
     assert len(ribt.test_registry) == 2
 
+
 @with_setup(setup, teardown_ribt)
 def test_ribt_autodiscover():
     ribt.autodiscover()
@@ -135,6 +142,7 @@ def test_ribt_autodiscover():
 
     ribt.instrument_site(True)
     assert 'dummyapp.ribt' in sys.modules
+
 
 @with_setup(setup, teardown_ribt)
 def test_ribt_testcase_is_included():
@@ -149,6 +157,7 @@ def test_ribt_testcase_is_included():
     assert 'dojo.require(\'RibtTools.TestRunner' in content
     assert 'dojo.require(\'RibtTools.Mvc' in content
     assert 'RibtTools.TestRunner.TestCaseCollector' in content
+
 
 @with_setup(setup, teardown_ribt)
 def test_ribt_includes_tests():

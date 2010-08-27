@@ -10,7 +10,7 @@ from django.conf import settings
 
 projectdir = os.path.join(os.path.dirname(__file__))
 
-cachedir = settings.CRUNCHYFROG_CACHE_ROOT
+cachedir = settings.SKYLARK_CACHE_ROOT
 
 
 def exist(*filelist):
@@ -53,9 +53,9 @@ def get_request_fixture():
 
 def setup():
     settings.DEBUG = True
-    settings.CRUNCHYFROG_PLANS = 'mediadeploy'
-    settings.CRUNCHYFROG_PLANS_DEFAULT = 'default'
-    settings.CRUNCHYFROG_PLANS_ROLLUP_SALT = 'aaaaaaaaaaaaaaaa'
+    settings.SKYLARK_PLANS = 'mediadeploy'
+    settings.SKYLARK_PLANS_DEFAULT = 'default'
+    settings.SKYLARK_PLANS_ROLLUP_SALT = 'aaaaaaaaaaaaaaaa'
 
 
 def teardown():

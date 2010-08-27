@@ -31,13 +31,13 @@ def test_can_change_deploy_plan_name():
 
     # Make sure that if there is no deploy plan (file missing) that it comes
     # back with SeparateEverything
-    settings.CRUNCHYFROG_PLANS = 'mediadeploy_notthere'
+    settings.SKYLARK_PLANS = 'mediadeploy_notthere'
     plan = get_for_context(context, render_full_page)
     assert isinstance(plan, SeparateEverything)
 
     # Change it to something valid that is not the default
-    settings.CRUNCHYFROG_PLANS = 'mediadeploy_alt'
-    settings.CRUNCHYFROG_PLANS_DEFAULT = 'alternative'
+    settings.SKYLARK_PLANS = 'mediadeploy_alt'
+    settings.SKYLARK_PLANS_DEFAULT = 'alternative'
     plan = get_for_context(context, render_full_page)
     assert isinstance(plan, FewestFiles)
 
@@ -45,12 +45,12 @@ def test_can_change_deploy_plan_name():
     plan = get_for_context(context, False)
     assert isinstance(plan, SeparateEverything)
 
-    settings.CRUNCHYFROG_PLANS = 'mediadeploy_bad'
-    settings.CRUNCHYFROG_PLANS_DEFAULT = 'default'
+    settings.SKYLARK_PLANS = 'mediadeploy_bad'
+    settings.SKYLARK_PLANS_DEFAULT = 'default'
     py.test.raises(ValueError, get_for_context, context, render_full_page)
 
     settings.DEBUG = False
-    settings.CRUNCHYFROG_PLANS = 'mediadeploy_notthere'
+    settings.SKYLARK_PLANS = 'mediadeploy_notthere'
     py.test.raises(MissingMediaPlan, get_for_context, context, render_full_page)
 
 @with_setup(setup, teardown)
@@ -60,7 +60,7 @@ def test_deploy_reusable():
     hash_css = 'f27f963509901f608889f688b1e39f72'
 
     settings.DEBUG = False
-    settings.CRUNCHYFROG_PLANS = 'mediadeploy_reusable'
+    settings.SKYLARK_PLANS = 'mediadeploy_reusable'
 
     request = get_request_fixture()
     c = RequestContext(request)
@@ -119,7 +119,7 @@ def test_deploy_fewest():
     hash_css = 'a30e20a6a1d62976266b612a7e5d634a'
     hash_js = '0006e47a5dca47f5f3e46c45d852ad09'
 
-    settings.CRUNCHYFROG_PLANS = 'mediadeploy_fewest'
+    settings.SKYLARK_PLANS = 'mediadeploy_fewest'
 
     request = get_request_fixture()
     c = RequestContext(request)
@@ -183,7 +183,7 @@ def test_deploy_fewest_instrumented():
     hash_js = '157bee29e2605105eff447aeef28b1d8'
 
     ribt.instrument_site(True)
-    settings.CRUNCHYFROG_PLANS = 'mediadeploy_fewest'
+    settings.SKYLARK_PLANS = 'mediadeploy_fewest'
 
     request = get_request_fixture()
     c = RequestContext(request)
@@ -203,7 +203,7 @@ def test_deploy_fewest_instrumented():
 
 @with_setup(setup, teardown)
 def test_missing_rollup_requirement():
-    settings.CRUNCHYFROG_PLANS = 'mediadeploy_fewest'
+    settings.SKYLARK_PLANS = 'mediadeploy_fewest'
 
     request = get_request_fixture()
     c = RequestContext(request)
@@ -215,7 +215,7 @@ def test_missing_rollup_requirement():
 def test_deploy_reusable_no_js_minifying():
     hash_js = 'dc3591c55de520ec5deb5c0cd85686be'
 
-    settings.CRUNCHYFROG_PLANS = 'mediadeploy_reusable'
+    settings.SKYLARK_PLANS = 'mediadeploy_reusable'
 
     plan_options(minify_javascript=False)
 
@@ -236,7 +236,7 @@ def test_deploy_reusable_no_js_minifying():
 
 @with_setup(setup, teardown)
 def test_will_not_needlessly_rollup():
-    settings.CRUNCHYFROG_PLANS = 'mediadeploy_reusable'
+    settings.SKYLARK_PLANS = 'mediadeploy_reusable'
 
     hash_js1 = 'dc3591c55de520ec5deb5c0cd85686be'
     filename = os.path.join(cachedir, 'out', '%s.js' % hash_js1)

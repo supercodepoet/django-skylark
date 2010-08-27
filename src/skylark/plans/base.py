@@ -113,8 +113,8 @@ class BasePlan(object):
             self._prepare_assets, self._prepare_assets_cache, 2))
 
         self.cache_root = os.path.join(
-            settings.CRUNCHYFROG_CACHE_ROOT, self.cache_prefix)
-        self.cache_url = urljoin(settings.CRUNCHYFROG_CACHE_URL,
+            settings.SKYLARK_CACHE_ROOT, self.cache_prefix)
+        self.cache_url = urljoin(settings.SKYLARK_CACHE_URL,
             '%s/' % self.cache_prefix)
         self.context = context
         self.render_full_page = render_full_page
@@ -546,7 +546,7 @@ class RollupPlan(object):
 
     def _make_filename(self, files):
         files.sort()
-        return hashlib.md5('%s%s' % (settings.CRUNCHYFROG_PLANS_ROLLUP_SALT,
+        return hashlib.md5('%s%s' % (settings.SKYLARK_PLANS_ROLLUP_SALT,
             pickle.dumps(files))).hexdigest()
 
     def _prepare_rollup(self, attr, rollup, keep, insert_point, **kwargs):
@@ -708,7 +708,7 @@ class RollupPlan(object):
         roll_modules.append({'name': name, 'static': static, 'source': source})
 
     def _resolve_dojo_module_path(self, mod):
-        if not settings.CRUNCHYFROG_DOJO_VIA_INTERNALBUILD:
+        if not settings.SKYLARK_DOJO_VIA_INTERNALBUILD:
             # We can only make this work if we use the internal build
             return None
 

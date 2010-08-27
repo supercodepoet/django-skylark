@@ -85,5 +85,5 @@ INSTALLED_APPS = (
     'planapp',
 )
 
-CRUNCHYFROG_CACHE_ROOT = os.path.join(MEDIA_ROOT, 'cfcache')
-CRUNCHYFROG_CACHE_URL  = urljoin(MEDIA_URL, 'cfcache/')
+SKYLARK_CACHE_ROOT = os.path.join(MEDIA_ROOT, 'cfcache')
+SKYLARK_CACHE_URL  = urljoin(MEDIA_URL, 'cfcache/')

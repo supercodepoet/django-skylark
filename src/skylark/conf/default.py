@@ -6,22 +6,22 @@ from django.conf import settings as django_settings
 from urlparse import urljoin
 
 # General settings
-CRUNCHYFROG_CACHE_ROOT = os.path.join(django_settings.MEDIA_ROOT, 'cfcache')
-CRUNCHYFROG_CACHE_URL = urljoin(django_settings.MEDIA_URL, 'cfcache/')
-CRUNCHYFROG_INIT_CLEAR_CACHE = False
-CRUNCHYFROG_PLANS = 'mediadeploy'
-CRUNCHYFROG_PLANS_DEFAULT = 'default'
-CRUNCHYFROG_PLANS_ROLLUP_SALT = ''.join(sample(string.hexdigits, 16))
-CRUNCHYFROG_ENABLE_TIDY = True
-CRUNCHYFROG_RAISE_CSS_ERRORS = django_settings.DEBUG
-CRUNCHYFROG_RAISE_HTML_ERRORS = django_settings.DEBUG
+SKYLARK_CACHE_ROOT = os.path.join(django_settings.MEDIA_ROOT, 'cfcache')
+SKYLARK_CACHE_URL = urljoin(django_settings.MEDIA_URL, 'cfcache/')
+SKYLARK_INIT_CLEAR_CACHE = False
+SKYLARK_PLANS = 'mediadeploy'
+SKYLARK_PLANS_DEFAULT = 'default'
+SKYLARK_PLANS_ROLLUP_SALT = ''.join(sample(string.hexdigits, 16))
+SKYLARK_ENABLE_TIDY = True
+SKYLARK_RAISE_CSS_ERRORS = django_settings.DEBUG
+SKYLARK_RAISE_HTML_ERRORS = django_settings.DEBUG
 
 # Dojo toolkit related
-CRUNCHYFROG_DOJO_DEBUGATALLCOSTS = django_settings.DEBUG
-CRUNCHYFROG_DOJO_COPY_INTERNALBUILD = True
-CRUNCHYFROG_DOJO_VIA_INTERNALBUILD = True
-CRUNCHYFROG_DOJO_VIA_CDN_AOL = None
-CRUNCHYFROG_DOJO_VIA_URL = None
+SKYLARK_DOJO_DEBUGATALLCOSTS = django_settings.DEBUG
+SKYLARK_DOJO_COPY_INTERNALBUILD = True
+SKYLARK_DOJO_VIA_INTERNALBUILD = True
+SKYLARK_DOJO_VIA_CDN_AOL = None
+SKYLARK_DOJO_VIA_URL = None
 
 # Ribt testing and MVC
-CRUNCHYFROG_RIBT_INSTRUMENTED = False
+SKYLARK_RIBT_INSTRUMENTED = False

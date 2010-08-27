@@ -58,8 +58,8 @@ def test_missing_skylark_settings():
 
     assert settings.MEDIA_URL
     assert settings.MEDIA_ROOT
-    assert settings.CRUNCHYFROG_CACHE_ROOT
-    assert settings.CRUNCHYFROG_CACHE_URL
+    assert settings.SKYLARK_CACHE_ROOT
+    assert settings.SKYLARK_CACHE_URL
 
 @with_setup(setup, teardown)
 def test_returns_http_response():
@@ -343,7 +343,7 @@ def test_bad_html():
     assert 'line 25' in str(e.value)
     assert "Warning: <tag> missing '>'" in str(e.value)
 
-    settings.CRUNCHYFROG_RAISE_HTML_ERRORS = False
+    settings.SKYLARK_RAISE_HTML_ERRORS = False
 
     assert pa.dumps()
 

@@ -66,7 +66,7 @@ class Renderer(object):
             omit_media=self.omit_media)
 
         render_context = copy.copy(self.context)
-        render_context['cache_url'] = settings.CRUNCHYFROG_CACHE_URL
+        render_context['cache_url'] = settings.SKYLARK_CACHE_URL
         render_context['doctype'] = self.doctype
         render_context['prepared_instructions'] = prepared_instructions
         render_context['is_instrumented'] = ribt.is_instrumented()

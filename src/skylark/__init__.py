@@ -57,7 +57,7 @@ class RequestContext(template.RequestContext):
                 'request': request,
                 'assembly_stack': [],
                 'settings': copy_then_filter_settings(
-                    django_settings, 'CRUNCHYFROG')}
+                    django_settings, 'SKYLARK')}
             # Hook the request object
             setattr(request, 'skylark_internals', internals)
 
@@ -67,7 +67,7 @@ __cache_cleared = False
 
 
 def clear_media_cache():
-    cachedir = settings.CRUNCHYFROG_CACHE_ROOT
+    cachedir = settings.SKYLARK_CACHE_ROOT
     # Some directories in the cache should not be deleted
     skip = ['addon']
     if not os.path.isdir(cachedir):
@@ -79,7 +79,7 @@ def clear_media_cache():
         if os.path.isdir(d):
             shutil.rmtree(d)
 
-if settings.CRUNCHYFROG_INIT_CLEAR_CACHE and not __cache_cleared:
+if settings.SKYLARK_INIT_CLEAR_CACHE and not __cache_cleared:
     """
     When we initialize CF, let's delete the cache automatically if our settings
     tell us to
@@ -104,7 +104,7 @@ def copy_addons():
     sense to just use the entire Dojo release?  This may eventually get altered
     so that it downloads a release of Dojo and untars it into addon.
     """
-    addondir = os.path.join(settings.CRUNCHYFROG_CACHE_ROOT, 'addon')
+    addondir = os.path.join(settings.SKYLARK_CACHE_ROOT, 'addon')
     if os.path.isdir(addondir):
         # Don't copy it again, that's silly
         return
@@ -115,6 +115,6 @@ def copy_addons():
     dojoxdir = os.path.join(thisdir, *(mediadir + ['dojox']))
     shutil.copytree(dojoxdir, os.path.join(addondir, 'dojox'))
 
-if settings.CRUNCHYFROG_DOJO_COPY_INTERNALBUILD and not __copy_addons:
+if settings.SKYLARK_DOJO_COPY_INTERNALBUILD and not __copy_addons:
     copy_addons()
     __copy_addons = True

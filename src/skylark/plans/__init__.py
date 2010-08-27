@@ -28,8 +28,8 @@ def get_for_context(context, render_full_page):
     try:
         from skylark.conf import settings
         plan = get_plan(
-            settings.CRUNCHYFROG_PLANS,
-            settings.CRUNCHYFROG_PLANS_DEFAULT)
+            settings.SKYLARK_PLANS,
+            settings.SKYLARK_PLANS_DEFAULT)
 
         from base import BasePlan
         if isinstance(plan, BasePlan):
@@ -50,6 +50,6 @@ def get_for_context(context, render_full_page):
         else:
             raise MissingMediaPlan('Could not import the media plan for '
                 'CrunchyFrog media deployment: %s name %s' % (
-                    settings.CRUNCHYFROG_PLANS,
-                    settings.CRUNCHYFROG_PLANS_DEFAULT,
+                    settings.SKYLARK_PLANS,
+                    settings.SKYLARK_PLANS_DEFAULT,
                 ))

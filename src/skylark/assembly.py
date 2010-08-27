@@ -27,7 +27,7 @@ except OSError:
     """
     We can't use tidy, most likely libtidy is not installed on the system
     """
-    settings.CRUNCHYFROG_ENABLE_TIDY = False
+    settings.SKYLARK_ENABLE_TIDY = False
 
 
 class HtmlTidyErrors(Exception):
@@ -217,14 +217,14 @@ class BaseAssembly(object):
         if not settings.DEBUG or not self.render_full_page:
             return content
 
-        if not settings.CRUNCHYFROG_ENABLE_TIDY:
+        if not settings.SKYLARK_ENABLE_TIDY:
             document = content
         else:
             document, errors = tidylib.tidy_document(content)
             # We want to let the proprietary attributes slide, Ribt uses these
             errors = self.__convert_tidy_errors(
                 errors, filter=['proprietary attribute'])
-            if errors and settings.CRUNCHYFROG_RAISE_HTML_ERRORS:
+            if errors and settings.SKYLARK_RAISE_HTML_ERRORS:
                 formatted_errors = self.__format_tidy_errors(content, errors)
                 raise HtmlTidyErrors('We tried to tidy up the document and '
                    'got these errors: %s' % ', '.join(formatted_errors))
