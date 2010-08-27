@@ -1,0 +1,11 @@
+{{ doctype|safe }}
+<html>
+    <head>
+        <title>{{ prepared_instructions.title|safe }}</title>
+        {% include "skylark/parts/html_meta.html" %}
+        {% include "skylark/parts/html_css.html" %}
+        {% include "skylark/parts/cf_injected.html" %}
+        {% include "skylark/parts/js.html" %}
+    </head>
+    {% include "skylark/parts/body.html" %}
+</html>

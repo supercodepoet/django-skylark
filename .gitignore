@@ -16,4 +16,4 @@ eggs
 parts
 tmp
 
-src/crunchyfrog/tests/media
+src/skylark/tests/media
