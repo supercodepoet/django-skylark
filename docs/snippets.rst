@@ -4,7 +4,7 @@ Rendering pieces of HTML
 
 Page assemblies are fine, but there are occasions when you just need to render a
 chunk of HTML and you don't want the HTML and HEAD sections but you still want
-the ``<script>`` and ``<link>`` tags that CrunchyFrog will produce when you
+the ``<script>`` and ``<link>`` tags that Django Skylark will produce when you
 render an assembly.
 
 This is possible with ``SnippetAssembly``.
@@ -19,7 +19,7 @@ Snippet assemblies
 Here's an example of a SnippetAssembly::
 
     from django.http import HttpResponse
-    from crunchyfrog.snippet import SnippetAssembly, RequestContext
+    from skylark.snippet import SnippetAssembly, RequestContext
 
     def list(request):
         c = RequestContext(request, {

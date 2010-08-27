@@ -106,7 +106,7 @@ def autodiscover():
 
     for app in settings.INSTALLED_APPS:
         if app == 'skylark':
-            # Skip Crunchyfrog, these aren't the droids we are looking for
+            # Skip Django Skylark, these aren't the droids we are looking for
             continue
 
         try:

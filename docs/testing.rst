@@ -8,16 +8,16 @@ Testing Javascript with a browser and Ribt
 Instrumenting your site
 -----------------------
 
-CrunchyFrog does not include the files it needs to run tests in normal everyday
-development or production.  We have to instruct it that we are testing.  To do
-that we'll change a setting.
+Django Skylark does not include the files it needs to run tests in normal
+everyday development or production.  We have to instruct it that we are testing.
+To do that we'll change a setting.
 
 In your :file:`settings.py` file, add this ::
 
-    CRUNCHYFROG_RIBT_INSTRUMENTED = True
+    SKYLARK_RIBT_INSTRUMENTED = True
 
-Telling CrunchyFrog about your tests
-------------------------------------
+Telling Django Skylark about your tests
+---------------------------------------
 
 Edit the YAML file, adding a ``tests`` instruction ::
 

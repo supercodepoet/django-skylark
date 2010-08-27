@@ -2,7 +2,7 @@
 Getting started
 ===============
 
-Setting up a Django project, app, and preparing to use CrunchyFrog
+Setting up a Django project, app, and preparing to use Django Skylark
 ------------------------------------------------------------------
 
 Let's make a new Django project.  Let's assume you've already setup Django and
@@ -25,7 +25,7 @@ Let's change directories into our new project. ::
 
     cd demo
 
-Great, we've got a Django project started.  Let's install Django CrunchyFrog.
+Great, we've got a Django project started.  Let's install Django Skylark.
     
 .. include:: install.rst
 
@@ -36,7 +36,7 @@ Now edit ``settings.py`` to add the to the installed apps directory. ::
         'django.contrib.contenttypes',
         'django.contrib.sessions',
         'django.contrib.sites',
-        'crunchyfrog',
+        'skylark',
     )
 
 We also need to make some tweeks to the ``MEDIA_ROOT`` and ``MEDIA_URL`` ::
@@ -79,13 +79,13 @@ Now add this to the installed apps.  Edit ``settings.py`` again. ::
         'django.contrib.contenttypes',
         'django.contrib.sessions',
         'django.contrib.sites',
-        'crunchyfrog',
+        'skylark',
         'goodies',
     )
 
-Now we're gonna use CrunchyFrog's command line interface to get us going. ::
+Now we're gonna use Django Skylark's command line interface to get us going. ::
 
-    python manage.py crunchypage -a goodies -p list
+    python manage.py skylarkpage -a goodies -p list
 
 What this is going to do is create a page called list in the goodies
 application.  Pages will generally match up with a function in your view.
@@ -97,7 +97,7 @@ doing. ::
 
     We can create this for you and continue from here if you like.
                                                            
-    Create /Users/robmadole/Development/workbench/crunchytutorial/demo/goodies/templates (yes/no)? 
+    Create /Users/robmadole/Development/workbench/skylarktutorial/demo/goodies/templates (yes/no)? 
 
 Tell it ``yes`` so it will create the missing templates directory. ::
 
@@ -117,15 +117,15 @@ Tell it ``yes`` so it will create the missing templates directory. ::
     Are you sure you want to do this (yes/no)? 
 
 Tell it ``yes`` again.  Now we'll create a set of files and directories for
-CrunchyFrog to use.
+Django Skylark to use.
 
-And as the last bit that CrunchyFrog does, it outputs an example views.py file
+And as the last bit that Django Skylark does, it outputs an example views.py file
 for you.
 
 So let's use this.  Copy and paste that last part into ``goodies/views.py`` ::
 
     from django.http import HttpResponse
-    from crunchyfrog.page import PageAssembly, RequestContext
+    from skylark.page import PageAssembly, RequestContext
 
     def list(request):
         c = RequestContext(request, {
@@ -189,6 +189,6 @@ something like this. ::
     Your page is working (using only the finest baby frogs, dew picked and flown in from Iraq)    
 
 Now would be a great time to go onto the next section to dive a :doc:`little
-deeper into CrunchyFrog</intro>`.
+deeper into Django Skylark</intro>`.
 
 .. _Django installation guide: http://docs.djangoproject.com/en/dev/intro/install/

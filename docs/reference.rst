@@ -8,7 +8,7 @@ TODO YAML files are templates.
 --------
 
 Let's you specifiy a template to use when rendering the page.  Remember you
-shouldn't be including the HTML or HEAD sections, CrunchyFrog will do this for
+shouldn't be including the HTML or HEAD sections, Django Skylark will do this for
 you.
 
 Here is an example template

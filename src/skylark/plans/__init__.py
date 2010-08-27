@@ -49,7 +49,7 @@ def get_for_context(context, render_full_page):
             return SeparateEverything(context, render_full_page)
         else:
             raise MissingMediaPlan('Could not import the media plan for '
-                'CrunchyFrog media deployment: %s name %s' % (
+                'Django Skylark media deployment: %s name %s' % (
                     settings.SKYLARK_PLANS,
                     settings.SKYLARK_PLANS_DEFAULT,
                 ))

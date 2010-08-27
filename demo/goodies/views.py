@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from crunchyfrog.page import PageAssembly, RequestContext
+from skylark.page import PageAssembly, RequestContext
 
 def list(request):
     c = RequestContext(request, {

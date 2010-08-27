@@ -88,9 +88,9 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
-    'crunchyfrog',
+    'skylark',
     'themes',
     'goodies',
 )
 
-CRUNCHYFROG_RIBT_INSTRUMENTED = True
+SKYLARK_RIBT_INSTRUMENTED = True

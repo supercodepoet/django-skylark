@@ -3,7 +3,7 @@ Extending (or using) other YAML files
 =====================================
 It's important to adhere to the DRY principal. In case you have forgotten this
 stands for "Do not Repeat Yourself".  Django Templates allow you to extend one
-template with another.  CrunchyFrog allows you to specify another YAML file
+template with another.  Django Skylark allows you to specify another YAML file
 within your own.
 
 Here's how this works.  Let's create a YAML file with everything we need called ``add.yaml`` ::
@@ -52,7 +52,7 @@ Now our ``add.yaml`` becomes this ::
     css:
         - static: goodies/add/media/css/screen.css
 
-Behind the scenes CrunchyFrog will run across this instruction and add the
+Behind the scenes Django Skylark will run across this instruction and add the
 common.yaml file to its list of page instructions.
 
 .. note:: The order is important when you are dealing with Javascript and CSS.

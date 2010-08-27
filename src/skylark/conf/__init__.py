@@ -3,7 +3,7 @@ from django.conf import settings as django_settings
 from django.utils.functional import LazyObject
 
 
-class CrunchyFrogSettings(LazyObject):
+class SkylarkSettings(LazyObject):
     def _setup(self):
         for name in dir(default_settings):
             if name == name.upper() and \
@@ -13,4 +13,4 @@ class CrunchyFrogSettings(LazyObject):
 
         self._wrapped = django_settings
 
-settings = CrunchyFrogSettings()
+settings = SkylarkSettings()

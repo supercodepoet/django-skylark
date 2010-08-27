@@ -3,7 +3,7 @@ from django.template import Template
 
 def add_origin(func):
     """
-    We utilize the origin a lot internally for CrunchyFrog and when a template
+    We utilize the origin a lot internally for Django Skylark and when a template
     is created with one, we make it available off the Template instance itself.
     This allows us to continue to use the Django loader internals with minimal
     fuss and as much forward compatibility as possible

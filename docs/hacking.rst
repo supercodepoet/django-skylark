@@ -1,5 +1,5 @@
 =============================
-Hacking on Django CrunchyFrog
+Hacking on Django Skylark
 =============================
 
 We use buildout. ::

@@ -2,7 +2,7 @@
 Using CleverCSS
 ===============
 `CleverCSS`_ is a small markup language for CSS inspired by Python.  We like it
-so much that we integrated it directly into CrunchyFrog.
+so much that we integrated it directly into Django Skylark.
 
 .. note:: We are going to use the project we set up in :doc:`getting started</gettingstarted>` and
           things will work out much better if you do too
@@ -39,7 +39,7 @@ Now it's time to edit our YAML file to include this.  So edit
           process: clevercss
           media: screen
 
-CrunchyFrog will grab the file and automatically run it through the CleverCSS
+Django Skylark will grab the file and automatically run it through the CleverCSS
 interpreter and include the results on your page assembly.
 
 So make sure your server is running now ::
@@ -65,7 +65,7 @@ Here is the page's output ::
 
         <script type="text/javascript">
             //<![CDATA[
-            // Injected by Django CrunchyFrog
+            // Injected by Django Skylark
             var $CF = { MEDIA_URL: "http://127.0.0.1:8000/sitemedia/cfcache/" }
             //]]>
         </script>

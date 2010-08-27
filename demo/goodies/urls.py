@@ -1,5 +1,5 @@
 from django.conf.urls.defaults import *
-from crunchyfrog.ribt import test_registry
+from skylark.ribt import test_registry
 
 import views
 

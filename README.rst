@@ -1,20 +1,20 @@
-Using Django CrunchyFrog
-========================
+Using Django Skylark
+====================
 
-CrunchyFrog is a Django app.  You can install it with pip::
+Django Skylark is a Django app.  You can install it with pip::
 
-    pip install django-crunchyfrog
+    pip install django-skylark
 
 Inside your settings.py add the following::
 
     INSTALLED_APPS = (
-        'crunchyfrog',
+        'skylark',
     )
 
 Developers
 ==========
 
-Start out in the CrunchyFrog directory.
+Start out in the Django Skylark directory.
 
 Let's bootstrap buildout::
 

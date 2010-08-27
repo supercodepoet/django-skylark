@@ -1,6 +1,6 @@
 from django.core.urlresolvers import reverse
 
-from crunchyfrog.ribt import test_registry
+from skylark.ribt import test_registry
 
 import views
 

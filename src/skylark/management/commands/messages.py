@@ -1,9 +1,9 @@
 MESSAGE_HELP = \
-"""This command will create a CrunchyFrog page and kick start a configuration
+"""This command will create a Django Skylark page and kick start a configuration
 file for you
 
 Do something like this:
-    ./manage.py crunchypage -a goodiesapp -p list
+    ./manage.py skylarkpage -a goodiesapp -p list
 
 Will create a page called "list" in the goodiesapp"""
 

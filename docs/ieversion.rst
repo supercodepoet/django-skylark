@@ -15,7 +15,7 @@ comments.  They look like this. ::
 These have to appear in the HTML.  Typically, you would put a ``<link>`` tag in
 there that points to a css file with just those special styles.
 
-We can do this in CrunchyFrog by using the ``ieversion`` attribute. ::
+We can do this in Django Skylark by using the ``ieversion`` attribute. ::
 
     body: goodies/list/list.html
     title: Goodies
@@ -49,12 +49,12 @@ So put something like this in for ``CONDITION`` :
 ``lt IE 7``
     If it's less than Internet Explorer 7
 
-.. note:: You don't need the ``if`` in front of the condition.  CrunchyFrog will do this for you.  Just put the condition there.
+.. note:: You don't need the ``if`` in front of the condition.  Django Skylark will do this for you.  Just put the condition there.
 
 What does it produce
 --------------------
 
-If you look at the output once CrunchyFrog outputs your page you'll see some
+If you look at the output once Django Skylark outputs your page you'll see some
 HTML comments around the ``<link>`` tag referencing your CSS file.  This
 comment is special in the eyes of Internet Explorer.  It will look for this
 formatting and evaluate the condition you have inside.

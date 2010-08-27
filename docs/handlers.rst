@@ -12,7 +12,7 @@ Here is an example of how you accomplish this in Django.
     from django.conf.urls.defaults import *
     from dummyapp.views import index
 
-    from crunchyfrog.views.generic import *
+    from skylark.views.generic import *
 
     handler404 = 'myproject.views.handle404'
     handler500 = 'myproject.views.handle500'
@@ -25,7 +25,7 @@ As of Django 1.1 (this changed around the release of 1.2) you had to use a
 string here instead of a callable.  However we workaround this to make the
 following possible.
 
-Using CrunchyFrog to render 404 and 500 pages
+Using Django Skylark to render 404 and 500 pages
 ---------------------------------------------
 
 .. warning:: You have to be careful.  We are dealing with error pages, typically
@@ -48,7 +48,7 @@ An example ::
     from django.conf.urls.defaults import *
     from dummyapp.views import index
 
-    from crunchyfrog.views.generic import *
+    from skylark.views.generic import *
 
     handler404 = render_404_from_yaml('dummyapp/handler/404.yaml')
     handler500 = render_500_from_yaml('dummyapp/handler/500.yaml')

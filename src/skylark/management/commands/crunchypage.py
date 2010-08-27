@@ -25,7 +25,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if len(args) > 0:
             # Display the help and quit this foolishness
-            self.print_help('crunchypage', '')
+            self.print_help('skylarkpage', '')
             return
 
         # Here is our args
@@ -139,7 +139,7 @@ class Command(BaseCommand):
 
     def __create_these(self, dirs_to_create, files_to_create):
         """
-        Makes the directories and files needed by CrunchyFrog
+        Makes the directories and files needed by Django Skylark
         """
         already_exists_message = "%s already exists, skiping"
 

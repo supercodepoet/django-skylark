@@ -11,7 +11,7 @@ from skylark import ribt
 
 def add_yaml(yamlfile):
     """
-    Decorator that can be used to add crunchy dependencies out side the normal
+    Decorator that can be used to add skylark dependencies out side the normal
     PageAssembly
     """
     # This is now a deprecated method, totally remove it when we hit 1.0

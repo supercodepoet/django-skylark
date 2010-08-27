@@ -1,13 +1,13 @@
-=====================================
-Deploying CrunchyFrog into production
-=====================================
+========================================
+Deploying Django Skylark into production
+========================================
 
 Deployment plans
 ----------------
 
-CrunchyFrog manages all of the media files for you, this you probably have
+Django Skylark manages all of the media files for you, this you probably have
 figured out by now.  What you probably don't know is that you can tell
-CrunchyFrog how you want it to behave.
+Django Skylark how you want it to behave.
 
 Why have different methods of handling media?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -40,7 +40,7 @@ in.
 
 A deployment plan look like this ::
 
-    from crunchyfrog import plans
+    from skylark import plans
     from django.conf import settings
 
     if settings.DEBUG:
@@ -53,10 +53,10 @@ verbatim and keep on rollin.
 
 How will the deployment plan be processed?
 
-    #. CrunchyFrog will look for a :file:`mediadeploy.py` file (this can be
-       changed with :attr:`CRUNCHYFROG_PLANS`)
+    #. Django Skylark will look for a :file:`mediadeploy.py` file (this can be
+       changed with :attr:`SKYLARK_PLANS`)
     #. If uses the value of ``default`` as the plan you wish to use. (this can
-       be changed with :attr:`CRUNCHYFROG_PLANS_DEFAULT`)
+       be changed with :attr:`SKYLARK_PLANS_DEFAULT`)
     #. It creates an instance of the plan to use as it throws media around.
 
 SeparateEverything
@@ -94,7 +94,7 @@ CSS.
 
 .. warning:: It may not be the best idea to use this site-wide as every page will
    have a separate Javascript and CSS file.  This is mainly in place to support
-   a future feature of CrunchyFrog where you can specify plans be applied to
+   a future feature of Django Skylark where you can specify plans be applied to
    specific views.
 
 Options

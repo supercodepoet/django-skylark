@@ -92,7 +92,7 @@ __copy_addons = False
 
 def copy_addons():
     """
-    There are dependencies that CrunchyFrog and Ribt have that we need to
+    There are dependencies that Django Skylark and Ribt have that we need to
     include whenever the application starts.
 
     Right now this is:

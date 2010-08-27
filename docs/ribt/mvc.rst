@@ -35,7 +35,7 @@ We'll get into the details of what these are, at first it's not apparent.  But
 this is a laundry list of the things we are trygin to solve with Ribt.
 
 * An MVC pattern implementation in Javascript
-* Integration with Django CrunchyFrog
+* Integration with Django Skylark
 * Automatic bootstrapping of objects
 * Data binding for passing in simple information to your objects
 * Event binding, for example tying the onclick event to a method in you object
@@ -65,4 +65,4 @@ use JQuery to do some basic things.
 Handling the dependency on Dojo
 -------------------------------
 
-.. todo:: Describe the CRUNCHYFROG_DOJO_VIA settings
+.. todo:: Describe the SKYLARK_DOJO_VIA settings

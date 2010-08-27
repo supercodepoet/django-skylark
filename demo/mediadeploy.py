@@ -1,4 +1,4 @@
-from crunchyfrog import plans
+from skylark import plans
 from django.conf import settings
 
 if settings.DEBUG:

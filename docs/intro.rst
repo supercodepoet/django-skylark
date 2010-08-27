@@ -1,17 +1,11 @@
 ===================================
-Introduction to Django CrunchyFrog
+Introduction to Django Skylark
 ===================================
-
-.. epigraph::
-
-    If we took the bones out it wouldn't be crunchy would it?
-
-    -- Mr. Milton
 
 Make web development easier
 ---------------------------
-CrunchyFrog is a more structured, conventional way to produce web applications
-that are what we typically consider Web 2.0.
+Django Skylark is a more structured, conventional way to produce web
+applications that are what we typically consider Web 2.0.
 
 It's not Flex_, Sproutcore_, or Cappuccino_.  Instead it's somewhere in between
 those tools and stringing together Javascript, HTML, CSS, and images.
@@ -33,7 +27,7 @@ How do we make this easier?
 Here's an example of a PageAssembly::
 
     from django.http import HttpResponse
-    from crunchyfrog.page import PageAssembly, RequestContext
+    from skylark.page import PageAssembly, RequestContext
 
     def list(request):
         c = RequestContext(request, {
@@ -62,7 +56,7 @@ What does ``goodies/list/list.html`` look like::
 That's all we have so far.  Notice that we don't have a normal HTML page here.
 There is no doctype, no ``<html>`` tag, it's just the good stuff: the ``<body>`` tag.
 
-Now CrunchyFrog does it's thing.  It takes the bits you've assembled and is
+Now Django Skylark does it's thing.  It takes the bits you've assembled and is
 going to render the page for you.
 
 The HTML that this will create looks something like this::
@@ -93,7 +87,7 @@ You can't have a Web 2.0 site without Javascript.  So we need to include jQuery.
 The typical pattern to do this is that you'd create a directory off of your
 MEDIA_ROOT and copy jQuery there.  Then you have to add the
 ``django.core.context_processors.media`` to your ``TEMPLATE_CONTEXT_PROCESSORS`` so you
-can then use ``MEDIA_URL`` in your HTML pages.  CrunchyFrog has a different way.::
+can then use ``MEDIA_URL`` in your HTML pages.  Django Skylark has a different way.::
 
     body: goodies/list/list.html
     title: Goodies
@@ -101,7 +95,7 @@ can then use ``MEDIA_URL`` in your HTML pages.  CrunchyFrog has a different way.
     js:
         - url: {{ MEDIA_URL }}js/jquery.js
 
-.. note:: You don't need to mess with TEMPLATE_CONTEXT_PROCESSORS, CrunchyFrog will take care
+.. note:: You don't need to mess with TEMPLATE_CONTEXT_PROCESSORS, Django Skylark will take care
           of this for you
 
 That makes it a bit easier.  We let the page assembly handle where to put the
@@ -122,7 +116,7 @@ script tag.  So now our HTML looks like this.::
     </html>
 
 Great.  We have jQuery now.  And we didn't have to dance with the Django
-Template processors.  (Because CrunchyFrog worried about the ``MEDIA_URL`` for us
+Template processors.  (Because Django Skylark worried about the ``MEDIA_URL`` for us
 automatically.)
 
 But this isn't doing anything.  We have included jQuery, but it's just sitting
@@ -156,7 +150,7 @@ Now we put ``animate.js`` in ``templates/goodies/list/media/js/animate.js``\, an
 
 Why are we putting this in ``templates/goodies/list/media/js/``\.  Django's convention
 states that this should really go somewhere in the ``MEDIA_ROOT``\.  The
-decision we made with CrunchyFrog is that your views typically involve a group
+decision we made with Django Skylark is that your views typically involve a group
 of files and directories to make a specific thing happen.  We'd rather see
 everything stick together in one place as opposed to stringing the files out in
 different directories.
@@ -168,7 +162,7 @@ So now our files for this page assembly look like this::
     ./templates/goodies/list/media/js/animate.js
 
 Now before you object to static files being served outside of the
-``MEDIA_ROOT`` let's look at the source code that CrunchyFrog produces. ::
+``MEDIA_ROOT`` let's look at the source code that Django Skylark produces. ::
 
     <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
     <html lang="en">
@@ -186,7 +180,7 @@ Now before you object to static files being served outside of the
     </html>
 
 Note that even though we had ``animate.js`` inside our templates directory, it's
-now being served out of the ``site_media`` static files locations.  CrunchyFrog
+now being served out of the ``site_media`` static files locations.  Django Skylark
 copied this file into the cache for you.
 
 Time for some CSS.  Let's create a new file in ``templates/goodies/list/media/css/screen.css``\.
@@ -274,7 +268,7 @@ Adding some assets for template tags
 ------------------------------------
 
 What happens if you have a yaml file for assests when you have template tag and want to use
-the CrunchyFrog framework? Luckly we have thought about that and have made it really, really
+the Django Skylark framework? Luckly we have thought about that and have made it really, really
 easy. All you have to do is use a simple python decorator in your template tag class and
 you are ready to roll.
 
@@ -293,10 +287,10 @@ Here is a sample template tag class::
             # Here you can render a template or return some type of HTML string
             return 'Some HTML stuff'
 
-To add assests from a yaml file to the page using CrunchyFrog::
+To add assests from a yaml file to the page using Django Skylark::
 
     from django import template
-    from crunchyfrog.renderer import add_yaml # Add this import
+    from skylark.renderer import add_yaml # Add this import
 
     register = template.Library()
 
@@ -311,7 +305,7 @@ To add assests from a yaml file to the page using CrunchyFrog::
             return 'Some HTML stuff'
 
 That is all that it takes to have CSS, META, JS , etc. assests included in the page header
-using the CrunchyFrog framework for a template tag and any templates it renders.
+using the Django Skylark framework for a template tag and any templates it renders.
 
 .. _Flex: http://www.adobe.com/products/flex/
 .. _Sproutcore: http://www.sproutcore.com/

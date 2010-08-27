@@ -1,5 +1,5 @@
 ==============================
-Configuring Django CrunchyFrog
+Configuring Django Skylark
 ==============================
 
 TODO

@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.conf.urls.defaults import *
-from crunchyfrog import ribt
+from skylark import ribt
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
@@ -10,7 +10,7 @@ ribt.autodiscover()
 
 urlpatterns = patterns('',
     # Example:
-    (r'^testrunner/', include('crunchyfrog.urls.ribt')),
+    (r'^testrunner/', include('skylark.urls.ribt')),
     (r'^goodies/', include('goodies.urls')),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 

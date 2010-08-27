@@ -4,7 +4,7 @@ DOJORELEASEBASENAME="dojo-release-$DOJORELEASEVERSION-src"
 DOJORELEASEFILE="dojo-release-$DOJORELEASEVERSION-src.tar.gz"
 DOJODIR="$DOJORELEASEBASENAME"
 PROFILE="ribt_dojo.profile.js"
-DESTDIR="../crunchyfrog/templates/ribt/media/_build"
+DESTDIR="../skylark/templates/ribt/media/_build"
 BUILDDIR="$DOJODIR/util/buildscripts"
 BUILD="build.sh"
 
