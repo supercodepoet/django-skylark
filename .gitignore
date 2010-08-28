@@ -17,3 +17,4 @@ parts
 tmp
 
 src/skylark/tests/media
+demo/media/cfcache
