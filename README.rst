@@ -1,3 +1,16 @@
+What is this?
+=============
+
+Web development can be a pain.  HTML, CSS, Javascript, DOM; it's a few inches
+shy of bamboo under your fingernails.  If you have a large application with a
+few people working on it can get even worse.
+
+Django Skylark attempts to make some of this better by:
+
+    * Letting you describe your pages and something else assemble it
+    * Managing your media
+    * Providing a thin Javascript framework for those that don't need magic
+    
 Using Django Skylark
 ====================
 
@@ -11,33 +24,14 @@ Inside your settings.py add the following::
         'skylark',
     )
 
-Developers
-==========
+Documentation
+=============
 
-Start out in the Django Skylark directory.
+You can `view it online <http://packages.python.org/django-skylark/?>`_.
 
-Let's bootstrap buildout::
+Or run these commands to build it locally ::
 
     python bootstrap.py --distribute
-
-Now run buildout::
-
     ./bin/buildout
-
-It will take a bit, downloading all the dependencies it needs.  Once it's
-finished try running the tests::
-
-    ./bin/test
-
-Building the documentation
-==========================
-
-Docs are in the :file:`docs` directory.  It was written using Sphinx.
-
-To build the documentation::
-
-    cd docs/
-    make html
-
-The Makefile should then build the html version and stick the output in the
-:file:`docs/_build directory`.
+    cd docs
+    make html; open _build/html/index.html

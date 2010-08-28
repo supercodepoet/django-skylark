@@ -9,10 +9,9 @@ from django.template import TemplateDoesNotExist
 
 from skylark import *
 from skylark import ribt
-from skylark import loader
 from skylark.page import PageAssembly
 from skylark.plans import *
-from skylark.plans.base import BadOption, BadPlanSituation
+from skylark.plans.base import BadOption
 from skylark.plans.separate import SeparateEverything
 from skylark.plans.fewest import FewestFiles
 
