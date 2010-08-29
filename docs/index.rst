@@ -6,9 +6,7 @@
 Welcome to Django Skylark's documentation
 =========================================
 
-Django Skylark aims to make web development more pleasant.  Imagine web
-development is a baby dead frog; we cover it in chocolate so it goes down
-easier.
+Django Skylark aims to make web development more pleasant.
 
 .. todolist::
 

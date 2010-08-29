@@ -56,8 +56,7 @@ We use Dojo, but that doesn't mean you can't use X
 
 We made the choice to use Dojo as the backend of our implementation.  This does
 not mean you can't use JQuery.  In fact, it was a requirement that we didn't
-*develop out* the possibility to use other libraries.  We use JQuery at
-Localbase for a lot of our animations and other things that it does very well.
+*develop out* the possibility to use other libraries.
 
 You'll also notice as you go through our documentation that many of our examples
 use JQuery to do some basic things.

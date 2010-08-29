@@ -26,7 +26,7 @@ string here instead of a callable.  However we workaround this to make the
 following possible.
 
 Using Django Skylark to render 404 and 500 pages
----------------------------------------------
+------------------------------------------------
 
 .. warning:: You have to be careful.  We are dealing with error pages, typically
     seen when something goes wrong in the case of a 500.  You need to test these
