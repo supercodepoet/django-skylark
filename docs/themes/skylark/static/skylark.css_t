@@ -10,11 +10,11 @@
  */
  
 @import url("basic.css");
- 
+
 /* -- page layout ----------------------------------------------------------- */
  
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Linux Libertine', Palatino, 'Palatino Linotype', 'Book Antiqua', Georgia, 'Times New Roman', serif;
     font-size: 100%;
     background-color: #302015;
     xcolor: #555;
@@ -145,7 +145,7 @@ div.body h3,
 div.body h4,
 div.body h5,
 div.body h6 {
-    font-family: Arial, sans-serif;
+    font-family: 'Essays 1743', Palatino, 'Palatino Linotype', 'Book Antiqua',Georgia, 'Times New Roman', serif;
     background-color: #C7ECED;
     font-weight: normal;
     color: #3C2D23;

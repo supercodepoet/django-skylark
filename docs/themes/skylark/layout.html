@@ -35,11 +35,9 @@
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
           {%- block sidebarlogo %}
-          {%- if logo %}
-            <p class="logo"><a href="{{ pathto(master_doc) }}">
-              <img class="logo" src="{{ pathto('_static/' + logo, 1) }}" alt="Logo"/>
-            </a></p>
-          {%- endif %}
+          <p class="logo"><a href="{{ pathto(master_doc) }}">
+            <img class="logo" src="{{ pathto('_static/images/skylark.png', 1) }}" width="180" alt="Django Skylark logo"/>
+          </a></p>
           {%- endblock %}
           {%- if sidebars != None %}
             {#- new style sidebar: explicitly include/exclude templates #}
