@@ -1,0 +1,11 @@
+{{ doctype|safe }}
+<html>
+    <head>
+        <title>{{ prepared_instructions.title|safe }}</title>
+        {% include "crunchyfrog/parts/html_meta.html" %}
+        {% include "crunchyfrog/parts/html_css.html" %}
+        {% include "crunchyfrog/parts/cf_injected.html" %}
+        {% include "crunchyfrog/parts/js.html" %}
+    </head>
+    {% include "crunchyfrog/parts/body.html" %}
+</html>

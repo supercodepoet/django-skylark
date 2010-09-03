@@ -14,3 +14,8 @@ class Html401Frameset(Renderer):
     doctype = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">'
     template_name = 'crunchyfrog/html401.html'
     snippet_template_name = 'crunchyfrog/htmlsnippet.html'
+
+class Html5(Renderer):
+    doctype = '<!DOCTYPE html>'
+    template_name = 'crunchyfrog/html5.html'
+    snippet_template_name = 'crunchyfrog/htmlsnippet.html'

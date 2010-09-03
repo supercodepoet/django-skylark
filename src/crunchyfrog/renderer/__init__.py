@@ -3,6 +3,7 @@ from crunchyfrog.renderer.html import *
 from crunchyfrog.renderer.xhtml import *
 
 renderers = {
+    'html': Html5,
     'HTML 4.01 Transitional': Html401Transitional,
     'HTML 4.01 Strict':       Html401Strict,
     'HTML 4.01 Frameset':     Html401Frameset,
