@@ -9,16 +9,6 @@ from skylark.conf import settings
 from skylark import ribt
 
 
-def add_yaml(yamlfile):
-    """
-    Decorator that can be used to add skylark dependencies out side the normal
-    PageAssembly
-    """
-    # This is now a deprecated method, totally remove it when we hit 1.0
-    raise DeprecationWarning('add_yaml is deprecated, your YAML file will not '
-                             'be processed')
-
-
 class Renderer(object):
     """
     The base class that performs the heavy lifting of taking page instructions
@@ -30,11 +20,10 @@ class Renderer(object):
 
     # Used to place a doctype at the beginning of a rendered page.  This only
     # applies to html and xhtml pages that are rendered with a PageAssembly.
-    doctype = ('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 '
-               'Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">')
+    doctype = ('<!DOCTYPE html>')
 
     # What template do we use to render?
-    template_name = 'skylark/html401.html'
+    template_name = 'skylark/html5.html'
     snippet_template_name = 'skylark/htmlsnippet.html'
 
     def __init__(self, page_instructions, context, render_full_page=True,

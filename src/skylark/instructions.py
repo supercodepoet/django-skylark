@@ -130,10 +130,9 @@ class PageInstructions(object):
             self.root_yaml = sourcefile
 
         if not sourcefile == self.root_yaml:
-            # This must be coming from our add_yaml decorator or from someone
-            # who is invoking the add method through
-            # PageAssembly.add_page_instruction.  We need to put this in the
-            # proper spot though, so make sure we aren't adding this to the
+            # This must be coming from someone who is invoking the add method
+            # through PageAssembly.add_page_instruction.  We need to put this
+            # in the proper spot, so make sure we aren't adding this to the
             # other_yaml dictionary if it's already in the uses_yaml dictionary
             if not sourcefile in self.uses_yaml:
                 self.other_yaml.append(sourcefile)

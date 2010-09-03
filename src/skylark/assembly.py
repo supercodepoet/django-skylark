@@ -203,7 +203,7 @@ class BaseAssembly(object):
             # PageAssembly should handle this for us
             self.instructions.pipe_media_to(root_pa.instructions)
 
-        doctype = self.instructions.doctype or 'HTML 4.01 Transitional'
+        doctype = self.instructions.doctype or 'html'
 
         page_renderer = renderer.get(doctype, self.instructions, self.context,
             render_full_page=self.render_full_page,

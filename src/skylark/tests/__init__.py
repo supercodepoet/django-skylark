@@ -56,6 +56,7 @@ def setup():
     settings.SKYLARK_PLANS = 'mediadeploy'
     settings.SKYLARK_PLANS_DEFAULT = 'default'
     settings.SKYLARK_PLANS_ROLLUP_SALT = 'aaaaaaaaaaaaaaaa'
+    settings.SKYLARK_ENABLE_TIDY = False
 
 
 def teardown():

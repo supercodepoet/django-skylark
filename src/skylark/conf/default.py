@@ -12,7 +12,7 @@ SKYLARK_INIT_CLEAR_CACHE = False
 SKYLARK_PLANS = 'mediadeploy'
 SKYLARK_PLANS_DEFAULT = 'default'
 SKYLARK_PLANS_ROLLUP_SALT = ''.join(sample(string.hexdigits, 16))
-SKYLARK_ENABLE_TIDY = True
+SKYLARK_ENABLE_TIDY = False   # For now until tidylib catches up with html5
 SKYLARK_RAISE_CSS_ERRORS = django_settings.DEBUG
 SKYLARK_RAISE_HTML_ERRORS = django_settings.DEBUG
 

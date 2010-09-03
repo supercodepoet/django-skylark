@@ -4,9 +4,11 @@ from skylark.snippet import SnippetAssembly
 
 register = template.Library()
 
+
 @register.tag
 def dummy(parser, token):
     return DummyTagNode()
+
 
 class DummyTagNode(template.Node):
     def render(self, context):

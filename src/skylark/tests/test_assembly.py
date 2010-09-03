@@ -8,13 +8,12 @@ from nose.plugins.skip import SkipTest
 from skylark import *
 from skylark.assembly import *
 from skylark.page import PageAssembly
-from skylark.snippet import SnippetAssembly
 from django.http import HttpResponse
 from django.template import TemplateDoesNotExist
-from django.core.cache import cache
 from yaml.parser import ParserError
 
 from skylark.tests import *
+
 
 def test_can_not_create_page_assembly():
     py.test.raises(TypeError, "pa = PageAssembly()")
@@ -29,6 +28,7 @@ def test_can_not_create_page_assembly():
     c = RequestContext(request, { 'foo': 'bar' })
     py.test.raises(ValueError, 'pa = PageAssembly((), c)')
 
+
 def test_can_create_page_assembly():
     request = get_request_fixture()
     c = RequestContext(request, { 'foo': 'bar' })
@@ -39,6 +39,7 @@ def test_can_create_page_assembly():
     """ We should be able to pass it a tuple with more than one file in it """
     pa = PageAssembly(('somefile/that/doesnt/exist.yaml', 'someother/file.yaml'), c)
 
+
 def test_missing_template():
     request = get_request_fixture()
     c = RequestContext(request, { 'foo': 'bar' })
@@ -46,12 +47,14 @@ def test_missing_template():
 
     py.test.raises(TemplateDoesNotExist, "pa.get_http_response()")
 
+
 def test_provides_page_instructions():
     request = get_request_fixture()
     c = RequestContext(request, { 'foo': 'bar' })
     pa = PageAssembly('dummyapp/page/invalid.yaml', c)
 
     py.test.raises(ParserError, pa.get_http_response)
+
 
 def test_missing_skylark_settings():
     from skylark.conf import settings
@@ -61,6 +64,7 @@ def test_missing_skylark_settings():
     assert settings.SKYLARK_CACHE_ROOT
     assert settings.SKYLARK_CACHE_URL
 
+
 @with_setup(setup, teardown)
 def test_returns_http_response():
     request = get_request_fixture()
@@ -69,6 +73,7 @@ def test_returns_http_response():
 
     assert isinstance(pa.get_http_response(), HttpResponse)
 
+
 @with_setup(setup, teardown)
 def test_include_with_inline():
     request = get_request_fixture()
@@ -76,6 +81,7 @@ def test_include_with_inline():
     pa = PageAssembly('dummyapp/page/includeinline.yaml', c)
 
     py.test.raises(AttributeError, pa.get_http_response)
+
 
 @with_setup(setup, teardown)
 def test_creates_files_in_cache():
@@ -101,6 +107,7 @@ def test_creates_files_in_cache():
     # And fix the addons since we just dumped them
     copy_addons()
 
+
 @with_setup(setup, teardown)
 def test_can_render_an_asset():
     request = get_request_fixture()
@@ -119,6 +126,7 @@ def test_can_render_an_asset():
     assert 'my_favorite_color = "gray"' in content
     assert 'background-color: gray' in content
 
+
 @with_setup(setup, teardown)
 def test_can_detect_bad_processor():
     request = get_request_fixture()
@@ -126,6 +134,7 @@ def test_can_detect_bad_processor():
     pa = PageAssembly('dummyapp/page/badprocessor.yaml', c)
 
     py.test.raises(AttributeError, pa.get_http_response)
+
 
 @with_setup(setup, teardown)
 def test_can_render_clevercss():
@@ -145,6 +154,7 @@ def test_can_render_clevercss():
         'out/dummyapp/page/media/js/templates/notreferenced.html',
         'out/dummyapp/page/media/js/templates/sample.js',
     )
+
 
 @with_setup(setup, teardown)
 def test_missing_yaml_attributes():
@@ -169,6 +179,7 @@ def test_missing_yaml_attributes():
 
     assert isinstance(content, unicode), 'The returned value from dumps() did not return a unicode instance, instead the value was %r' % content 
 
+
 @with_setup(setup, teardown)
 def test_will_not_duplicate_assets():
     request = get_request_fixture()
@@ -190,6 +201,7 @@ def test_will_not_duplicate_assets():
     assert len(re.findall('sample.js', content)) == 1
     assert len(re.findall('files.js', content)) == 1
 
+
 @with_setup(setup, teardown)
 def test_title_tag_is_escaped():
     request = get_request_fixture()
@@ -199,6 +211,7 @@ def test_title_tag_is_escaped():
     content = pa.dumps()
 
     assert content.index('Title &lt; &gt; &#39; &quot;')
+
 
 @with_setup(setup, teardown)
 def test_will_copy_assets():
@@ -219,6 +232,7 @@ def test_will_copy_assets():
     )
 
     assert content.find('notreferenced') == -1, 'Found a reference to a file that has been set include: false in the yaml file.  It should not show up in the rendered output'
+
 
 @with_setup(setup, teardown)
 def test_references_other_yaml_files():
@@ -244,6 +258,7 @@ def test_references_other_yaml_files():
     assert "body {" in content
     assert "background-color: red" in content
 
+
 @with_setup(setup, teardown)
 def test_renders_meta_section():
     request = get_request_fixture()
@@ -262,6 +277,7 @@ def test_renders_meta_section():
     assert '<meta http-equiv="test" content="test-content">' in content
     assert '<meta name="test-meta" content="foo">' in content
 
+
 @with_setup(setup, teardown)
 def test_will_do_conditional_comments():
     request = get_request_fixture()
@@ -275,14 +291,18 @@ def test_will_do_conditional_comments():
     # This is for the JS, which we also support
     assert '<!--[if gte IE 7]>' in content
 
+
 @with_setup(setup, teardown)
 def test_will_tidy_output():
     assert settings.DEBUG
+    settings.SKYLARK_ENABLE_TIDY = True
     request = get_request_fixture()
     c = RequestContext(request)
     pa = PageAssembly('dummyapp/page/sample.yaml', c)
-    assert len(pa.dumps().split("\n")) == 43 
+    assert len(pa.dumps().split("\n")) == 42     # The answer to everything
 
+
+@attr('focus')
 @with_setup(setup, teardown)
 def test_will_use_correct_doctype():
     request = get_request_fixture()
@@ -291,8 +311,7 @@ def test_will_use_correct_doctype():
 
     content = pa.dumps()
 
-    assert '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN' in content
-    assert 'html4/loose.dtd' in content
+    assert '<!DOCTYPE html>' in content
 
     pa = PageAssembly('dummyapp/page/xhtmlstrict.yaml', c)
 
@@ -311,8 +330,9 @@ def test_will_use_correct_doctype():
         'out/dummyapp/page/media/js/templates/sample.js',
     )
 
+
 @with_setup(setup, teardown)
-def test_add_yaml_decorator():
+def test_will_work_with_templatetags():
     request = get_request_fixture()
     c = RequestContext(request, {})
     pa = PageAssembly('dummyapp/page/tag.yaml', c)
@@ -332,8 +352,11 @@ def test_add_yaml_decorator():
     assert 'This is my tag test' in content
     assert '/media/cfcache/out/dummyapp/tag/media/css/screen.css" media="screen"' in content
 
+
 @with_setup(setup, teardown)
 def test_bad_html():
+    settings.SKYLARK_ENABLE_TIDY = True
+
     request = get_request_fixture()
     c = RequestContext(request, {})
     pa = PageAssembly('dummyapp/page/badhtml.yaml', c)
@@ -347,7 +370,7 @@ def test_bad_html():
 
     assert pa.dumps()
 
-@attr('focus')
+
 @with_setup(setup, teardown)
 def test_cache_in_debug_mode():
     request = get_request_fixture()
@@ -392,8 +415,6 @@ def test_cache_in_debug_mode():
 
     assert content_before != content_after
 
-global handler_called
-handler_called = False
 
 @with_setup(setup, teardown)
 def test_can_register_handlers():
@@ -424,6 +445,7 @@ def test_can_register_handlers():
 
     assert len(BaseAssembly._page_assembly_handlers) == 0
 
+
 @with_setup(setup, teardown)
 def test_can_unregister_handlers():
     def handler(page_instructions, renderer, assembly):
@@ -438,6 +460,7 @@ def test_can_unregister_handlers():
 
     assert len(BaseAssembly._page_assembly_handlers) == 0
 
+
 @with_setup(setup, teardown)
 def test_handles_snippets_inside_page_assemblies():
     request = get_request_fixture()
@@ -449,3 +472,6 @@ def test_handles_snippets_inside_page_assemblies():
     assert content.count("DynamicApp.Snippet.Controller") == 1
     assert content.count("dummyapp/snippet/media/js/base.js") == 1
     assert content.count("dummyapp/page/media/js/sample.js") == 1
+
+global handler_called
+handler_called = False
