@@ -1,11 +1,11 @@
 /**
-* Parse the DOM for occurences of ribtType
+* Parse the DOM for occurences of chirpType
 */
-dojo.provide('RibtTools.Mvc.Parser');
+dojo.provide('ChirpTools.Mvc.Parser');
 
-dojo.require('RibtTools.Error');
+dojo.require('ChirpTools.Error');
 
-dojo.declare('RibtTools.Mvc.Parser', null, {
+dojo.declare('ChirpTools.Mvc.Parser', null, {
     // Constant defines to support IE
     DOCUMENT_FRAGMENT_NODE: document.DOCUMENT_FRAGMENT_NODE || 11,
 
@@ -17,7 +17,7 @@ dojo.declare('RibtTools.Mvc.Parser', null, {
     },
 
     /**
-     * Looks through a DOMNode and finds ribtType attributes
+     * Looks through a DOMNode and finds chirpType attributes
      */
     parse: function(node) {
         node = node || dojo.body();
@@ -36,10 +36,10 @@ dojo.declare('RibtTools.Mvc.Parser', null, {
         dojo.forEach(node, function(element) {
             if (element.nodeType != this.ELEMENT_NODE) { return; }
 
-            dojo.query('*[ribtType]', element).forEach(this._createController, this);
+            dojo.query('*[chirpType]', element).forEach(this._createController, this);
 
-            // Let's check the element itself, maybe it has an ribtType
-            elementType = dojo.attr(element, 'ribtType');
+            // Let's check the element itself, maybe it has an chirpType
+            elementType = dojo.attr(element, 'chirpType');
             if (elementType) {
                 this._createController(element);
             }
@@ -49,7 +49,7 @@ dojo.declare('RibtTools.Mvc.Parser', null, {
     /**
      * Places content within a refNode according to position
      *
-     * If there are ribtType attributes within, it will parse those and act
+     * If there are chirpType attributes within, it will parse those and act
      * accordingly.
      */
     place: function(node, refNode, position) {
@@ -63,7 +63,7 @@ dojo.declare('RibtTools.Mvc.Parser', null, {
         var needsGc = []; // list of elements needing their controller destroyed
         position = position.toLowerCase();
         if (position == 'replace' || position == 'only') {
-            dojo.query('*[ribtType]', refNode).forEach(function(element) {
+            dojo.query('*[chirpType]', refNode).forEach(function(element) {
                 if (element._controller) {
                     needsGc.push(element);
                 }
@@ -97,20 +97,20 @@ dojo.declare('RibtTools.Mvc.Parser', null, {
     },
 
     /**
-     * Takes a given element containing an ribtType attribute and creates the
+     * Takes a given element containing an chirpType attribute and creates the
      * controller specified by that value
      */
     _createController: function(element) {
-        var ribtType = dojo.attr(element, 'ribtType');
+        var chirpType = dojo.attr(element, 'chirpType');
         // Create our object and give it the element
         try {
-            var clsInfo = this.getClassInfo(ribtType);
+            var clsInfo = this.getClassInfo(chirpType);
             var obj = new clsInfo['cls'](element, clsInfo['params']);
             // Hang the new obj off the element, during garbage collection we
             // can be intelligent about how we destroy the view and controller
             element._controller = obj;
         } catch (e) {
-            throw new RibtTools.Error('Unable to create an instance of ' + ribtType + ', error was: ' + e.message);
+            throw new ChirpTools.Error('Unable to create an instance of ' + chirpType + ', error was: ' + e.message);
         }
     },
 
@@ -175,7 +175,7 @@ dojo.declare('RibtTools.Mvc.Parser', null, {
             // get pointer to widget class
             var cls = dojo.getObject(className);
             if(!dojo.isFunction(cls)){
-                throw new RibtTools.Error("Could not retrieve object '" + className +
+                throw new ChirpTools.Error("Could not retrieve object '" + className +
                     "'. It's possible an error prevented it from loading");
             }
             var proto = cls.prototype;

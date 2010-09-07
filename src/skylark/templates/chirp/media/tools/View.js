@@ -1,20 +1,20 @@
-dojo.provide('RibtTools.Mvc.View');
+dojo.provide('ChirpTools.Mvc.View');
 
 dojo.require('dojo.NodeList-traverse');
-dojo.require('RibtTools.Error');
-dojo.require('RibtTools.Mvc.TemplateManager');
-dojo.require('RibtTools.Mvc.Dom');
+dojo.require('ChirpTools.Error');
+dojo.require('ChirpTools.Mvc.TemplateManager');
+dojo.require('ChirpTools.Mvc.Dom');
 
 /**
  * Base View
  */
-dojo.declare('RibtTools.Mvc.View', null, {
+dojo.declare('ChirpTools.Mvc.View', null, {
     /**
      * Constructor
      */
     constructor: function(domNode) {
         if ($CF.INSTRUMENTED) {
-            dojo.publish(RibtTools.Mvc.Events.New.View, [ this ]);
+            dojo.publish(ChirpTools.Mvc.Events.New.View, [ this ]);
         }
 
         // Find our view hook
@@ -22,7 +22,7 @@ dojo.declare('RibtTools.Mvc.View', null, {
             this._setDomNode(domNode);
         }
 
-        this.templates = RibtTools.Mvc.TemplateManager.getTemplatesFor(this.declaredClass);
+        this.templates = ChirpTools.Mvc.TemplateManager.getTemplatesFor(this.declaredClass);
     },
 
     /**
@@ -34,7 +34,7 @@ dojo.declare('RibtTools.Mvc.View', null, {
     },
 
     /**
-     * Binds to any element within the panel that has an ribtBind attribute
+     * Binds to any element within the panel that has an chirpBind attribute
      */
     _bind: function(panel, removeExisting) {
         this._bindHandles = this._bindHandles || {};
@@ -47,12 +47,12 @@ dojo.declare('RibtTools.Mvc.View', null, {
 
         this._connectHandlersToView();
 
-        dojo.query('*[ribtBind], *[ribtBindGroup]', panel).forEach(function(element) {
+        dojo.query('*[chirpBind], *[chirpBindGroup]', panel).forEach(function(element) {
             if (!this._bindBelongsTo(element, panel)) { return; }
 
-            var attr = dojo.attr(element, 'ribtBind') || dojo.attr(element, 'ribtBindGroup');
+            var attr = dojo.attr(element, 'chirpBind') || dojo.attr(element, 'chirpBindGroup');
 
-            if (dojo.attr(element, 'ribtBind')) {
+            if (dojo.attr(element, 'chirpBind')) {
                 this[attr] = element;
             } else {
                 this[attr] = this[attr] || []
@@ -104,7 +104,7 @@ dojo.declare('RibtTools.Mvc.View', null, {
                 continue;
             }
 
-            if (RibtTools.Mvc.Dom.containsEvent(funcName)) {
+            if (ChirpTools.Mvc.Dom.containsEvent(funcName)) {
                 this._bindHandles[funcName] = [];
                 this._bindHandles[funcName].push(dojo.connect(
                     this.domNode, funcName.toLowerCase(), this, func));
@@ -128,7 +128,7 @@ dojo.declare('RibtTools.Mvc.View', null, {
             if (bindName == funcPrefix) {
                 var eventType = funcName.toLowerCase().replace(bindName.toLowerCase(), '');
                 
-                if (RibtTools.Mvc.Dom.containsEvent(eventType)) {
+                if (ChirpTools.Mvc.Dom.containsEvent(eventType)) {
                     handlers.push({ 'funcName': funcName, 'func': func, 'eventType': eventType });
                 }
             }
@@ -140,7 +140,7 @@ dojo.declare('RibtTools.Mvc.View', null, {
     /**
      * Connects to a handler, for example
      *
-     *    ribtBind="button"
+     *    chirpBind="button"
      *
      *    this.buttonOnClick = function() {
      *        // do whatever
@@ -155,15 +155,15 @@ dojo.declare('RibtTools.Mvc.View', null, {
     },
 
     /**
-     * Looks at an element that has an ribtBind attribute and determines if it
-     * belongs to a specific ribtTypeElement
+     * Looks at an element that has an chirpBind attribute and determines if it
+     * belongs to a specific chirpTypeElement
      */
-    _bindBelongsTo: function(bindElement, ribtTypeElement) {
-        var firstLbType = dojo.query(bindElement).closest('*[ribtType]')[0];
+    _bindBelongsTo: function(bindElement, chirpTypeElement) {
+        var firstLbType = dojo.query(bindElement).closest('*[chirpType]')[0];
 
-        // If we don't have a ribtType, we'll assume that it all applies to us
+        // If we don't have a chirpType, we'll assume that it all applies to us
         if (!firstLbType) { return true; }
-        if (firstLbType == ribtTypeElement) { return true; }
+        if (firstLbType == chirpTypeElement) { return true; }
 
         return false;
     },
@@ -175,7 +175,7 @@ dojo.declare('RibtTools.Mvc.View', null, {
      */
     publishLocal: function(topic, args) {
         if (!topic) {
-            throw new RibtTools.Error('Trying to publish a topic from instance of ' +
+            throw new ChirpTools.Error('Trying to publish a topic from instance of ' +
                 this.declaredClass + ' that has no value, did you misspell it?');
         }
 
@@ -190,7 +190,7 @@ dojo.declare('RibtTools.Mvc.View', null, {
      * Convenience method to publish events from the view to the world
      */
     publishGlobal: function(topic, args) {
-        ribt.publish(topic, args);
+        chirp.publish(topic, args);
     },
 
     /**
@@ -218,6 +218,6 @@ dojo.declare('RibtTools.Mvc.View', null, {
             dojo.destroy(this.domNode);
         }
 
-        dojo.publish(RibtTools.Mvc.Events.ViewDestruction, [ this ]);
+        dojo.publish(ChirpTools.Mvc.Events.ViewDestruction, [ this ]);
     }
 })

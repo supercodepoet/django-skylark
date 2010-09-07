@@ -8,7 +8,7 @@ from django.utils import simplejson
 
 from skylark import RequestContext
 from skylark.page import PageAssembly
-from skylark.ribt import test_registry, is_instrumented, instrument_site
+from skylark.chirp import test_registry, is_instrumented, instrument_site
 
 
 def testrunner(request):
@@ -31,7 +31,7 @@ def interface_start(request):
         'url_deinstrument': reverse(deinstrument),
     })
 
-    pa = PageAssembly('ribt/testrunner/display/display.yaml', context)
+    pa = PageAssembly('chirp/testrunner/display/display.yaml', context)
     return pa.get_http_response()
 
 
@@ -49,7 +49,7 @@ def subject_start(request):
     us some brief information before the test runs start
     """
     context = RequestContext(request)
-    pa = PageAssembly('ribt/testrunner/subjectstart/subjectstart.yaml', context)
+    pa = PageAssembly('chirp/testrunner/subjectstart/subjectstart.yaml', context)
     return pa.get_http_response()
 
 # Don't test this module

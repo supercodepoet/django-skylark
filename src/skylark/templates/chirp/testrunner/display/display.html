@@ -2,18 +2,18 @@
     <script type="text/javascript">
         // We are interning the test case names and url here in the page
         // To speed everything up
-        dojo.setObject('RibtTools.TestRunner.TestEntryPoints', {
+        dojo.setObject('ChirpTools.TestRunner.TestEntryPoints', {
             'items':  {{ test_entry_points_json|safe }}
         });
     </script>
-    <div id="test-runner-wrapper" ribtType="RibtTools.TestRunner.Display.Controller" urlDeinstrument="{{ url_deinstrument }}" testCount="{{ test_count }}" initialUrl="{% url ribt-testrunner-subject-start %}">
-        <div ribtBind="testRunner" id="test-runner">
-            <a class="control" ribtBind="run" href="#">Run</a>
-            <ul class="test-entry-points" ribtBind="testEntryPointList">
+    <div id="test-runner-wrapper" chirpType="ChirpTools.TestRunner.Display.Controller" urlDeinstrument="{{ url_deinstrument }}" testCount="{{ test_count }}" initialUrl="{% url chirp-testrunner-subject-start %}">
+        <div chirpBind="testRunner" id="test-runner">
+            <a class="control" chirpBind="run" href="#">Run</a>
+            <ul class="test-entry-points" chirpBind="testEntryPointList">
             </ul>
         </div>
-        <div ribtBind="subject" style="display: none;" id="subject">
-            <iframe ribtBind="subjectFrame" id="subject-frame" src="about:blank"></iframe>
+        <div chirpBind="subject" style="display: none;" id="subject">
+            <iframe chirpBind="subjectFrame" id="subject-frame" src="about:blank"></iframe>
         </div>
     </div>
 </body>

@@ -41,7 +41,7 @@ class PageInstructions(object):
         self.js = []
         self.css = []
         self.meta = []
-        self.ribt = []
+        self.chirp = []
 
     def part_exists(self, part):
         """
@@ -52,7 +52,7 @@ class PageInstructions(object):
         instructions = []
         instructions.extend(self.js)
         instructions.extend(self.css)
-        instructions.extend(self.ribt)
+        instructions.extend(self.chirp)
 
         for instruction in instructions:
             if self._get_source_attribute(instruction) == \
@@ -79,7 +79,7 @@ class PageInstructions(object):
         """
         Push all the media into the destination_instructions
         """
-        for attr in ('js', 'css', 'ribt',):
+        for attr in ('js', 'css', 'chirp',):
             media = getattr(self, attr)
             to_remove = []
             dest_media = getattr(destination_instructions, attr)
@@ -160,14 +160,14 @@ class PageInstructions(object):
                         uses['file'])
 
             for attr in ('doctype', 'js', 'css', 'body', 'title', 'meta',
-                         'ribt'):
+                         'chirp'):
                 if attr in instruction:
                     pi_object = getattr(self, attr)
                     i_object = instruction[attr]
 
                     if isinstance(pi_object, list):
                         for part in i_object:
-                            if attr in ('js', 'css', 'ribt',):
+                            if attr in ('js', 'css', 'chirp',):
                                 if self.part_exists(part):
                                     continue
 

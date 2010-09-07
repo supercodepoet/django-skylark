@@ -2,7 +2,7 @@ title: Full monty of a YAML file but a missing dependency
 body: planapp/page/full.html
 
 uses:
-    - file: ribt/tools.yaml
+    - file: chirp/tools.yaml
     - file: planapp/page/uses1.yaml
 
 meta:
@@ -33,7 +33,7 @@ css:
     - inline: planapp/page/media/css/inline.css
       media: screen
 
-ribt:
+chirp:
     - namespace: PlanApp.Page
       location: planapp/page/media/js
       require: 

@@ -1,16 +1,16 @@
-dojo.provide('RibtTools.TestRunner.TestCaseMvcInstances');
+dojo.provide('ChirpTools.TestRunner.TestCaseMvcInstances');
 
 /**
  * A collection of MVC objects on the current page
  */
-dojo.setObject('RibtTools.TestRunner.TestCaseMvcInstances', {
+dojo.setObject('ChirpTools.TestRunner.TestCaseMvcInstances', {
     /**
      * Adds an instance to the instances array
      *
-     * @param instance Either a RibtTools.Mvc.Controller or RibtTools.Mvc.View
+     * @param instance Either a ChirpTools.Mvc.Controller or ChirpTools.Mvc.View
      */
     addMvcInstance: function(instance) {
-        RibtTools.TestRunner.TestCaseMvcInstances.instances.push(instance);
+        ChirpTools.TestRunner.TestCaseMvcInstances.instances.push(instance);
     },
 
     /**
@@ -19,5 +19,5 @@ dojo.setObject('RibtTools.TestRunner.TestCaseMvcInstances', {
     instances: []
 });
 
-dojo.subscribe(RibtTools.Mvc.Events.New.Controller, RibtTools.TestRunner.TestCaseMvcInstances.addMvcInstance);
-dojo.subscribe(RibtTools.Mvc.Events.New.View, RibtTools.TestRunner.TestCaseMvcInstances.addMvcInstance);
+dojo.subscribe(ChirpTools.Mvc.Events.New.Controller, ChirpTools.TestRunner.TestCaseMvcInstances.addMvcInstance);
+dojo.subscribe(ChirpTools.Mvc.Events.New.View, ChirpTools.TestRunner.TestCaseMvcInstances.addMvcInstance);

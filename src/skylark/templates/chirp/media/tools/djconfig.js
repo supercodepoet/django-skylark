@@ -1,4 +1,4 @@
-// This information is part of the RibtTools framework
+// This information is part of the ChirpTools framework
 if (!djConfig) {
     var djConfig = {
         parseOnLoad: false,

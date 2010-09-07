@@ -8,7 +8,7 @@ from nose.plugins.skip import SkipTest
 from django.template import TemplateDoesNotExist
 
 from skylark import *
-from skylark import ribt
+from skylark import chirp
 from skylark import plans
 from skylark.page import PageAssembly
 from skylark.instructions import PageInstructions
@@ -59,8 +59,8 @@ def test_can_change_deploy_plan_name():
 
 @with_setup(setup, teardown)
 def test_deploy_reusable():
-    hash_js1 = 'c33650950234f497a5b78e9d23ee1b59'
-    hash_js2 = 'dc3591c55de520ec5deb5c0cd85686be'
+    hash_js1 = '96936cfbde05fe1cce209c7f344dbd08'
+    hash_js2 = 'd921f357906a0e5e06da6a704376247b'
     hash_css = 'f27f963509901f608889f688b1e39f72'
 
     settings.DEBUG = False
@@ -84,9 +84,9 @@ def test_deploy_reusable():
         jsfile.find('dojo.provide("dojox.timing")')
     assert jsfile.find("dojo.provide('PlanApp.Page.View')") < \
         jsfile.find("dojo.provide('PlanApp.Page.Controller')")
-    assert jsfile.find("dojo.registerModulePath('RibtTools'") < \
-        jsfile.find("dojo.provide('RibtTools.Error')")
-    assert "dojo.registerModulePath('RibtTools" not in content
+    assert jsfile.find("dojo.registerModulePath('ChirpTools'") < \
+        jsfile.find("dojo.provide('ChirpTools.Error')")
+    assert "dojo.registerModulePath('ChirpTools" not in content
 
     cssfile = get_contents(
         os.path.join(cachedir, 'out', '%s.css' % hash_css)
@@ -122,7 +122,7 @@ def test_deploy_reusable():
 @with_setup(setup, teardown)
 def test_deploy_fewest():
     hash_css = 'a30e20a6a1d62976266b612a7e5d634a'
-    hash_js = '0006e47a5dca47f5f3e46c45d852ad09'
+    hash_js = '99cd70ab43d662a64aa33c794433295a'
 
     settings.SKYLARK_PLANS = 'mediadeploy_fewest'
 
@@ -186,9 +186,9 @@ def test_deploy_fewest():
 
 @with_setup(setup, teardown)
 def test_deploy_fewest_instrumented():
-    hash_js = '157bee29e2605105eff447aeef28b1d8'
+    hash_js = 'cb0aa470231a819d45ee02783f5fc468'
 
-    ribt.instrument_site(True)
+    chirp.instrument_site(True)
     settings.SKYLARK_PLANS = 'mediadeploy_fewest'
 
     request = get_request_fixture()
@@ -203,9 +203,9 @@ def test_deploy_fewest_instrumented():
         os.path.join(cachedir, 'out', '%s.js' % hash_js)
     )
 
-    assert "dojo.provide('ribt')" in jsfile
+    assert "dojo.provide('chirp')" in jsfile
 
-    ribt.instrument_site(False)
+    chirp.instrument_site(False)
 
 
 @with_setup(setup, teardown)
@@ -221,7 +221,7 @@ def test_missing_rollup_requirement():
 
 @with_setup(setup, teardown)
 def test_deploy_reusable_no_js_minifying():
-    hash_js = 'dc3591c55de520ec5deb5c0cd85686be'
+    hash_js = 'd921f357906a0e5e06da6a704376247b'
 
     settings.SKYLARK_PLANS = 'mediadeploy_reusable'
 
@@ -247,7 +247,7 @@ def test_deploy_reusable_no_js_minifying():
 def test_will_not_needlessly_rollup():
     settings.SKYLARK_PLANS = 'mediadeploy_reusable'
 
-    hash_js1 = 'dc3591c55de520ec5deb5c0cd85686be'
+    hash_js1 = 'd921f357906a0e5e06da6a704376247b'
     filename = os.path.join(cachedir, 'out', '%s.js' % hash_js1)
 
     request = get_request_fixture()

@@ -4,7 +4,7 @@ body: dummyapp/issue_bb_19/issue_bb_19.html
 js:
     - static: dummyapp/issue_bb_19/media/js/static.js
 
-ribt:
+chirp:
     - namespace: DummyApp.BB.Issue19
       location: dummyapp/issue_bb_19/media/js
       require: 

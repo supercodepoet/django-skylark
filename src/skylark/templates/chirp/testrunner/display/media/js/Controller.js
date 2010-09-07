@@ -1,16 +1,16 @@
-dojo.provide('RibtTools.TestRunner.Display.Controller');
+dojo.provide('ChirpTools.TestRunner.Display.Controller');
 
-dojo.require('RibtTools.Mvc.Controller');
-dojo.require('RibtTools.SyncTimer.Timer');
-dojo.require('RibtTools.TestRunner.Display.View');
-dojo.require('RibtTools.TestRunner.Events');
-dojo.require('RibtTools.TestRunner.Channel');
+dojo.require('ChirpTools.Mvc.Controller');
+dojo.require('ChirpTools.SyncTimer.Timer');
+dojo.require('ChirpTools.TestRunner.Display.View');
+dojo.require('ChirpTools.TestRunner.Events');
+dojo.require('ChirpTools.TestRunner.Channel');
 
 /**
  * Responsible for starting everything.  Creates the top bar and window where the
  * tests happen
  */
-dojo.declare('RibtTools.TestRunner.Display.Controller', RibtTools.Mvc.Controller, {
+dojo.declare('ChirpTools.TestRunner.Display.Controller', ChirpTools.Mvc.Controller, {
     /**
      * Time to wait between running test entry points
      */
@@ -61,29 +61,29 @@ dojo.declare('RibtTools.TestRunner.Display.Controller', RibtTools.Mvc.Controller
      */ 
     constructor: function(domNode) {
         // Get our basic user-facing display setup
-        this.view = new RibtTools.TestRunner.Display.View(domNode);
+        this.view = new ChirpTools.TestRunner.Display.View(domNode);
         this.view.setSubjectSize();
         this.view.showAll();
 
         // The channel is how we communicate with the other frame
-        this.channel = RibtTools.TestRunner.Channel;
+        this.channel = ChirpTools.TestRunner.Channel;
         this.channel.setSubject(this.view.subjectFrame);
 
         // We need to wait until the subject frame is ready before we talk to it
-        dojo.subscribe(RibtTools.TestRunner.Events.SubjectFrame.Ready, this, this.notifyTestCount);
+        dojo.subscribe(ChirpTools.TestRunner.Events.SubjectFrame.Ready, this, this.notifyTestCount);
         dojo.addOnUnload(this, this.deinstrumentSite);
 
         // Our entry points are interned in the page as the following object
         // We initialize our test entry points, creating new instances of the specififed item
-        this.initTestEntryPoints(RibtTools.TestRunner.TestEntryPoints.items);
+        this.initTestEntryPoints(ChirpTools.TestRunner.TestEntryPoints.items);
 
         // Now that they exist, we want to show them in the top bar
         this.view.showTestEntryPoints(this._testEntryPoints);
 
         // Events from the test runners top section
         // These are the controls that adjust test execution
-        this.subscribe(RibtTools.TestRunner.Events.Display.RunClick, this, this.kickoffTestEntryPoints);
-        this.subscribe(RibtTools.TestRunner.Events.Display.RunOneClick, this, this.kickoffTestEntryPoints);
+        this.subscribe(ChirpTools.TestRunner.Events.Display.RunClick, this, this.kickoffTestEntryPoints);
+        this.subscribe(ChirpTools.TestRunner.Events.Display.RunOneClick, this, this.kickoffTestEntryPoints);
 
         // And finally, let's show something in the subject frame
         this.channel.navigate(this.initialUrl);
@@ -97,7 +97,7 @@ dojo.declare('RibtTools.TestRunner.Display.Controller', RibtTools.Mvc.Controller
      */ 
     initTestEntryPoints: function(data) {
         dojo.forEach(data, function(rawTep) {
-            var tepInstance = new RibtTools.TestRunner.Display.TestEntryPoint(
+            var tepInstance = new ChirpTools.TestRunner.Display.TestEntryPoint(
                 rawTep.url, rawTep.name);
 
             tepInstance.channel(this.channel);
@@ -135,7 +135,7 @@ dojo.declare('RibtTools.TestRunner.Display.Controller', RibtTools.Mvc.Controller
             var toRun = this._testEntryPoints;
         }
 
-        var st = new RibtTools.SyncTimer.Timer(toRun);
+        var st = new ChirpTools.SyncTimer.Timer(toRun);
 
         st.onStop = dojo.hitch(this, function(syncTimer) {
             var testEntryPoints = syncTimer.getUnitsRan();
@@ -211,6 +211,6 @@ dojo.declare('RibtTools.TestRunner.Display.Controller', RibtTools.Mvc.Controller
      * Notifies how many test entry points are available fro running
      */ 
     notifyTestCount: function() {
-        this.channel.publish(RibtTools.TestRunner.Events.TestCount, [ this.testCount ]);
+        this.channel.publish(ChirpTools.TestRunner.Events.TestCount, [ this.testCount ]);
     }
 });

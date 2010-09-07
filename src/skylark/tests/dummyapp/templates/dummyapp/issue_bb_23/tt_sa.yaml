@@ -3,7 +3,7 @@ body: dummyapp/issue_bb_23/tt_sa.html
 js:
     - static: dummyapp/issue_bb_23/media/js/tt_sa.js
 
-ribt:
+chirp:
     - namespace: DummyApp.BB.Issue23.TTSa
       location: dummyapp/issue_bb_23/media/js
       require:

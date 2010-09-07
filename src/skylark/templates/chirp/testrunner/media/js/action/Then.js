@@ -1,8 +1,8 @@
-dojo.provide('RibtTools.TestRunner.Action.Then');
+dojo.provide('ChirpTools.TestRunner.Action.Then');
 
-dojo.require('RibtTools.TestRunner.Action.Base');
+dojo.require('ChirpTools.TestRunner.Action.Base');
 
-dojo.declare('RibtTools.TestRunner.Action.Then', RibtTools.TestRunner.Action.Base, {
+dojo.declare('ChirpTools.TestRunner.Action.Then', ChirpTools.TestRunner.Action.Base, {
     _callback: undefined,
 
     constructor: function(callback) {

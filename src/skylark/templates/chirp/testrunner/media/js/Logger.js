@@ -1,4 +1,4 @@
-dojo.provide('RibtTools.TestRunner.Logger');
+dojo.provide('ChirpTools.TestRunner.Logger');
 
 /**
  * Generic logger for any object in the TestRunner
@@ -6,7 +6,7 @@ dojo.provide('RibtTools.TestRunner.Logger');
  * This object is a singleton, so we will create a new instance of it
  * after it's defined.
  */
-dojo.declare('_RibtTools.TestRunner.Logger', null, {
+dojo.declare('_ChirpTools.TestRunner.Logger', null, {
     /**
      * Do we also output logged messages to the console?
      */
@@ -50,5 +50,5 @@ dojo.declare('_RibtTools.TestRunner.Logger', null, {
 });
 
 // Create the actual object from the singleton
-dojo.setObject('RibtTools.TestRunner.Logger',
-    new _RibtTools.TestRunner.Logger());
+dojo.setObject('ChirpTools.TestRunner.Logger',
+    new _ChirpTools.TestRunner.Logger());

@@ -49,8 +49,8 @@ def test_bb_issue_19():
     files within the cfcache.  The reason that this creates a problem, is that
     the directory may be created by another directive like js: -file:
     app/page/media/js/file.js and then another directive may add content to
-    that same directory ribt: -location: app/page/media/js. The first js
-    will create the directory and the ribt section will then be skipped.
+    that same directory chirp: -location: app/page/media/js. The first js
+    will create the directory and the chirp section will then be skipped.
     """
     settings.DEBUG = False
     settings.SKYLARK_PLANS = 'mediadeploy'
@@ -135,7 +135,7 @@ def test_bb_issue_25():
     # TODO Need to still write a test for block comments
     settings.SKYLARK_PLANS = 'mediadeploy_reusable'
 
-    hash_js = '3f46c49944ed3463a6ed211a9b6af5d0'
+    hash_js = 'bbc01a8493372bb2e9127837ed42dfab'
 
     request = get_request_fixture()
     c = RequestContext(request, {})
@@ -149,11 +149,11 @@ def test_bb_issue_25():
         os.path.join(cachedir, 'out', '%s.js' % hash_js)
     )
 
-    assert "dojo.registerModulePath('RibtTools'" in jsfile
-    assert "dojo.provide('RibtTools.Error')" in jsfile
+    assert "dojo.registerModulePath('ChirpTools'" in jsfile
+    assert "dojo.provide('ChirpTools.Error')" in jsfile
     assert 'dojo.provide("dojox.timing._base")' in jsfile
     assert 'dojo.provide("dojox.timing")' in jsfile
-    assert "dojo.provide('RibtTools.SyncTimer.Timer')" in jsfile
+    assert "dojo.provide('ChirpTools.SyncTimer.Timer')" in jsfile
     assert 'dojo.provide("dojo.back")' in jsfile
     assert 'dojo.provide("dojo.NodeList-traverse")' in jsfile
     assert "dojo.registerModulePath('DummyApp.BB.Issue25'" in jsfile

@@ -1,6 +1,6 @@
 dojo.provide('Localbase.Connections.ConnectAs.Individual.SelectView');
 
-dojo.require('RibtTools.Mvc.View');
+dojo.require('ChirpTools.Mvc.View');
 dojo.require('dojox.dtl');
 dojo.require('dojox.dtl.dom');
 dojo.require('dojox.dtl.Context');

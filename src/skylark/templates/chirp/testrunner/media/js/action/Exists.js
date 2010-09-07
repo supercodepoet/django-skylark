@@ -1,8 +1,8 @@
-dojo.provide('RibtTools.TestRunner.Action.Exists');
+dojo.provide('ChirpTools.TestRunner.Action.Exists');
 
-dojo.require('RibtTools.TestRunner.Action.Base');
+dojo.require('ChirpTools.TestRunner.Action.Base');
 
-dojo.declare('RibtTools.TestRunner.Action.Exists', RibtTools.TestRunner.Action.Base, {
+dojo.declare('ChirpTools.TestRunner.Action.Exists', ChirpTools.TestRunner.Action.Base, {
     /**
      * 
      */

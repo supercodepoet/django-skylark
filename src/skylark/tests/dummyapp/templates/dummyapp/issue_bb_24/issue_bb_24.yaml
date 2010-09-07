@@ -17,7 +17,7 @@ css:
     - inline: dummyapp/page/media/css/notreferenced.css
       media: screen
     
-ribt:
+chirp:
     - namespace: DummyApp.BB.Issue24
       location: dummyapp/issue_bb_24/media/js
       require:

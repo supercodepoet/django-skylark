@@ -15,7 +15,7 @@ from django.utils.functional import memoize
 
 from skylark.conf import settings
 from skylark.processor import clevercss
-from skylark import ribt
+from skylark import chirp
 from skylark import cssimgreplace
 
 
@@ -141,7 +141,7 @@ class BasePlan(object):
             'meta': [],
             'js': [],
             'css': [],
-            'ribt': [],
+            'chirp': [],
         }
 
         self.prepared_instructions['render_full_page'] = self.render_full_page
@@ -410,7 +410,7 @@ class BasePlan(object):
                     # be relative to the YAML file
                     #
                     # This is quite possible if the yaml file is processing a
-                    # "ribt:" attribute.
+                    # "chirp:" attribute.
                     try:
                         sourcedirectory = find_directory_from_loader(
                             page_instructions, asset)
@@ -470,30 +470,30 @@ class BasePlan(object):
         """
         self.prepared_instructions['meta'] = page_instructions.meta
 
-    def prepare_ribt(self, page_instructions):
-        ribt_instructions = page_instructions.ribt
+    def prepare_chirp(self, page_instructions):
+        chirp_instructions = page_instructions.chirp
 
-        self.prepared_instructions['ribt'] = ribt_instructions
+        self.prepared_instructions['chirp'] = chirp_instructions
 
-        for ribt_module in ribt_instructions:
-            assert 'namespace' in ribt_module, ('You are missing the '
+        for chirp_module in chirp_instructions:
+            assert 'namespace' in chirp_module, ('You are missing the '
                 'namespace attribute for this item')
-            assert 'location' in ribt_module, ('You are missing the '
+            assert 'location' in chirp_module, ('You are missing the '
                  'location attribute for this item')
-            assert 'require' in ribt_module or 'tests' in ribt_module, (
+            assert 'require' in chirp_module or 'tests' in chirp_module, (
                  'You are missing the require list for this item')
 
-            if not 'require' in ribt_module:
-                ribt_module['require'] = []
-            ribt_module['needs_registration'] = True
+            if not 'require' in chirp_module:
+                chirp_module['require'] = []
+            chirp_module['needs_registration'] = True
 
-            namespace = ribt_module['namespace']
-            location = ribt_module['location']
-            require = ribt_module['require']
+            namespace = chirp_module['namespace']
+            location = chirp_module['location']
+            require = chirp_module['require']
 
             tests = []
-            if ribt.is_instrumented():
-                tests = ribt_module.get('tests', tests)
+            if chirp.is_instrumented():
+                tests = chirp_module.get('tests', tests)
 
             require.extend(tests)
 
@@ -527,7 +527,7 @@ class BasePlan(object):
             """
             self.prepare_js(page_instructions)
             self.prepare_css(page_instructions)
-            self.prepare_ribt(page_instructions)
+            self.prepare_chirp(page_instructions)
 
         return self.prepared_instructions
 
@@ -661,20 +661,20 @@ class RollupPlan(object):
         js_tmp= "dojo.registerModulePath('%(namespace)s', '%(location)s');"
         return js_tmp % {'namespace': namespace, 'location': location}
 
-    def _ribt_needs_registration(self, ribt_instructions, needs_registration):
-        for ribt_module in ribt_instructions:
-            ribt_module['needs_registration'] = needs_registration
+    def _chirp_needs_registration(self, chirp_instructions, needs_registration):
+        for chirp_module in chirp_instructions:
+            chirp_module['needs_registration'] = needs_registration
 
-    def _rollup_ribt(self, ribt_instructions):
+    def _rollup_chirp(self, chirp_instructions):
         local_modules = []
         skip_modules = []
 
-        for ribt_module in ribt_instructions:
-            if 'require' not in ribt_module:
+        for chirp_module in chirp_instructions:
+            if 'require' not in chirp_module:
                 continue
-            namespace = ribt_module['namespace']
-            location = ribt_module['location']
-            require = ribt_module['require']
+            namespace = chirp_module['namespace']
+            location = chirp_module['location']
+            require = chirp_module['require']
 
             # Figure out the path for each requirement based on namespace and
             # location
@@ -695,9 +695,9 @@ class RollupPlan(object):
             # Well, we decided to skip some modules and registration of the
             # module still needs to be listed in the script block below the
             # rolled up files
-            self._ribt_needs_registration(ribt_instructions, True)
+            self._chirp_needs_registration(chirp_instructions, True)
         else:
-            self._ribt_needs_registration(ribt_instructions, False)
+            self._chirp_needs_registration(chirp_instructions, False)
 
         self._local_modules = local_modules
         self._skip_modules = skip_modules
@@ -746,7 +746,7 @@ class RollupPlan(object):
 
         # Filter this module out of the prepared instructions, we've now set it
         # to roll in with the other JS
-        self._unprepare_ribt_dojo_module(name)
+        self._unprepare_chirp_dojo_module(name)
 
         roll_modules.append({'name': name, 'static': static, 'source': source})
 
@@ -769,19 +769,19 @@ class RollupPlan(object):
         if mod_parts[0].lower() != 'dojo' and mod_parts[0].lower() != 'dojox':
             # We have a problem Houston, this thing is not a Dojo module but
             # it's not included in the local modules
-            namespaces = [i['namespace'] for i in self.page_instructions.ribt]
+            namespaces = [i['namespace'] for i in self.page_instructions.chirp]
             raise DojoModuleResolution('While processing %s, dojo module %s '
                'was not found, the following namespaces are registered: %s' %
                (self.page_instructions.root_yaml, mod, ', '.join(namespaces)))
         # Perhaps it's a dojo or dojox module
-        mod_path = '%s.js' % os.path.join('ribt', 'media', *mod_parts)
+        mod_path = '%s.js' % os.path.join('chirp', 'media', *mod_parts)
 
         return mod_path
 
-    def _unprepare_ribt_dojo_module(self, mod):
-        for ribt_instruction in self.prepared_instructions['ribt']:
-            if 'require' not in ribt_instruction:
+    def _unprepare_chirp_dojo_module(self, mod):
+        for chirp_instruction in self.prepared_instructions['chirp']:
+            if 'require' not in chirp_instruction:
                 continue
-            if mod in ribt_instruction['require']:
-                ribt_instruction['require'].remove(mod)
+            if mod in chirp_instruction['require']:
+                chirp_instruction['require'].remove(mod)
                 return

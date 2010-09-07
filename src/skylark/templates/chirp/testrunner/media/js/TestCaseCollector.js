@@ -1,9 +1,9 @@
-dojo.provide('RibtTools.TestRunner.TestCaseCollector');
+dojo.provide('ChirpTools.TestRunner.TestCaseCollector');
 
-dojo.require('RibtTools.Error');
-dojo.require('RibtTools.SyncTimer.Timer');
-dojo.require('RibtTools.TestRunner.Events');
-dojo.require('RibtTools.TestRunner.Logger');
+dojo.require('ChirpTools.Error');
+dojo.require('ChirpTools.SyncTimer.Timer');
+dojo.require('ChirpTools.TestRunner.Events');
+dojo.require('ChirpTools.TestRunner.Logger');
 
 /**
  * Functions within the subject, and collects test cases that should be
@@ -11,7 +11,7 @@ dojo.require('RibtTools.TestRunner.Logger');
  *
  * This object is a singleton, and gets created at the end
  */
-dojo.declare('_RibtTools.TestRunner.TestCaseCollector', null, {
+dojo.declare('_ChirpTools.TestRunner.TestCaseCollector', null, {
     /**
      * How long between ticks
      */
@@ -50,7 +50,7 @@ dojo.declare('_RibtTools.TestRunner.TestCaseCollector', null, {
     /**
      * The collected logs from the test cases
      */
-    _log: RibtTools.TestRunner.Logger,
+    _log: ChirpTools.TestRunner.Logger,
 
     /**
      * The assertions from the test cases
@@ -62,7 +62,7 @@ dojo.declare('_RibtTools.TestRunner.TestCaseCollector', null, {
      */
     _withinTestRunner: function() {
         try {
-            if (window.parent.RibtTools.TestRunner.TestEntryPoints) {
+            if (window.parent.ChirpTools.TestRunner.TestEntryPoints) {
                 return true;
             }
         } catch (e) {
@@ -76,11 +76,11 @@ dojo.declare('_RibtTools.TestRunner.TestCaseCollector', null, {
      * @constructor
      */
     constructor: function() {
-        this._started = ribt.time();
+        this._started = chirp.time();
 
         if (this._withinTestRunner()) {
             this._requireTestEntryPoint = true;
-            dojo.subscribe(RibtTools.TestRunner.Events.Running, this, function(testEntryPoint) {
+            dojo.subscribe(ChirpTools.TestRunner.Events.Running, this, function(testEntryPoint) {
                 this._testEntryPoint = testEntryPoint;
             });
         }
@@ -108,7 +108,7 @@ dojo.declare('_RibtTools.TestRunner.TestCaseCollector', null, {
 
         if (this._requireTestEntryPoint) {
             // Because we are running within a test runner, we require a test entry point
-            if (ribt.time() > (this._waitForTestEntryPoint + this._started)) {
+            if (chirp.time() > (this._waitForTestEntryPoint + this._started)) {
                 // We have ran out of time
                 this._log.critical('Cannot run tests, we do not have a test entry point and there is an indication that one is required');
                 return;
@@ -136,14 +136,14 @@ dojo.declare('_RibtTools.TestRunner.TestCaseCollector', null, {
                 var cls = dojo.getObject(testCaseName);
 
                 if(!dojo.isFunction(cls)){
-                    throw new RibtTools.Error("Could not load test case class '" + className);
+                    throw new ChirpTools.Error("Could not load test case class '" + className);
                 }
 
                 this._testCaseObjects.push(new cls(this._testEntryPoint));
             }, this);
             
             // Create a new sync timer with the test cases within
-            var st = new RibtTools.SyncTimer.Timer(this._testCaseObjects);
+            var st = new ChirpTools.SyncTimer.Timer(this._testCaseObjects);
 
             st.interval(this._interval);
             st.timeout(this._timeout);
@@ -161,7 +161,7 @@ dojo.declare('_RibtTools.TestRunner.TestCaseCollector', null, {
     /**
      * After each test case runs, we arrive here
      *
-     * @param syncTimer Instance of RibtTools.SyncTimer.Timer
+     * @param syncTimer Instance of ChirpTools.SyncTimer.Timer
      * @param unit The test action that just finished running
      */
     afterRun: function(syncTimer, unit) {
@@ -178,7 +178,7 @@ dojo.declare('_RibtTools.TestRunner.TestCaseCollector', null, {
      * When all of the test cases finish, we provide the units that were ran
      * to the test entry point for later use displaying the results
      *
-     * @param syncTimer Instance of RibtTools.SyncTimer.Timer
+     * @param syncTimer Instance of ChirpTools.SyncTimer.Timer
      */
     onStop: function(syncTimer) {
         if (this._testEntryPoint) {
@@ -196,5 +196,5 @@ dojo.declare('_RibtTools.TestRunner.TestCaseCollector', null, {
     }
 });
 
-dojo.setObject('RibtTools.TestRunner.TestCaseCollector',
-    new _RibtTools.TestRunner.TestCaseCollector);
+dojo.setObject('ChirpTools.TestRunner.TestCaseCollector',
+    new _ChirpTools.TestRunner.TestCaseCollector);

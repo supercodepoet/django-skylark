@@ -3,7 +3,7 @@ body: dummyapp/issue_bb_23/tt_after_sa.html
 js:
     - static: dummyapp/issue_bb_23/media/js/tt_after_sa.js
 
-ribt:
+chirp:
     - namespace: DummyApp.BB.Issue23.TTAfterSa
       location: dummyapp/issue_bb_23/media/js
       require:

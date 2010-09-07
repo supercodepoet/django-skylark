@@ -1,23 +1,23 @@
 uses:
-    - file: ribt/tools.yaml
+    - file: chirp/tools.yaml
 
-ribt:
-    - namespace: RibtTools.TestRunner
-      location: ribt/testrunner/media/js
+chirp:
+    - namespace: ChirpTools.TestRunner
+      location: chirp/testrunner/media/js
       require:
-        - RibtTools.TestRunner.Events
-        - RibtTools.TestRunner.Logger
-        - RibtTools.TestRunner.Channel
-        - RibtTools.TestRunner.TestCaseCollector
-        - RibtTools.TestRunner.TestCase
-        - RibtTools.TestRunner.TestCaseTest
-        - RibtTools.TestRunner.TestCaseAssertions
-        - RibtTools.TestRunner.TestCaseMvcInstances
-    - namespace: RibtTools.TestRunner.Action
-      location: ribt/testrunner/media/js/action
+        - ChirpTools.TestRunner.Events
+        - ChirpTools.TestRunner.Logger
+        - ChirpTools.TestRunner.Channel
+        - ChirpTools.TestRunner.TestCaseCollector
+        - ChirpTools.TestRunner.TestCase
+        - ChirpTools.TestRunner.TestCaseTest
+        - ChirpTools.TestRunner.TestCaseAssertions
+        - ChirpTools.TestRunner.TestCaseMvcInstances
+    - namespace: ChirpTools.TestRunner.Action
+      location: chirp/testrunner/media/js/action
       require:
-        - RibtTools.TestRunner.Action.Base
-        - RibtTools.TestRunner.Action.When
-        - RibtTools.TestRunner.Action.Wait
-        - RibtTools.TestRunner.Action.Exists
-        - RibtTools.TestRunner.Action.Then
+        - ChirpTools.TestRunner.Action.Base
+        - ChirpTools.TestRunner.Action.When
+        - ChirpTools.TestRunner.Action.Wait
+        - ChirpTools.TestRunner.Action.Exists
+        - ChirpTools.TestRunner.Action.Then

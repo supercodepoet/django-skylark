@@ -6,7 +6,7 @@ js:
 css:
     - static: dummyapp/snippet/media/css/screen.css
 
-ribt:
+chirp:
     - namespace: DynamicApp.Snippet
       location: dynamicapp/media/js
       require: 

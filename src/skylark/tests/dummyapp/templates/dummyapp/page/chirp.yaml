@@ -1,13 +1,13 @@
 title: Testing that Dojo requirements get rendered to the page
-body: dummyapp/page/ribt.html
+body: dummyapp/page/chirp.html
 
 uses:
-    - file: ribt/tools.yaml
+    - file: chirp/tools.yaml
 
 js:
     - static: dummyapp/page/media/js/sample.js
 
-ribt:
+chirp:
     - namespace: DynamicApp.Page
       location: dynamicapp/media/js
       require: 

@@ -1,14 +1,14 @@
-dojo.provide('RibtTools.Mvc.Controller');
+dojo.provide('ChirpTools.Mvc.Controller');
 
-dojo.require('RibtTools.Error');
-dojo.require('RibtTools.Mvc.Events');
-dojo.require('RibtTools.Mvc.SubscriptionCache');
-dojo.require('RibtTools.Mvc.History');
+dojo.require('ChirpTools.Error');
+dojo.require('ChirpTools.Mvc.Events');
+dojo.require('ChirpTools.Mvc.SubscriptionCache');
+dojo.require('ChirpTools.Mvc.History');
 
 /**
  * Base Controller
  */
-dojo.declare('RibtTools.Mvc.Controller', null, {
+dojo.declare('ChirpTools.Mvc.Controller', null, {
     /**
      * Implemented controller must set this.view
      */
@@ -19,11 +19,11 @@ dojo.declare('RibtTools.Mvc.Controller', null, {
      */
     constructor: function(domNode, params, injectedData) {
         if ($CF.INSTRUMENTED) {
-            dojo.publish(RibtTools.Mvc.Events.New.Controller, [ this ]);
+            dojo.publish(ChirpTools.Mvc.Events.New.Controller, [ this ]);
         }
 
         this._injectedData      = injectedData || undefined;
-        this._subscriptionCache = new RibtTools.Mvc.SubscriptionCache;
+        this._subscriptionCache = new ChirpTools.Mvc.SubscriptionCache;
         this._delegates         = [];
         this._topicHandles      = [];
 
@@ -49,12 +49,12 @@ dojo.declare('RibtTools.Mvc.Controller', null, {
     _setDomNode: function(domNode, params) {
         this.domNode = domNode;
 
-        if (!dojo.attr(this.domNode, 'ribtType')) {
-            dojo.attr(this.domNode, 'ribtType', this.declaredClass);
+        if (!dojo.attr(this.domNode, 'chirpType')) {
+            dojo.attr(this.domNode, 'chirpType', this.declaredClass);
         }
 
-        if (dojo.attr(this.domNode, 'ribtBind') || dojo.attr(this.domNode, 'ribtGroup')) {
-            throw new RibtTools.Error('You cannot use ribtBind or ribtGroup on the same node as ribtType');
+        if (dojo.attr(this.domNode, 'chirpBind') || dojo.attr(this.domNode, 'chirpGroup')) {
+            throw new ChirpTools.Error('You cannot use chirpBind or chirpGroup on the same node as chirpType');
         }
 
         if (params) {
@@ -65,7 +65,7 @@ dojo.declare('RibtTools.Mvc.Controller', null, {
 
                 if (attr) {
                     this._params[name] = params[name];
-                    this[name] = ribt.str2obj(attr, params[name]);
+                    this[name] = chirp.str2obj(attr, params[name]);
                 }
             }
         }
@@ -132,13 +132,13 @@ dojo.declare('RibtTools.Mvc.Controller', null, {
      */
     initHistoryHandler: function(args) {
         if (this._subscriptionCache.contains(this, args.handler)) {
-            throw new RibtTools.Error('You are trying to initialize the history handler ' +
+            throw new ChirpTools.Error('You are trying to initialize the history handler ' +
                 'after a subscription has been made to ' +
                 args.handler);
         }
         var travel = args.handler || false;
 
-        RibtTools.Mvc.History.registerTravel(this, travel);
+        ChirpTools.Mvc.History.registerTravel(this, travel);
     },
 
     /**
@@ -148,11 +148,11 @@ dojo.declare('RibtTools.Mvc.Controller', null, {
      *
      * Most of the time, this can be accomplished by caching the domNode that is
      * passed into the controller when it starts.  You can then
-     * ribt.place(domNodeCache, 'replace') and have everything work out
+     * chirp.place(domNodeCache, 'replace') and have everything work out
      * correctly.
      */
     _restoreInitialState: function() {
-        this.publishLocal(RibtTools.Mvc.Events.History.RestoreInitialState,
+        this.publishLocal(ChirpTools.Mvc.Events.History.RestoreInitialState,
             [ this._originalDomNode || null ]
         );
     },
@@ -171,7 +171,7 @@ dojo.declare('RibtTools.Mvc.Controller', null, {
             var view = args[0];
 
             if (!view.declaredClass) {
-                throw new RibtTools.Error('You cannot subscribe using this.subscribe ' +
+                throw new ChirpTools.Error('You cannot subscribe using this.subscribe ' +
                     'if the event wasn\'t published with the view\'s this.publish.');
             }
 
@@ -194,7 +194,7 @@ dojo.declare('RibtTools.Mvc.Controller', null, {
      * for clean up later.
      */
     subscribeGlobal: function(topic, context, method) {
-        this._topicHandles.push(ribt.subscribe(topic, context, method));
+        this._topicHandles.push(chirp.subscribe(topic, context, method));
     },
 
     /**
@@ -214,7 +214,7 @@ dojo.declare('RibtTools.Mvc.Controller', null, {
      * Convenience method to publish events from the controller to the world
      */
     publishGlobal: function(topic, args) {
-        ribt.publish(topic, args);
+        chirp.publish(topic, args);
     },
 
     /**
@@ -262,7 +262,7 @@ dojo.declare('RibtTools.Mvc.Controller', null, {
     },
 
     /**
-     * Do whatever is necessary to remove things, this gets called by ribt.place
+     * Do whatever is necessary to remove things, this gets called by chirp.place
      * while we are removing elements in the DOM
      */
     destroy: function() {

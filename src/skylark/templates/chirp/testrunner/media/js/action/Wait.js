@@ -1,8 +1,8 @@
-dojo.provide('RibtTools.TestRunner.Action.Wait');
+dojo.provide('ChirpTools.TestRunner.Action.Wait');
 
-dojo.require('RibtTools.TestRunner.Action.Base');
+dojo.require('ChirpTools.TestRunner.Action.Base');
 
-dojo.declare('RibtTools.TestRunner.Action.Wait', RibtTools.TestRunner.Action.Base, {
+dojo.declare('ChirpTools.TestRunner.Action.Wait', ChirpTools.TestRunner.Action.Base, {
     _ms: undefined,
 
     constructor: function(ms) {

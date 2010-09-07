@@ -2,7 +2,7 @@ title: My SA
 # Missing the body on purpose, this caused a recursive loop in production and created Issue 24
 
 uses:
-    - file: ribt/tools.yaml
+    - file: chirp/tools.yaml
 
 js:
     - static: dummyapp/issue_bb_24/media/js/somefile.js
@@ -10,7 +10,7 @@ js:
 css:
     - static: dummyapp/issue_bb_24/media/css/somefile.css
 
-ribt:
+chirp:
     - namespace: DummyApp.BB.Issue24Sa
       location: dummyapp/issue_bb_24/media/js
       require:

@@ -1,11 +1,11 @@
-dojo.provide('RibtTools.SyncTimer.Timer');
+dojo.provide('ChirpTools.SyncTimer.Timer');
 
 dojo.require('dojox.timing');
-dojo.require('RibtTools.Error');
-dojo.require('RibtTools.SyncTimer.Unit');
-dojo.require('RibtTools.SyncTimer.UnitState');
+dojo.require('ChirpTools.Error');
+dojo.require('ChirpTools.SyncTimer.Unit');
+dojo.require('ChirpTools.SyncTimer.UnitState');
 
-dojo.declare('RibtTools.SyncTimer.Timer', null, {
+dojo.declare('ChirpTools.SyncTimer.Timer', null, {
     // The amount of time between runs or ticks
     _interval: 50,
 
@@ -54,13 +54,13 @@ dojo.declare('RibtTools.SyncTimer.Timer', null, {
      */
     constructor: function(stack) {
         if (!dojo.isArray(stack)) {
-            throw new RibtTools.Error('You must provide an array to the RibtTools.SyncTimer.Timer constructor');
+            throw new ChirpTools.Error('You must provide an array to the ChirpTools.SyncTimer.Timer constructor');
         }
 
         // Iterate through the stack, make sure each item is an instance of Unit
         dojo.forEach(stack, function(unit) {
-            if (!unit.isInstanceOf || !unit.isInstanceOf(RibtTools.SyncTimer.Unit)) {
-                throw new RibtTools.Error('Each instance in the stack must be an RibtTools.SyncTimer.Unit');
+            if (!unit.isInstanceOf || !unit.isInstanceOf(ChirpTools.SyncTimer.Unit)) {
+                throw new ChirpTools.Error('Each instance in the stack must be an ChirpTools.SyncTimer.Unit');
             }
         });
 
@@ -115,7 +115,7 @@ dojo.declare('RibtTools.SyncTimer.Timer', null, {
     start: function() {
         this._internalTimer = new dojox.timing.Timer(this._interval);
 
-        this._timeStarted = ribt.time();
+        this._timeStarted = chirp.time();
 
         this._internalTimer.onTick = dojo.hitch(this, function() {
             if (this._fullStop) {
@@ -124,10 +124,10 @@ dojo.declare('RibtTools.SyncTimer.Timer', null, {
             }
 
             // If we've been running to long, this timer needs to time out itself
-            if (ribt.time() > (this._timeStarted + this._timeout)) {
+            if (chirp.time() > (this._timeStarted + this._timeout)) {
                 this._timedOut = true;
                 if (this._running) {
-                    this._running._synctimer_unit_state = RibtTools.SyncTimer.UnitState.TIMEOUT;
+                    this._running._synctimer_unit_state = ChirpTools.SyncTimer.UnitState.TIMEOUT;
                 }
                 this._internalTimer.stop();
                 return;
@@ -172,7 +172,7 @@ dojo.declare('RibtTools.SyncTimer.Timer', null, {
         });
 
         this._internalTimer.onStop = dojo.hitch(this, function() {
-            this._timeFinished = ribt.time();
+            this._timeFinished = chirp.time();
 
             if (this.onStop) {
                 this.onStop(this);

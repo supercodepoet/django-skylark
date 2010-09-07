@@ -1,9 +1,9 @@
-dojo.provide('RibtTools.TestRunner.Display.View');
+dojo.provide('ChirpTools.TestRunner.Display.View');
 
-dojo.require('RibtTools.Mvc.View');
-dojo.require('RibtTools.TestRunner.Events');
+dojo.require('ChirpTools.Mvc.View');
+dojo.require('ChirpTools.TestRunner.Events');
 
-dojo.declare('RibtTools.TestRunner.Display.View', RibtTools.Mvc.View, {
+dojo.declare('ChirpTools.TestRunner.Display.View', ChirpTools.Mvc.View, {
     /**
      * The portion at the top of the page that let's you see what tests are
      * running and the current status
@@ -46,11 +46,11 @@ dojo.declare('RibtTools.TestRunner.Display.View', RibtTools.Mvc.View, {
         dojo.forEach(teps, function(tep) {
             node = dojo.create('li', {
                 innerHTML: tep.name,
-                ribtBindGroup: 'testEntryPoint'
+                chirpBindGroup: 'testEntryPoint'
             }, this.testEntryPointList, 'last');
             play = dojo.create('a', {
                 innerHTML: 'Run',
-                ribtBindGroup: 'testEntryPointRun',
+                chirpBindGroup: 'testEntryPointRun',
                 href: '#'
             }, node, 'first');
             tep.setNode(node);
@@ -77,7 +77,7 @@ dojo.declare('RibtTools.TestRunner.Display.View', RibtTools.Mvc.View, {
      * When the run button is clicked
      */
     runOnClick: function(event) {
-        this.publish(RibtTools.TestRunner.Events.Display.RunClick);
+        this.publish(ChirpTools.TestRunner.Events.Display.RunClick);
     },
 
     /**
@@ -86,6 +86,6 @@ dojo.declare('RibtTools.TestRunner.Display.View', RibtTools.Mvc.View, {
     testEntryPointRunOnClick: function(event) {
         var tep = event.currentTarget.parentNode._tep;
 
-        this.publish(RibtTools.TestRunner.Events.Display.RunOneClick, [ tep ]);
+        this.publish(ChirpTools.TestRunner.Events.Display.RunOneClick, [ tep ]);
     }
 });

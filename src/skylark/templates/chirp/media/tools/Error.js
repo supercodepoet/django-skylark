@@ -1,3 +1,3 @@
-dojo.provide('RibtTools.Error');
+dojo.provide('ChirpTools.Error');
 
-dojo.setObject('RibtTools.Error', Error);
+dojo.setObject('ChirpTools.Error', Error);

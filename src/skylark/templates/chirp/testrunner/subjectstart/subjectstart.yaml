@@ -1,13 +1,13 @@
-title: Beginning Ribt tests
-body: ribt/testrunner/subjectstart/subjectstart.html
+title: Beginning Chirp tests
+body: chirp/testrunner/subjectstart/subjectstart.html
 
 uses:
-    - file: ribt/tools.yaml
-    - file: ribt/testrunner/testrunner.yaml
+    - file: chirp/tools.yaml
+    - file: chirp/testrunner/testrunner.yaml
 
-ribt:
-    - namespace: RibtTools.TestRunner.SubjectStart
-      location: ribt/testrunner/subjectstart/media/js
+chirp:
+    - namespace: ChirpTools.TestRunner.SubjectStart
+      location: chirp/testrunner/subjectstart/media/js
       require:
-        - RibtTools.TestRunner.SubjectStart.Controller
-        - RibtTools.TestRunner.SubjectStart.View
+        - ChirpTools.TestRunner.SubjectStart.Controller
+        - ChirpTools.TestRunner.SubjectStart.View

@@ -1,9 +1,9 @@
-dojo.provide('RibtTools.TestRunner.TestCaseAssertions');
+dojo.provide('ChirpTools.TestRunner.TestCaseAssertions');
 
 /**
  * Object that is used to make assertions while testing
  */
-dojo.declare('RibtTools.TestRunner.TestCaseAssertions', null, {
+dojo.declare('ChirpTools.TestRunner.TestCaseAssertions', null, {
     /**
      * The assertions that fail
      */

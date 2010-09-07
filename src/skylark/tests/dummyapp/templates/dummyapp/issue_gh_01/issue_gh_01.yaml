@@ -2,9 +2,9 @@ title: GitHub Issue 01
 body: dummyapp/issue_gh_01/issue_gh_01.html
 
 uses:
-    - file: ribt/tools.yaml
+    - file: chirp/tools.yaml
 
-ribt:
+chirp:
     - namespace: DummyApp.GH.Issue01
       location: dummyapp/issue_gh_01/media/js
       require: 

@@ -1,9 +1,9 @@
-dojo.provide('RibtTools.TestRunner.Action.Base');
+dojo.provide('ChirpTools.TestRunner.Action.Base');
 
-dojo.require('RibtTools.Error');
-dojo.require('RibtTools.SyncTimer.Unit');
+dojo.require('ChirpTools.Error');
+dojo.require('ChirpTools.SyncTimer.Unit');
 
-dojo.declare('RibtTools.TestRunner.Action.Base', RibtTools.SyncTimer.Unit, {
+dojo.declare('ChirpTools.TestRunner.Action.Base', ChirpTools.SyncTimer.Unit, {
     _interval: 50,
     _timeout: 5000,
 
@@ -26,7 +26,7 @@ dojo.declare('RibtTools.TestRunner.Action.Base', RibtTools.SyncTimer.Unit, {
 
     run: function() {
         if (!this.tick) {
-            throw new RibtTools.Error('No tick method available on ' + this.declaredClass);
+            throw new ChirpTools.Error('No tick method available on ' + this.declaredClass);
         }
 
         if (!this.finished) {

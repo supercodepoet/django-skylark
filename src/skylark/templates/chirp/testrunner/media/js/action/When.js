@@ -1,8 +1,8 @@
-dojo.provide('RibtTools.TestRunner.Action.When');
+dojo.provide('ChirpTools.TestRunner.Action.When');
 
-dojo.require('RibtTools.TestRunner.Action.Base');
+dojo.require('ChirpTools.TestRunner.Action.Base');
 
-dojo.declare('RibtTools.TestRunner.Action.When', RibtTools.TestRunner.Action.Base, {
+dojo.declare('ChirpTools.TestRunner.Action.When', ChirpTools.TestRunner.Action.Base, {
     /**
      * 
      */

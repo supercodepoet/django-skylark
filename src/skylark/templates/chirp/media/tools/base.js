@@ -1,12 +1,12 @@
-dojo.provide('ribt');
+dojo.provide('chirp');
 
 // These are the utility function that are used a lot throughout the framework
-dojo.setObject('ribt', {
+dojo.setObject('chirp', {
     /**
      * Makes events and hooks into dojo.provide to make sure that dependencies
      * still work as expected.  Use it like this:
      *
-     *    dojo.provide(ribt.makeEvents('MyProject.AppName.Page.Events', [
+     *    dojo.provide(chirp.makeEvents('MyProject.AppName.Page.Events', [
      *        'SomeCrazyEvent']))
      *
      */
@@ -14,7 +14,7 @@ dojo.setObject('ribt', {
         var lower = function(str) { return str.toLowerCase(); }
 
         if (!dojo.isArray(evs)) {
-            throw new RibtTools.Error('Second argument to make events is not valid');
+            throw new ChirpTools.Error('Second argument to make events is not valid');
         }
 
         var nameParts = name.split('.');
@@ -53,7 +53,7 @@ dojo.setObject('ribt', {
                 errorMsg = initialMsg;
             }
             
-            throw new RibtTools.Error(errorMsg);
+            throw new ChirpTools.Error(errorMsg);
         }
         
     },
@@ -82,7 +82,7 @@ dojo.setObject('ribt', {
                 errorMsg = initialMsg;
             }
             
-            throw new RibtTools.Error(errorMsg);
+            throw new ChirpTools.Error(errorMsg);
         }
     },
 
@@ -102,21 +102,21 @@ dojo.setObject('ribt', {
      * view
      */
     makeTemplate: function() {
-        dojo.require('RibtTools.Mvc.TemplateManager');
+        dojo.require('ChirpTools.Mvc.TemplateManager');
 
-        RibtTools.Mvc.TemplateManager.makeTemplate.apply(
-            RibtTools.Mvc.TemplateManager, arguments);
+        ChirpTools.Mvc.TemplateManager.makeTemplate.apply(
+            ChirpTools.Mvc.TemplateManager, arguments);
     }
 });
 
 dojo.addOnLoad(function() {
     // When the page loads, we need to create a parse and search through the
-    var parser = new RibtTools.Mvc.Parser();
+    var parser = new ChirpTools.Mvc.Parser();
 
     // Setup some shortcuts to our public methods
-    ribt.parse   = dojo.hitch(parser, parser.parse);
-    ribt.str2obj = dojo.hitch(parser, parser.str2obj);
-    ribt.place   = dojo.hitch(parser, parser.place);
+    chirp.parse   = dojo.hitch(parser, parser.parse);
+    chirp.str2obj = dojo.hitch(parser, parser.str2obj);
+    chirp.place   = dojo.hitch(parser, parser.place);
 
-    ribt.parse();
+    chirp.parse();
 });

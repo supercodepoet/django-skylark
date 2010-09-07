@@ -11,34 +11,34 @@ from skylark.snippet import SnippetAssembly
 from django.conf import settings
 
 from skylark.tests import *
-from skylark import ribt
+from skylark import chirp
 
 
-def teardown_ribt():
+def teardown_chirp():
     teardown()
-    ribt.instrument_site(False)
-    ribt.test_registry.clear()
+    chirp.instrument_site(False)
+    chirp.test_registry.clear()
 
 
-@with_setup(setup, teardown_ribt)
+@with_setup(setup, teardown_chirp)
 def test_instrument():
-    assert not ribt.is_instrumented()
-    ribt.instrument_site(True)
-    py.test.raises(ribt.RibtError, ribt.instrument_site, True)
-    assert ribt.is_instrumented()
-    ribt.instrument_site(False)
-    assert not ribt.is_instrumented()
-    settings.SKYLARK_RIBT_INSTRUMENTED = True
+    assert not chirp.is_instrumented()
+    chirp.instrument_site(True)
+    py.test.raises(chirp.ChirpError, chirp.instrument_site, True)
+    assert chirp.is_instrumented()
+    chirp.instrument_site(False)
+    assert not chirp.is_instrumented()
+    settings.SKYLARK_CHIRP_INSTRUMENTED = True
     # This only get's triggered if we render a page, so let's do that
     request = get_request_fixture()
     c = RequestContext(request, {})
     sa = SnippetAssembly('dummyapp/snippet/snippet.yaml', c)
     content = sa.dumps()
-    assert ribt.is_instrumented()
-    settings.SKYLARK_RIBT_INSTRUMENTED = False
+    assert chirp.is_instrumented()
+    settings.SKYLARK_CHIRP_INSTRUMENTED = False
 
 
-@with_setup(setup, teardown_ribt)
+@with_setup(setup, teardown_chirp)
 def test_snippet_render():
     request = get_request_fixture()
     c = RequestContext(request, {})
@@ -54,18 +54,18 @@ def test_snippet_render():
     assert "dojo.registerModulePath('DynamicApp.Snippet'" in content
 
     exist(
-        'out/dynamicapp/media/js/ribtloaded.js',
-        'out/dynamicapp/media/js/templates/ribtloaded.html',
+        'out/dynamicapp/media/js/chirploaded.js',
+        'out/dynamicapp/media/js/templates/chirploaded.html',
     )
 
     assert 'This is my snippet test' in content
                               
 
-@with_setup(setup, teardown_ribt)
-def test_ribt_renders_in_page():
+@with_setup(setup, teardown_chirp)
+def test_chirp_renders_in_page():
     request = get_request_fixture()
     c = RequestContext(request, {})
-    pa = PageAssembly('dummyapp/page/ribt.yaml', c)
+    pa = PageAssembly('dummyapp/page/chirp.yaml', c)
 
     content = pa.dumps()
 
@@ -80,8 +80,8 @@ def test_ribt_renders_in_page():
         'out/dummyapp/tag/media/css/screen.css',
         'out/dummyapp/tag/media/img/testimage.png',
         'out/dummyapp/tag/media/js/templates/test.html',
-        'out/dynamicapp/media/js/ribtloaded.js',
-        'out/dynamicapp/media/js/templates/ribtloaded.html',
+        'out/dynamicapp/media/js/chirploaded.js',
+        'out/dynamicapp/media/js/templates/chirploaded.html',
     )
 
     assert "dojo.registerModulePath('DynamicApp.Page'" in content
@@ -93,13 +93,13 @@ def test_ribt_renders_in_page():
     assert 'addon/dojo/dojo.js' in content
 
 
-@with_setup(setup, teardown_ribt)
-def test_ribt_dojo_settings():
+@with_setup(setup, teardown_chirp)
+def test_chirp_dojo_settings():
     settings.SKYLARK_DOJO_VIA_CDN_AOL = True
 
     request = get_request_fixture()
     c = RequestContext(request, {})
-    pa = PageAssembly('dummyapp/page/ribt.yaml', c)
+    pa = PageAssembly('dummyapp/page/chirp.yaml', c)
     content = pa.dumps()
     assert 'http://o.aolcdn.com/dojo/1.4/dojo/dojo.xd.js' in content
 
@@ -109,72 +109,72 @@ def test_ribt_dojo_settings():
 
     request = get_request_fixture()
     c = RequestContext(request, {})
-    pa = PageAssembly('dummyapp/page/ribt.yaml', c)
+    pa = PageAssembly('dummyapp/page/chirp.yaml', c)
     content = pa.dumps()
     assert 'http://testdojo.com/dojo.js' in content
 
     settings.SKYLARK_DOJO_VIA_URL = None
 
 
-@with_setup(setup, teardown_ribt)
-def test_ribt_test_registry_add():
-    py.test.raises(ribt.RibtError, ribt.test_registry.add, None)
+@with_setup(setup, teardown_chirp)
+def test_chirp_test_registry_add():
+    py.test.raises(chirp.ChirpError, chirp.test_registry.add, None)
 
-    ribt.test_registry.add('/someurl', name='Some Test')
+    chirp.test_registry.add('/someurl', name='Some Test')
 
-    names = [ i.name for i in ribt.test_registry.list() ]
-    urls = [ i.url for i in ribt.test_registry.list() ]
+    names = [ i.name for i in chirp.test_registry.list() ]
+    urls = [ i.url for i in chirp.test_registry.list() ]
 
-    assert '/someurl' in ribt.test_registry
-    assert '/nothere' not in ribt.test_registry
+    assert '/someurl' in chirp.test_registry
+    assert '/nothere' not in chirp.test_registry
     assert '/someurl' in urls
     assert 'Some Test' in names
 
-    ribt.test_registry.add('/another', name='A special test')
+    chirp.test_registry.add('/another', name='A special test')
 
-    assert len(ribt.test_registry) == 2
-
-
-@with_setup(setup, teardown_ribt)
-def test_ribt_autodiscover():
-    ribt.autodiscover()
-    assert 'dummyapp.ribt' in ribt._ribt_modules
-
-    ribt.instrument_site(True)
-    assert 'dummyapp.ribt' in sys.modules
+    assert len(chirp.test_registry) == 2
 
 
-@with_setup(setup, teardown_ribt)
-def test_ribt_testcase_is_included():
-    assert not ribt.is_instrumented()
-    ribt.instrument_site(True)
+@with_setup(setup, teardown_chirp)
+def test_chirp_autodiscover():
+    chirp.autodiscover()
+    assert 'dummyapp.chirp' in chirp._chirp_modules
+
+    chirp.instrument_site(True)
+    assert 'dummyapp.chirp' in sys.modules
+
+
+@with_setup(setup, teardown_chirp)
+def test_chirp_testcase_is_included():
+    assert not chirp.is_instrumented()
+    chirp.instrument_site(True)
 
     request = get_request_fixture()
     c = RequestContext(request, {})
-    pa = PageAssembly('dummyapp/page/ribt.yaml', c)
+    pa = PageAssembly('dummyapp/page/chirp.yaml', c)
     content = pa.dumps()
 
-    assert 'dojo.require(\'RibtTools.TestRunner' in content
-    assert 'dojo.require(\'RibtTools.Mvc' in content
-    assert 'RibtTools.TestRunner.TestCaseCollector' in content
+    assert 'dojo.require(\'ChirpTools.TestRunner' in content
+    assert 'dojo.require(\'ChirpTools.Mvc' in content
+    assert 'ChirpTools.TestRunner.TestCaseCollector' in content
 
 
-@with_setup(setup, teardown_ribt)
-def test_ribt_includes_tests():
-    assert not ribt.is_instrumented()
-    ribt.instrument_site(True)
+@with_setup(setup, teardown_chirp)
+def test_chirp_includes_tests():
+    assert not chirp.is_instrumented()
+    chirp.instrument_site(True)
 
     request = get_request_fixture()
     c = RequestContext(request, {})
-    pa = PageAssembly('dummyapp/page/ribt.yaml', c)
+    pa = PageAssembly('dummyapp/page/chirp.yaml', c)
     content = pa.dumps()
 
     assert "dojo.require('DynamicApp.Page.Test')" in content
 
-    ribt.instrument_site(False)
+    chirp.instrument_site(False)
 
     c = RequestContext(request, {})
-    pa = PageAssembly('dummyapp/page/ribt.yaml', c)
+    pa = PageAssembly('dummyapp/page/chirp.yaml', c)
     content = pa.dumps()
 
     assert "dojo.require('DynamicApp.Page.Test')" not in content

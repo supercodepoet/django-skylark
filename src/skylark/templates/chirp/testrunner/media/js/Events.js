@@ -1,6 +1,6 @@
-dojo.provide('RibtTools.TestRunner.Events');
+dojo.provide('ChirpTools.TestRunner.Events');
 
-ribt.makeEvents('RibtTools.TestRunner.Events', [
+chirp.makeEvents('ChirpTools.TestRunner.Events', [
     'TestCount',
     'TestFinished',
     'Channel.RemoteReady',

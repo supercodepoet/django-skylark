@@ -1,14 +1,14 @@
-dojo.provide('RibtTools.Mvc.History');
+dojo.provide('ChirpTools.Mvc.History');
 
 dojo.require('dojo.back');
-dojo.require('RibtTools.Error');
+dojo.require('ChirpTools.Error');
 
-dojo.setObject('RibtTools.Mvc.History', {
+dojo.setObject('ChirpTools.Mvc.History', {
     _history: [],
 
     registerTravel: function(context, travel) {
         if (typeof travel != 'string') {
-            throw new RibtTools.Error('Options for goesBackOrForwards must be a string');
+            throw new ChirpTools.Error('Options for goesBackOrForwards must be a string');
         }
 
         travelMethod = this._wrap_method(context, context[travel]);
@@ -16,10 +16,10 @@ dojo.setObject('RibtTools.Mvc.History', {
     },
 
     _navigate: function(index) {
-        var obj = RibtTools.Mvc.History._history[index];
+        var obj = ChirpTools.Mvc.History._history[index];
         if (obj) {
             obj.originalMethod.apply(obj.context, obj.arguments);
-            RibtTools.Mvc.History._restoreInitial(index + 1);
+            ChirpTools.Mvc.History._restoreInitial(index + 1);
         }
     },
 
@@ -29,7 +29,7 @@ dojo.setObject('RibtTools.Mvc.History', {
      * to get things back to the beginning.
      */
     _restoreInitial: function(index) {
-        var history = RibtTools.Mvc.History._history;
+        var history = ChirpTools.Mvc.History._history;
         if (!history[index]) { return; }
         var context = history[index].context;
         // If it's zero, no need to go through the loop
@@ -57,7 +57,7 @@ dojo.setObject('RibtTools.Mvc.History', {
 
     _wrap_method: function(context, originalMethod) {
         return function() {
-            var history = RibtTools.Mvc.History._history;
+            var history = ChirpTools.Mvc.History._history;
 
             history.push({
                 'originalMethod': originalMethod,
@@ -71,7 +71,7 @@ dojo.setObject('RibtTools.Mvc.History', {
             };
 
             var navigateFunction = dojo.hitch(histContext, function() {
-                RibtTools.Mvc.History._navigate(histContext.index);
+                ChirpTools.Mvc.History._navigate(histContext.index);
             });
 
             dojo.back.addToHistory({
@@ -80,7 +80,7 @@ dojo.setObject('RibtTools.Mvc.History', {
                 changeUrl: true
             });
 
-            RibtTools.Mvc.History._history = history
+            ChirpTools.Mvc.History._history = history
             originalMethod.apply(context, arguments);
         }
     }
@@ -90,15 +90,15 @@ dojo.addOnLoad(
     function() {
         dojo.back.setInitialState({
             back: function() {
-                var history = RibtTools.Mvc.History._history;
+                var history = ChirpTools.Mvc.History._history;
                 if (history[0]) {
-                    RibtTools.Mvc.History._restoreInitial(0);
+                    ChirpTools.Mvc.History._restoreInitial(0);
                 }
             },
             forward: function() {
-                var history = RibtTools.Mvc.History._history;
+                var history = ChirpTools.Mvc.History._history;
                 if (history[0]) {
-                    RibtTools.Mvc.History._navigate(0);
+                    ChirpTools.Mvc.History._navigate(0);
                 }
             },
             changeUrl: false

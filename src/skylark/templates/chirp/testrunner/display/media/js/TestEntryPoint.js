@@ -1,9 +1,9 @@
-dojo.provide('RibtTools.TestRunner.Display.TestEntryPoint');
+dojo.provide('ChirpTools.TestRunner.Display.TestEntryPoint');
 
-dojo.require('RibtTools.SyncTimer.Unit');
-dojo.require('RibtTools.TestRunner.Events');
+dojo.require('ChirpTools.SyncTimer.Unit');
+dojo.require('ChirpTools.TestRunner.Events');
 
-dojo.declare('RibtTools.TestRunner.Display.TestEntryPoint', RibtTools.SyncTimer.Unit, {
+dojo.declare('ChirpTools.TestRunner.Display.TestEntryPoint', ChirpTools.SyncTimer.Unit, {
     /**
      * List of test cases collected after the tests run
      */
@@ -58,8 +58,8 @@ dojo.declare('RibtTools.TestRunner.Display.TestEntryPoint', RibtTools.SyncTimer.
     run: function() {
         this._channel.navigate(this.url);
 
-        this._channel.whenObject('RibtTools.TestRunner.TestCaseCollector', dojo.hitch(this, function() {
-            this._channel.publish(RibtTools.TestRunner.Events.Running, [ this ]);
+        this._channel.whenObject('ChirpTools.TestRunner.TestCaseCollector', dojo.hitch(this, function() {
+            this._channel.publish(ChirpTools.TestRunner.Events.Running, [ this ]);
         }));
     },
 

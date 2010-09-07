@@ -1,5 +1,5 @@
 js:
-    - inline: ribt/media/tools/djconfig.js
+    - inline: chirp/media/tools/djconfig.js
     {% if skylark_internals.settings.SKYLARK_DOJO_VIA_CDN_AOL %}
     - url: http://o.aolcdn.com/dojo/1.4/dojo/dojo.xd.js
     {% endif %}
@@ -9,30 +9,30 @@ js:
     {% if not skylark_internals.settings.SKYLARK_DOJO_VIA_CDN_AOL and not skylark_internals.settings.SKYLARK_DOJO_VIA_URL and not skylark_internals.settings.SKYLARK_DOJO_VIA_PATH and skylark_internals.settings.SKYLARK_DOJO_VIA_INTERNALBUILD %}
     - url: {{ skylark_internals.settings.SKYLARK_CACHE_URL }}addon/dojo/dojo.js.uncompressed.js
     {% endif %}
-    - static: ribt/media/tools/base.js
+    - static: chirp/media/tools/base.js
 
-ribt:
-    - namespace: RibtTools
-      location: ribt/media/tools
+chirp:
+    - namespace: ChirpTools
+      location: chirp/media/tools
       require:
-        - RibtTools.Error
+        - ChirpTools.Error
 
-    - namespace: RibtTools.SyncTimer
-      location: ribt/media/tools/synctimer
+    - namespace: ChirpTools.SyncTimer
+      location: chirp/media/tools/synctimer
       require:
-        - RibtTools.SyncTimer.Timer
-        - RibtTools.SyncTimer.Unit
-        - RibtTools.SyncTimer.UnitState
-        - RibtTools.SyncTimer.UnitFunction
+        - ChirpTools.SyncTimer.Timer
+        - ChirpTools.SyncTimer.Unit
+        - ChirpTools.SyncTimer.UnitState
+        - ChirpTools.SyncTimer.UnitFunction
 
-    - namespace: RibtTools.Mvc
-      location: ribt/media/tools
+    - namespace: ChirpTools.Mvc
+      location: chirp/media/tools
       require:
-        - RibtTools.Mvc.Dom
-        - RibtTools.Mvc.Events
-        - RibtTools.Mvc.Parser
-        - RibtTools.Mvc.Controller
-        - RibtTools.Mvc.View
-        - RibtTools.Mvc.History
-        - RibtTools.Mvc.SubscriptionCache
-        - RibtTools.Mvc.TemplateManager
+        - ChirpTools.Mvc.Dom
+        - ChirpTools.Mvc.Events
+        - ChirpTools.Mvc.Parser
+        - ChirpTools.Mvc.Controller
+        - ChirpTools.Mvc.View
+        - ChirpTools.Mvc.History
+        - ChirpTools.Mvc.SubscriptionCache
+        - ChirpTools.Mvc.TemplateManager

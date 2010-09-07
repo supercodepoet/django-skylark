@@ -6,7 +6,7 @@ from django.template import Template, loader
 
 from skylark import plans
 from skylark.conf import settings
-from skylark import ribt
+from skylark import chirp
 
 
 class Renderer(object):
@@ -58,7 +58,7 @@ class Renderer(object):
         render_context['cache_url'] = settings.SKYLARK_CACHE_URL
         render_context['doctype'] = self.doctype
         render_context['prepared_instructions'] = prepared_instructions
-        render_context['is_instrumented'] = ribt.is_instrumented()
+        render_context['is_instrumented'] = chirp.is_instrumented()
 
         if self.render_full_page:
             t = self.template_name

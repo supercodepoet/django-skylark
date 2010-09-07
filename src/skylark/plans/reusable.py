@@ -55,15 +55,15 @@ class ReusableFiles(BasePlan, RollupPlan):
 
         self._prepare_rollup('css', rollup, keep, insert_point)
 
-    def prepare_ribt(self, page_instructions):
-        super(ReusableFiles, self).prepare_ribt(page_instructions)
+    def prepare_chirp(self, page_instructions):
+        super(ReusableFiles, self).prepare_chirp(page_instructions)
 
-        rollup = self._rollup_ribt(self.prepared_instructions['ribt'])
+        rollup = self._rollup_chirp(self.prepared_instructions['chirp'])
 
-        # If there is anything left in the ribt instructions, we need to wrap
-        # our rolled up ribt content with a dojo.addOnLoad()
-        pi_ribt = self.prepared_instructions['ribt']
-        if [i['require'] for i in pi_ribt if i['require']]:
+        # If there is anything left in the chirp instructions, we need to wrap
+        # our rolled up chirp content with a dojo.addOnLoad()
+        pi_chirp = self.prepared_instructions['chirp']
+        if [i['require'] for i in pi_chirp if i['require']]:
             wrap_source = ('dojo.addOnLoad(function() {', '});',)
         else:
             wrap_source = ('', '',)

@@ -1,11 +1,11 @@
-dojo.provide('RibtTools.TestRunner.TestCaseTest');
+dojo.provide('ChirpTools.TestRunner.TestCaseTest');
 
-dojo.require('RibtTools.Error');
-dojo.require('RibtTools.SyncTimer.Unit');
-dojo.require('RibtTools.TestRunner.Action.When');
-dojo.require('RibtTools.TestRunner.Action.Wait');
-dojo.require('RibtTools.TestRunner.Action.Then');
-dojo.require('RibtTools.TestRunner.Action.Exists');
+dojo.require('ChirpTools.Error');
+dojo.require('ChirpTools.SyncTimer.Unit');
+dojo.require('ChirpTools.TestRunner.Action.When');
+dojo.require('ChirpTools.TestRunner.Action.Wait');
+dojo.require('ChirpTools.TestRunner.Action.Then');
+dojo.require('ChirpTools.TestRunner.Action.Exists');
 
 /**
  * A test case test is a single test like (testShouldAlwaysReturn) within a
@@ -14,7 +14,7 @@ dojo.require('RibtTools.TestRunner.Action.Exists');
  * This provides the glue between the test case and making the actual
  * assertion calls like this.exists('div.tab').
  */
-dojo.declare('RibtTools.TestRunner.TestCaseTest', RibtTools.SyncTimer.Unit, {
+dojo.declare('ChirpTools.TestRunner.TestCaseTest', ChirpTools.SyncTimer.Unit, {
     /**
      * The test function we will call to actually perform the actions
      */
@@ -60,7 +60,7 @@ dojo.declare('RibtTools.TestRunner.TestCaseTest', RibtTools.SyncTimer.Unit, {
      */
     _getMvcObject: function(name) {
         if (typeof name == 'object') {
-            throw new RibtTools.Error('Cannot use an object to retrive an MVC instance, use the string version of the name instead');
+            throw new ChirpTools.Error('Cannot use an object to retrive an MVC instance, use the string version of the name instead');
         }
 
         var context = { scope: this, name: name, toReturn: [] };
@@ -99,7 +99,7 @@ dojo.declare('RibtTools.TestRunner.TestCaseTest', RibtTools.SyncTimer.Unit, {
      * this.exists runs, it places an element onto the end of this array
      * to be executed by the test case.
      *
-     * @param action An instance of RibtTools.SyncTimer.Unit
+     * @param action An instance of ChirpTools.SyncTimer.Unit
      */
     addAction: function(action) {
         // Tie the log and assertion object to the unit
@@ -114,7 +114,7 @@ dojo.declare('RibtTools.TestRunner.TestCaseTest', RibtTools.SyncTimer.Unit, {
      */
     when: function(query) {
         this.addAction(
-            new RibtTools.TestRunner.Action.When(query));
+            new ChirpTools.TestRunner.Action.When(query));
     },
 
     /**
@@ -122,7 +122,7 @@ dojo.declare('RibtTools.TestRunner.TestCaseTest', RibtTools.SyncTimer.Unit, {
      */
     wait: function(ms) {
         this.addAction(
-            new RibtTools.TestRunner.Action.Wait(ms));
+            new ChirpTools.TestRunner.Action.Wait(ms));
     },
 
     /**
@@ -131,7 +131,7 @@ dojo.declare('RibtTools.TestRunner.TestCaseTest', RibtTools.SyncTimer.Unit, {
     then: function(callback) {
         callback = dojo.hitch(this, callback);
         this.addAction(
-            new RibtTools.TestRunner.Action.Then(callback));
+            new ChirpTools.TestRunner.Action.Then(callback));
     },
 
     /**
@@ -139,6 +139,6 @@ dojo.declare('RibtTools.TestRunner.TestCaseTest', RibtTools.SyncTimer.Unit, {
      */
     exists: function(query) {
         this.addAction(
-            new RibtTools.TestRunner.Action.Exists(query));
+            new ChirpTools.TestRunner.Action.Exists(query));
     }
 });

@@ -1,10 +1,10 @@
-dojo.provide('RibtTools.TestRunner.Channel');
+dojo.provide('ChirpTools.TestRunner.Channel');
 
 dojo.require('dojox.timing');
-dojo.require('RibtTools.Error');
-dojo.require('RibtTools.TestRunner.Events');
+dojo.require('ChirpTools.Error');
+dojo.require('ChirpTools.TestRunner.Events');
 
-dojo.declare('_RibtTools.TestRunner.Channel', null, {
+dojo.declare('_ChirpTools.TestRunner.Channel', null, {
     /**
      * Holds events that are waiting for the remote side to initialize
      */
@@ -81,7 +81,7 @@ dojo.declare('_RibtTools.TestRunner.Channel', null, {
             });
             checkForDojo();
         } else {
-            this.subjectFrame.contentWindow.dojo._fingerprint = ribt.time(); 
+            this.subjectFrame.contentWindow.dojo._fingerprint = chirp.time(); 
 
             var checkFingerprint = dojo.hitch(this, function() {
                 try {
@@ -115,7 +115,7 @@ dojo.declare('_RibtTools.TestRunner.Channel', null, {
 
         var timer = new dojox.timing.Timer(this._waitInterval);
 
-        timer.started = ribt.time();
+        timer.started = chirp.time();
 
         var context = {
             timer: timer,
@@ -127,7 +127,7 @@ dojo.declare('_RibtTools.TestRunner.Channel', null, {
         };
 
         timer.onTick = dojo.hitch(context, function() {
-            if (ribt.time() > (this.timer.started + this.timeout)) {
+            if (chirp.time() > (this.timer.started + this.timeout)) {
                 // Timeout
                 this.timer.stop();
                 return;
@@ -165,7 +165,7 @@ dojo.declare('_RibtTools.TestRunner.Channel', null, {
         // Everything that gets published to the remote dojo, we also want to receive
         this.localDojo.connect(this.subjectFrame.contentWindow.dojo, 'publish', dojo, 'publish');
 
-        this.publish(RibtTools.TestRunner.Events.Channel.RemoteReady, [ true ]);
+        this.publish(ChirpTools.TestRunner.Events.Channel.RemoteReady, [ true ]);
         this.dumpQueue();
 
         this._wired = true;
@@ -199,7 +199,7 @@ dojo.declare('_RibtTools.TestRunner.Channel', null, {
      * By default, this is what comes with the nekked' object
      */
     publish: function() {
-        throw new RibtTools.Error('Channel has not been initialized yet');
+        throw new ChirpTools.Error('Channel has not been initialized yet');
     },
 
     /**
@@ -209,7 +209,7 @@ dojo.declare('_RibtTools.TestRunner.Channel', null, {
      */
     _checkTopic: function(topic) {
         if (!topic) {
-            throw new RibtTools.Error('You are publishing an event that is undefined, check you spelling');
+            throw new ChirpTools.Error('You are publishing an event that is undefined, check you spelling');
         }
     },
 
@@ -242,4 +242,4 @@ dojo.declare('_RibtTools.TestRunner.Channel', null, {
     }
 });
 
-dojo.setObject('RibtTools.TestRunner.Channel', new _RibtTools.TestRunner.Channel());
+dojo.setObject('ChirpTools.TestRunner.Channel', new _ChirpTools.TestRunner.Channel());

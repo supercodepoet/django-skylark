@@ -92,11 +92,11 @@ __copy_addons = False
 
 def copy_addons():
     """
-    There are dependencies that Django Skylark and Ribt have that we need to
+    There are dependencies that Django Skylark and Chirp have that we need to
     include whenever the application starts.
 
     Right now this is:
-        * Dojo (slimmed down, custom build from ext/ribt_dojo.profile.js)
+        * Dojo (slimmed down, custom build from ext/chirp_dojo.profile.js)
 
     At the moment, this is slime enough that we are recreating these
     directories everytime the app initializes.  At some point this may become
@@ -109,7 +109,7 @@ def copy_addons():
         # Don't copy it again, that's silly
         return
     thisdir = os.path.dirname(__file__)
-    mediadir = ['templates', 'ribt', 'media', ]
+    mediadir = ['templates', 'chirp', 'media', ]
     dojodir = os.path.join(thisdir, *(mediadir + ['dojo']))
     shutil.copytree(dojodir, os.path.join(addondir, 'dojo'))
     dojoxdir = os.path.join(thisdir, *(mediadir + ['dojox']))

@@ -4,7 +4,7 @@ from django.utils.importlib import import_module
 from django.conf import settings
 
 
-class RibtError(Exception):
+class ChirpError(Exception):
     pass
 
 # Used to prevent getting too happy with the autodiscover
@@ -17,10 +17,10 @@ _instrumented = False
 # a period of time expires
 _time_instrumented = None
 
-# List of Ribt modules that need to loaded
-# This is to make sure that we don't try and import our Ribt testing modules
+# List of Chirp modules that need to loaded
+# This is to make sure that we don't try and import our Chirp testing modules
 # before everything is in place (namely all the urlpatterns)
-_ribt_modules = []
+_chirp_modules = []
 
 
 def check_instrumentation(meth):
@@ -29,7 +29,7 @@ def check_instrumentation(meth):
     """
     def check(*args, **kwargs):
         if settings.DEBUG and \
-           settings.SKYLARK_RIBT_INSTRUMENTED and \
+           settings.SKYLARK_CHIRP_INSTRUMENTED and \
            not is_instrumented():
             # The user has indicated that we need to be instrumented for
             # testing
@@ -53,20 +53,20 @@ def page_assembly_testcase_handler(page_instructions, renderer, assembly):
     instrumented (testing)
     """
     assembly.add_page_instructions(
-        page_instructions, 'ribt/testrunner/testcase.yaml')
+        page_instructions, 'chirp/testrunner/testcase.yaml')
 
 
 def instrument_site(on):
     """
     Sets a bit within the application that tells every other view that we are
-    testing the site using the Ribt test runner.
+    testing the site using the Chirp test runner.
     """
     from skylark.assembly import BaseAssembly
 
-    global _instrumented, _time_instrumented, _ribt_modules
+    global _instrumented, _time_instrumented, _chirp_modules
 
     if _instrumented and on:
-        raise RibtError('Ribt is already instrumented and ready for testing, '
+        raise ChirpError('Chirp is already instrumented and ready for testing, '
             'use is_instrumented to detect state')
 
     _instrumented = on
@@ -80,10 +80,10 @@ def instrument_site(on):
 
     BaseAssembly.register_handler(page_assembly_testcase_handler)
 
-    # Now we need to run through all the Ribt modules we found through
+    # Now we need to run through all the Chirp modules we found through
     # autodiscover and import them.  We didn't need any of it until we
     # instrumented our site
-    for mod in _ribt_modules:
+    for mod in _chirp_modules:
         import_module(mod)
 
 
@@ -91,7 +91,7 @@ def autodiscover():
     """
     Stolen directory from Django Admin.
 
-    Auto-discover INSTALLED_APPS ribt.py modules and fail silently when
+    Auto-discover INSTALLED_APPS chirp.py modules and fail silently when
     not present.
     """
     global _loading
@@ -102,7 +102,7 @@ def autodiscover():
     import imp
     from django.conf import settings
 
-    global _ribt_modules
+    global _chirp_modules
 
     for app in settings.INSTALLED_APPS:
         if app == 'skylark':
@@ -115,11 +115,11 @@ def autodiscover():
             continue
 
         try:
-            imp.find_module('ribt', app_path)
+            imp.find_module('chirp', app_path)
         except ImportError:
             continue
 
-        _ribt_modules.append("%s.ribt" % app)
+        _chirp_modules.append("%s.chirp" % app)
     _loading = False
 
 
@@ -139,7 +139,7 @@ class TestRegistry(object):
 
         # We don't want duplicates, that won't help anyone
         if not isinstance(url, (str, unicode)):
-            raise RibtError('You must add URLs to the test registry, not %s' %
+            raise ChirpError('You must add URLs to the test registry, not %s' %
                 type(url))
 
         if not url in self:

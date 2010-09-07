@@ -1,7 +1,7 @@
 // Generic events
-dojo.provide('RibtTools.Mvc.Events');
+dojo.provide('ChirpTools.Mvc.Events');
 
-ribt.makeEvents('RibtTools.Mvc.Events', [ 
+chirp.makeEvents('ChirpTools.Mvc.Events', [ 
     'ViewDestruction',
     'History.RestoreInitialState',
     'New.Controller',

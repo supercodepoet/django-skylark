@@ -1,13 +1,13 @@
-dojo.provide('RibtTools.TestRunner.TestCase');
+dojo.provide('ChirpTools.TestRunner.TestCase');
 
-dojo.require('RibtTools.SyncTimer.Timer');
-dojo.require('RibtTools.SyncTimer.Unit');
-dojo.require('RibtTools.SyncTimer.UnitFunction');
-dojo.require('RibtTools.TestRunner.Logger');
-dojo.require('RibtTools.TestRunner.TestCaseTest');
-dojo.require('RibtTools.TestRunner.TestCaseAssertions');
+dojo.require('ChirpTools.SyncTimer.Timer');
+dojo.require('ChirpTools.SyncTimer.Unit');
+dojo.require('ChirpTools.SyncTimer.UnitFunction');
+dojo.require('ChirpTools.TestRunner.Logger');
+dojo.require('ChirpTools.TestRunner.TestCaseTest');
+dojo.require('ChirpTools.TestRunner.TestCaseAssertions');
 
-dojo.declare('RibtTools.TestRunner.TestCase', RibtTools.SyncTimer.Unit, {
+dojo.declare('ChirpTools.TestRunner.TestCase', ChirpTools.SyncTimer.Unit, {
     /**
      * A list of actions that need to be ran to complete the test
      */
@@ -21,7 +21,7 @@ dojo.declare('RibtTools.TestRunner.TestCase', RibtTools.SyncTimer.Unit, {
     /**
      * Message that this test has generated while running
      */
-    _logger: RibtTools.TestRunner.Logger,
+    _logger: ChirpTools.TestRunner.Logger,
 
     /**
      * If a test runner is controlling us, we'll have a test entry point to talk to
@@ -56,9 +56,9 @@ dojo.declare('RibtTools.TestRunner.TestCase', RibtTools.SyncTimer.Unit, {
             this._testEntryPoint = arguments[0] || undefined;
         }
 
-        this._mvcInstances = RibtTools.TestRunner.TestCaseMvcInstances.instances;
+        this._mvcInstances = ChirpTools.TestRunner.TestCaseMvcInstances.instances;
 
-        this.assert = new RibtTools.TestRunner.TestCaseAssertions();
+        this.assert = new ChirpTools.TestRunner.TestCaseAssertions();
         this.assert.testcase = this;
     },
 
@@ -68,7 +68,7 @@ dojo.declare('RibtTools.TestRunner.TestCase', RibtTools.SyncTimer.Unit, {
     run: function() {
         var actions = [];
 
-        actions.push(new RibtTools.SyncTimer.UnitFunction(function() {
+        actions.push(new ChirpTools.SyncTimer.UnitFunction(function() {
             this.setUp();
         }, this));
 
@@ -77,7 +77,7 @@ dojo.declare('RibtTools.TestRunner.TestCase', RibtTools.SyncTimer.Unit, {
                 if (!dojo.isFunction(this[member])) { continue; }
                 // We will add all the actions we get back from the test
                 // case test to our actions list
-                var testCaseTest = new RibtTools.TestRunner.TestCaseTest(this[member], this);
+                var testCaseTest = new ChirpTools.TestRunner.TestCaseTest(this[member], this);
                 var testActions = testCaseTest.getActions();
 
                 if (testActions.length == 0) { continue; }
@@ -87,11 +87,11 @@ dojo.declare('RibtTools.TestRunner.TestCase', RibtTools.SyncTimer.Unit, {
             }
         }
 
-        actions.push(new RibtTools.SyncTimer.UnitFunction(function() {
+        actions.push(new ChirpTools.SyncTimer.UnitFunction(function() {
             this.tearDown();
         }, this));
 
-        this._syncTimer = new RibtTools.SyncTimer.Timer(actions);
+        this._syncTimer = new ChirpTools.SyncTimer.Timer(actions);
 
         this._syncTimer.onException = dojo.hitch(this, this.onException);
         this._syncTimer.onStop = dojo.hitch(this, this.onStop);

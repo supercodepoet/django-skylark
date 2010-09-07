@@ -1,12 +1,12 @@
-dojo.provide('RibtTools.SyncTimer.UnitFunction');
+dojo.provide('ChirpTools.SyncTimer.UnitFunction');
 
-dojo.require('RibtTools.SyncTimer.Unit')
+dojo.require('ChirpTools.SyncTimer.Unit')
 
 /**
  * A single function that runs immediately, this is a wrapper to make that
  * function into a SyncTimer Unit
  */
-dojo.declare('RibtTools.SyncTimer.UnitFunction', RibtTools.SyncTimer.Unit, {
+dojo.declare('ChirpTools.SyncTimer.UnitFunction', ChirpTools.SyncTimer.Unit, {
     _synctimer_unitfunction_func: undefined,
 
     _synctimer_unitfunction_scope: undefined,

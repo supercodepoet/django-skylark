@@ -9,8 +9,8 @@ from skylark import HttpResponse, RequestContext
 from skylark.conf import settings
 from skylark.instructions import PageInstructions
 from skylark import renderer
-from skylark import ribt
-from skylark.ribt import check_instrumentation
+from skylark import chirp
+from skylark.chirp import check_instrumentation
 
 try:
     import tidylib
@@ -222,7 +222,7 @@ class BaseAssembly(object):
             document = content
         else:
             document, errors = tidylib.tidy_document(content)
-            # We want to let the proprietary attributes slide, Ribt uses these
+            # We want to let the proprietary attributes slide, Chirp uses these
             errors = self.__convert_tidy_errors(
                 errors, filter=['proprietary attribute'])
             if errors and settings.SKYLARK_RAISE_HTML_ERRORS:

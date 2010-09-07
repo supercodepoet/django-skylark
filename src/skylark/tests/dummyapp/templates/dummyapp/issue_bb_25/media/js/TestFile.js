@@ -1,6 +1,6 @@
 dojo.provide('DummyApp.BB.Issue25.TestFile');
 
-dojo.require('RibtTools.Mvc.Controller');
+dojo.require('ChirpTools.Mvc.Controller');
 
 // dojo.require('Something.That.Doesnot.Exist')
 

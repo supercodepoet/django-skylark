@@ -1,6 +1,6 @@
-dojo.provide('RibtTools.Mvc.Dom');
+dojo.provide('ChirpTools.Mvc.Dom');
 
-dojo.setObject('RibtTools.Mvc.Dom', {
+dojo.setObject('ChirpTools.Mvc.Dom', {
     eventMap: [
         'onfocus',
         'onfocusin',
@@ -37,6 +37,6 @@ dojo.setObject('RibtTools.Mvc.Dom', {
         
     containsEvent: function(eventName) {
         eventName = eventName.toLowerCase();
-        return dojo.indexOf(RibtTools.Mvc.Dom.eventMap, eventName) > -1
+        return dojo.indexOf(ChirpTools.Mvc.Dom.eventMap, eventName) > -1
     }
 });

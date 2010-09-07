@@ -1,21 +1,21 @@
-dojo.provide('RibtTools.SyncTimer.Unit');
+dojo.provide('ChirpTools.SyncTimer.Unit');
 
-dojo.require('RibtTools.Error');
-dojo.require('RibtTools.SyncTimer.UnitState');
+dojo.require('ChirpTools.Error');
+dojo.require('ChirpTools.SyncTimer.UnitState');
 
 /**
  * Represents one unit of work for the sync timer.
  *
  * The sync timer will not continue until the unit says finished=true
  */
-dojo.declare('RibtTools.SyncTimer.Unit', null, {
+dojo.declare('ChirpTools.SyncTimer.Unit', null, {
     // We always want this run to run
     '-chains-': {
         run: 'after'
     },
 
     constructor: function() {
-        this._synctimer_unit_state = RibtTools.SyncTimer.UnitState.NOT_RUNNING;
+        this._synctimer_unit_state = ChirpTools.SyncTimer.UnitState.NOT_RUNNING;
         this._synctimer_timeStarted = undefined;
         this.finished = false;
     },
@@ -25,9 +25,9 @@ dojo.declare('RibtTools.SyncTimer.Unit', null, {
      */
     run: function() {
         if (this._synctimer_timeStarted == undefined) {
-            this._synctimer_timeStarted = ribt.time();
+            this._synctimer_timeStarted = chirp.time();
         }
-        this._synctimer_unit_state = RibtTools.SyncTimer.UnitState.RUNNING;
+        this._synctimer_unit_state = ChirpTools.SyncTimer.UnitState.RUNNING;
     },
 
     /**
@@ -35,8 +35,8 @@ dojo.declare('RibtTools.SyncTimer.Unit', null, {
      */
     timePassed: function() {
         if (!this._synctimer_timeStarted) {
-            throw new RibtTools.Error('Unit run() method has not been called yet');
+            throw new ChirpTools.Error('Unit run() method has not been called yet');
         }
-        return ribt.time() - this._synctimer_timeStarted;
+        return chirp.time() - this._synctimer_timeStarted;
     }
 });

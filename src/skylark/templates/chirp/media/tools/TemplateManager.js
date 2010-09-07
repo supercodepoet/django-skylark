@@ -1,10 +1,10 @@
-dojo.provide('RibtTools.Mvc.TemplateManager');
+dojo.provide('ChirpTools.Mvc.TemplateManager');
 
 dojo.require('dojox.dtl');
-dojo.require('RibtTools.Error');
+dojo.require('ChirpTools.Error');
 
 // This is our singleton skeleton
-dojo.declare('_RibtTools.Mvc.TemplateManager', null, {
+dojo.declare('_ChirpTools.Mvc.TemplateManager', null, {
     /**
      * Cache of templates tied to specfic views
      */
@@ -41,7 +41,7 @@ dojo.declare('_RibtTools.Mvc.TemplateManager', null, {
         var name = kwargs.name;
 
         if (!name) {
-            throw RibtTools.Error('You need to specify a name when making a ribt template');
+            throw ChirpTools.Error('You need to specify a name when making a chirp template');
         }
 
         if (this._templates[mvcView] && this._templates[mvcView][kwargs.name]) {
@@ -119,7 +119,7 @@ dojo.declare('_RibtTools.Mvc.TemplateManager', null, {
             var nodeStr = this.template.render(context);
 
             if (!nodeStr) {
-                throw new RibtTools.Error('Empty template was rendered');
+                throw new ChirpTools.Error('Empty template was rendered');
             }
 
             var container = this.manager._containerNode;
@@ -136,7 +136,7 @@ dojo.declare('_RibtTools.Mvc.TemplateManager', null, {
                 // We have one node inside the list, as expected
                 return nodeList[0];
             } else {
-                throw new RibtTools.Error('renderNode expects to find one ' +
+                throw new ChirpTools.Error('renderNode expects to find one ' +
                     'node being rendered, we found ' + nodeList.length);
             }
         });
@@ -179,5 +179,5 @@ dojo.declare('_RibtTools.Mvc.TemplateManager', null, {
 });
 
 // Create our singleton instance
-dojo.setObject('RibtTools.Mvc.TemplateManager',
-    new _RibtTools.Mvc.TemplateManager());
+dojo.setObject('ChirpTools.Mvc.TemplateManager',
+    new _ChirpTools.Mvc.TemplateManager());

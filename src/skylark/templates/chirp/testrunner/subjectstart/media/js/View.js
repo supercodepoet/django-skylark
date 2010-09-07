@@ -1,8 +1,8 @@
-dojo.provide('RibtTools.TestRunner.SubjectStart.View');
+dojo.provide('ChirpTools.TestRunner.SubjectStart.View');
 
-dojo.require('RibtTools.Mvc.View');
+dojo.require('ChirpTools.Mvc.View');
 
-dojo.declare('RibtTools.TestRunner.SubjectStart.View', RibtTools.Mvc.View, {
+dojo.declare('ChirpTools.TestRunner.SubjectStart.View', ChirpTools.Mvc.View, {
     constructor: function(domNode) {
         this._log('Loading tests');
     },

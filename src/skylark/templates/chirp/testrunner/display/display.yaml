@@ -1,17 +1,17 @@
-title: Ribt test runner
-body: ribt/testrunner/display/display.html
+title: Chirp test runner
+body: chirp/testrunner/display/display.html
 
 uses: 
-    - file: ribt/tools.yaml
-    - file: ribt/testrunner/testrunner.yaml
+    - file: chirp/tools.yaml
+    - file: chirp/testrunner/testrunner.yaml
 
 css:
-    - static: ribt/testrunner/media/css/baseline.compress.css
+    - static: chirp/testrunner/media/css/baseline.compress.css
 
-ribt:
-    - namespace: RibtTools.TestRunner.Display
-      location: ribt/testrunner/display/media/js
+chirp:
+    - namespace: ChirpTools.TestRunner.Display
+      location: chirp/testrunner/display/media/js
       require:
-        - RibtTools.TestRunner.Display.Controller
-        - RibtTools.TestRunner.Display.View
-        - RibtTools.TestRunner.Display.TestEntryPoint
+        - ChirpTools.TestRunner.Display.Controller
+        - ChirpTools.TestRunner.Display.View
+        - ChirpTools.TestRunner.Display.TestEntryPoint

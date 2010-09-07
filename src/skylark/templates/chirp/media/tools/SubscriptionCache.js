@@ -1,11 +1,11 @@
-dojo.provide('RibtTools.Mvc.SubscriptionCache');
+dojo.provide('ChirpTools.Mvc.SubscriptionCache');
 
 /**
  * A cache to record what subscriptions have been made, usefull for a controller
  * to track existing subscriptions and handle some error condititions that would
  * cause problems for the developer
  */
-dojo.declare('RibtTools.Mvc.SubscriptionCache', null, {
+dojo.declare('ChirpTools.Mvc.SubscriptionCache', null, {
     _cache: [],
 
     _getFunction: function(context, method) {
