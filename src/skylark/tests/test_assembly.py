@@ -157,6 +157,23 @@ def test_can_render_clevercss():
 
 
 @with_setup(setup, teardown)
+def test_can_render_lesscss():
+    request = get_request_fixture()
+    c = RequestContext(request, { 'foo': 'bar' })
+    pa = PageAssembly('dummyapp/page/lesscss.yaml', c)
+
+    content = pa.dumps()
+
+    assert '<link rel="stylesheet/less"' in content
+
+    media = (cachedir, 'out', 'dummyapp', 'page', 'media')
+    css = get_contents(join(*media + ('css', 'lesscss.css')))
+
+    assert '@primary: #252525;' in css
+    assert 'color: @primary;' in css
+
+
+@with_setup(setup, teardown)
 def test_missing_yaml_attributes():
     request = get_request_fixture()
     c = RequestContext(request, { 'foo': 'bar' })
@@ -302,7 +319,6 @@ def test_will_tidy_output():
     assert len(pa.dumps().split("\n")) == 42     # The answer to everything
 
 
-@attr('focus')
 @with_setup(setup, teardown)
 def test_will_use_correct_doctype():
     request = get_request_fixture()

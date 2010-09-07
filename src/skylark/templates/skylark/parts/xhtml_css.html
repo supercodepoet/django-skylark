@@ -3,9 +3,9 @@
     <!--[if {{ css.ieversion }}]>
     {% endif %}
     {% if css.location %}
-        <link rel="stylesheet" type="text/css" href="{{ css.location }}" media="{{ css.media|default:"screen" }}" />
+        <link rel="stylesheet{% if css.process == 'lessjs' %}/less{% endif %}" type="text/css" href="{{ css.location }}" media="{{ css.media|default:"screen" }}" />
     {% else %}
-        <style type="text/css" media="{{ css.media|default:"screen" }}">
+        <style rel="stylesheet{% if css.process == 'lessjs' %}/less{% endif %}" type="text/css" media="{{ css.media|default:"screen" }}">
             {{ css.source }}
         </style>
     {% endif %}

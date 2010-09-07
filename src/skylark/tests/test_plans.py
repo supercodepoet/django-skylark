@@ -9,7 +9,9 @@ from django.template import TemplateDoesNotExist
 
 from skylark import *
 from skylark import ribt
+from skylark import plans
 from skylark.page import PageAssembly
+from skylark.instructions import PageInstructions
 from skylark.plans import *
 from skylark.plans.base import BadOption
 from skylark.plans.separate import SeparateEverything
@@ -17,8 +19,10 @@ from skylark.plans.fewest import FewestFiles
 
 from skylark.tests import *
 
+
 def test_plan_options_invalid():
     py.test.raises(BadOption, plan_options, not_a_valid_option=True)
+
 
 @with_setup(setup, teardown)
 def test_can_change_deploy_plan_name():
@@ -51,6 +55,7 @@ def test_can_change_deploy_plan_name():
     settings.DEBUG = False
     settings.SKYLARK_PLANS = 'mediadeploy_notthere'
     py.test.raises(MissingMediaPlan, get_for_context, context, render_full_page)
+
 
 @with_setup(setup, teardown)
 def test_deploy_reusable():
@@ -112,6 +117,7 @@ def test_deploy_reusable():
 
     assert content.find('js/ie7only.css') < \
         content.find('%s.js' % hash_js2)
+
 
 @with_setup(setup, teardown)
 def test_deploy_fewest():
@@ -177,6 +183,7 @@ def test_deploy_fewest():
     assert content.find('%s.css' % hash_css) < \
         content.find('site.com/handheld.css')
 
+
 @with_setup(setup, teardown)
 def test_deploy_fewest_instrumented():
     hash_js = '157bee29e2605105eff447aeef28b1d8'
@@ -200,6 +207,7 @@ def test_deploy_fewest_instrumented():
 
     ribt.instrument_site(False)
 
+
 @with_setup(setup, teardown)
 def test_missing_rollup_requirement():
     settings.SKYLARK_PLANS = 'mediadeploy_fewest'
@@ -209,6 +217,7 @@ def test_missing_rollup_requirement():
     pa = PageAssembly('planapp/page/full_missing.yaml', c)
 
     py.test.raises(TemplateDoesNotExist, pa.dumps)
+
 
 @with_setup(setup, teardown)
 def test_deploy_reusable_no_js_minifying():
@@ -232,6 +241,7 @@ def test_deploy_reusable_no_js_minifying():
     assert '//' in jsfile
     # Should be Dojo documentation in here
     assert '// summary:' in jsfile
+
 
 @with_setup(setup, teardown)
 def test_will_not_needlessly_rollup():
@@ -259,3 +269,37 @@ def test_will_not_needlessly_rollup():
 
     assert first_time == os.stat(filename).st_mtime
     assert first_listing == os.listdir(os.path.join(cachedir, 'out'))
+
+
+@with_setup(setup, teardown)
+def test_will_rollup_with_lessjs():
+    settings.SKYLARK_PLANS = 'mediadeploy_reusable'
+
+    request = get_request_fixture()
+    c = RequestContext(request)
+    pa = PageAssembly('planapp/page/lesscss.yaml', c)
+
+    content = pa.dumps()
+
+    assert 'cfcache/out/planapp/page/media/css/lessjs.css' in content
+    assert '<link rel="stylesheet/less"' in content
+
+    settings.SKYLARK_PLANS = 'mediadeploy_fewest'
+
+    hash_css = '8015602c1f5583386d62d1478e2a8442'
+    filename = os.path.join(cachedir, 'out', '%s.css' % hash_css)
+
+    request = get_request_fixture()
+    c = RequestContext(request)
+    pa = PageAssembly('planapp/page/lesscss.yaml', c)
+
+    content = pa.dumps()
+
+    assert ('<link rel="stylesheet/less" type="text/css" '
+        'href="http://localhost:8000/media/cfcache/out/'
+        '%s.css" media="screen">' % hash_css in content)
+
+    css_file = get_contents(filename)
+
+    assert '@less' in css_file
+    assert 'cfcache/out/planapp/page/media/img/header.png' in css_file

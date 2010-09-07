@@ -1,0 +1,14 @@
+@less: white;
+
+body {
+    color: black;
+    background-color @less;
+
+    * {
+        color: red;
+    }
+
+    header {
+        background: transparent url(../img/header.png);
+    }
+}

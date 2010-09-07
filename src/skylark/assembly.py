@@ -1,13 +1,14 @@
 import hashlib
-import renderer
 import yaml
 import re
 
 from django import http, template
 from django.core.urlresolvers import resolve
+
 from skylark import HttpResponse, RequestContext
 from skylark.conf import settings
 from skylark.instructions import PageInstructions
+from skylark import renderer
 from skylark import ribt
 from skylark.ribt import check_instrumentation
 

@@ -13,6 +13,7 @@ from skylark.snippet import SnippetAssembly
 
 from skylark.tests import *
 
+
 @with_setup(setup, teardown)
 def test_bb_issue_07():
     """
@@ -35,6 +36,7 @@ def test_bb_issue_07():
         'out/dummyapp/issue_bb_07/media/js/Class.js',
         'out/dummyapp/issue_bb_07/media/js/templates/file.html',
     )
+
 
 @with_setup(setup, teardown)
 def test_bb_issue_19():
@@ -66,6 +68,7 @@ def test_bb_issue_19():
         'out/dummyapp/issue_bb_19/media/js/templates/file.html',
     )
 
+
 @with_setup(setup, teardown)
 def test_bb_issue_23():
     """
@@ -95,6 +98,7 @@ def test_bb_issue_23():
         assert content.find(item) < content.find("<body>")
         assert content.count(item) == 1
 
+
 @with_setup(setup, teardown)
 def test_bb_issue_24():
     """
@@ -111,6 +115,7 @@ def test_bb_issue_24():
     pa = PageAssembly('dummyapp/issue_bb_24/issue_bb_24.yaml', c)
 
     py.test.raises(TemplateSyntaxError, pa.dumps)
+
 
 @with_setup(setup, teardown)
 def test_bb_issue_25():
@@ -153,6 +158,7 @@ def test_bb_issue_25():
     assert 'dojo.provide("dojo.NodeList-traverse")' in jsfile
     assert "dojo.registerModulePath('DummyApp.BB.Issue25'" in jsfile
     assert "dojo.provide('DummyApp.BB.Issue25.TestFile')" in jsfile
+
 
 @with_setup(setup, teardown)
 def test_bb_issue_27():
@@ -209,7 +215,7 @@ def test_bb_issue_27():
     assert not_hooked_context['skylark_internals'] is not \
         request.skylark_internals
 
-@attr('focus')
+
 @with_setup(setup, teardown)
 def test_gh_issue_01():
     settings.SKYLARK_PLANS = 'mediadeploy_reusable'

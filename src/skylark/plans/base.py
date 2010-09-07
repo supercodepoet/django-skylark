@@ -76,6 +76,19 @@ def process_clevercss(source):
     return clevercss.convert(source)
 
 
+def process_lessjs(source):
+    """
+    Less is a CSS processor, that extends the syntax and adds variables,
+    arithmetic, and other goodies
+
+    Less.js author: http://cloudhead.io/
+    GitHub repo: http://github.com/cloudhead/less.js
+    """
+    # This is a simple pass through, we don't need to do anything for less.js
+    # to work
+    return source
+
+
 class BasePlan(object):
     """
     Base class that all the plans can subclass.  It provides common things like
@@ -103,7 +116,8 @@ class BasePlan(object):
     it to be modified by the function.
     """
     processing_funcs = {
-        'clevercss': process_clevercss}
+        'clevercss': process_clevercss,
+        'lessjs': process_lessjs}
 
     make_css_urls_absolute = False
 
@@ -172,7 +186,7 @@ class BasePlan(object):
                 app_directories._loader.load_template_source(template_name)
         return source, filepath
 
-    def _get_media_source(self, template_name, process_func=None, \
+    def _get_media_source(self, template_name, process_func=None,
         context=None, no_render=False):
         """
         Responsible for taking a template and generating the contents.
@@ -564,6 +578,20 @@ class RollupPlan(object):
             [rollup_instruction] + \
             other_instruction[insert_point:]
 
+    def _instructions_have_lessjs(self, instructions):
+        """
+        Goes through the instructions and determine if any of the source files
+        are set to be processed with lessjs.
+        """
+        for i in instructions:
+            try:
+                if i['process'] == 'lessjs':
+                    return True
+            except KeyError:
+                # No process, but that's OK
+                pass
+        return False
+
     def _rollup_static_files(self, instructions, extension, minifier=None,
         wrap_source=None):
         """
@@ -577,11 +605,14 @@ class RollupPlan(object):
         wrap_source = ('dojo.addOnLoad(function(){', '})',)
         """
         fix_css_urls = True if 'css' in extension else False
+        is_lessjs = self._instructions_have_lessjs(instructions)
 
-        if not minifier:
+        def nop_minifier(arg):
+            """
+            A minifier that does nothing, but is callable
+            """
+            return arg
 
-            def minifier(arg):
-                return arg
         # Figure out a name
         files = [i['static'] for i in instructions]
 
@@ -589,6 +620,9 @@ class RollupPlan(object):
         filename = os.path.join(self.cache_root, basename)
         location = urljoin(self.cache_url, basename)
         retval = {'location': location}
+
+        if is_lessjs:
+            retval['process'] = 'lessjs'
 
         if not files:
             return None
@@ -604,6 +638,15 @@ class RollupPlan(object):
 
         if not wrap_source:
             wrap_source = ('', '',)
+
+        if not minifier or is_lessjs:
+            """
+            If minifier is not defined we use a no-operate version
+
+            If lessjs is used, we can't alter the original file because it will
+            throw the parser off.  So we turn off the minification
+            """
+            minifier = nop_minifier
 
         if not os.path.isfile(filename) or settings.DEBUG:
             f = open(filename, 'w')

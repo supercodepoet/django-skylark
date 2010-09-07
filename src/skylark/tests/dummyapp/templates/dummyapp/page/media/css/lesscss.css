@@ -1,0 +1,9 @@
+@primary: #252525;
+
+.less {
+    color: @primary;
+}
+
+body {
+    .less;
+}

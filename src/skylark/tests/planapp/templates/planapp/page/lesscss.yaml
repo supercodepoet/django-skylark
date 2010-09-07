@@ -1,0 +1,10 @@
+title: Full monty of a YAML file
+body: planapp/page/full.html
+
+uses:
+    - file: planapp/page/full.yaml
+
+css:
+    - static: planapp/page/media/css/lessjs.css
+      media: screen
+      process: lessjs
