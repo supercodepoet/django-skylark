@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2004-2009, The Dojo Foundation All Rights Reserved.
+	Copyright (c) 2004-2010, The Dojo Foundation All Rights Reserved.
 	Available via Academic Free License >= 2.1 OR the modified BSD license.
 	see: http://dojotoolkit.org/license for details
 */
@@ -475,6 +475,11 @@ dojo.require("dojox.html.entities");
 
 		//Okay, finally process the input string.
 		processNode(contentDiv);
+		if(textContent){
+			// Insert any trailing text.  See: #10854
+			content.push(formatText(textContent));
+			textContent = "";
+		}
 		return content.join(""); //String
 	};
 })();

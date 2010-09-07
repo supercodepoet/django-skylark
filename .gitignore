@@ -18,3 +18,4 @@ tmp
 
 src/skylark/tests/media
 demo/media/cfcache
+ext/dojo-release*

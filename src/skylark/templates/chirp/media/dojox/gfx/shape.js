@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2004-2009, The Dojo Foundation All Rights Reserved.
+	Copyright (c) 2004-2010, The Dojo Foundation All Rights Reserved.
 	Available via Academic Free License >= 2.1 OR the modified BSD license.
 	see: http://dojotoolkit.org/license for details
 */
@@ -114,13 +114,13 @@ dojo.declare("dojox.gfx.Shape", null, {
 			return null;	// null
 		}
 		var m = this._getRealMatrix();
-		var r = [];
-		var g = dojox.gfx.matrix;
-		r.push(g.multiplyPoint(m, b.x, b.y));
-		r.push(g.multiplyPoint(m, b.x + b.width, b.y));
-		r.push(g.multiplyPoint(m, b.x + b.width, b.y + b.height));
-		r.push(g.multiplyPoint(m, b.x, b.y + b.height));
-		return r;	// Array
+			gm = dojox.gfx.matrix;
+		return [	// Array
+				gm.multiplyPoint(m, b.x, b.y),
+				gm.multiplyPoint(m, b.x + b.width, b.y),
+				gm.multiplyPoint(m, b.x + b.width, b.y + b.height),
+				gm.multiplyPoint(m, b.x, b.y + b.height)
+			];
 	},
 	getEventSource: function(){
 		// summary: returns a Node, which is used as
@@ -362,6 +362,13 @@ dojox.gfx.shape.Container = {
 
 	// group management
 
+	openBatch: function() {
+		// summary: starts a new batch, subsequent new child shapes will be held in
+		//	the batch instead of appending to the container directly
+	},
+	closeBatch: function() {
+		// summary: submits the current batch, append all pending child shapes to DOM
+	},
 	add: function(shape){
 		// summary: adds a shape to the list
 		// shape: dojox.gfx.Shape: a shape

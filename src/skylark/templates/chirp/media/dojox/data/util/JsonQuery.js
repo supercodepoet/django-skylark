@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2004-2009, The Dojo Foundation All Rights Reserved.
+	Copyright (c) 2004-2010, The Dojo Foundation All Rights Reserved.
 	Available via Academic Free License >= 2.1 OR the modified BSD license.
 	see: http://dojotoolkit.org/license for details
 */
@@ -61,9 +61,6 @@ dojo.declare("dojox.data.util.JsonQuery", null, {
 			for(i = 0; i < sort.length; i++){
 				args.queryStr += (first ? '[' : ',') + (sort[i].descending ? '\\' : '/') + "@[" + dojo._escapeString(sort[i].attribute) + "]";
 				first = false; 
-			}
-			if(!first){
-				args.queryStr += ']';
 			}
 		}
 		// this is optional because with client side paging JSONQuery doesn't yield the total count

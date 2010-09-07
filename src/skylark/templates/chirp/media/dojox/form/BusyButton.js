@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2004-2009, The Dojo Foundation All Rights Reserved.
+	Copyright (c) 2004-2010, The Dojo Foundation All Rights Reserved.
 	Available via Academic Free License >= 2.1 OR the modified BSD license.
 	see: http://dojotoolkit.org/license for details
 */
@@ -46,7 +46,7 @@ dojo.declare("dojox.form._BusyButtonMixin",
 		// summary:
 		//	sets state from idle to busy
 		this.isBusy = true;
-		this.attr("disabled", true);
+		this.set("disabled", true);
 			
 		this.setLabel(this.busyLabel, this.timeout);
 	},
@@ -55,7 +55,7 @@ dojo.declare("dojox.form._BusyButtonMixin",
 		// summary:
 		//	if no timeout is set or for other reason the user can put the button back
 		//  to being idle
-		this.attr("disabled", false);
+		this.set("disabled", false);
 		this.isBusy = false;
 		this.setLabel(this._label);
 		if(this._timeout){	clearTimeout(this._timeout); }
