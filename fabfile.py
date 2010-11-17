@@ -6,11 +6,11 @@ from pkginfo import version
 env.hosts     = ['localbase.webfactional.com']
 env.roledefs  = {'eggserver': ['localbase.webfactional.com']}
 env.user      = 'localbase'
-env.name_left = 'django-crunchyfrog'
+env.name_left = 'django-skylark'
 
 @roles('eggserver')
 def deploy():
-    """Deploys Django Crunchy Frog to our eggs directory on Web Faction"""
+    """Deploys Django Skylark to our eggs directory on Web Faction"""
     filename = '%s-%s.tar.gz' % (env.name_left, version,)
 
     local_filename  = 'dist/%s' % filename
