@@ -69,7 +69,9 @@ dojo.declare('ChirpTools.Mvc.View', null, {
                 var funcName = handler.funcName;
                 var context  = {'scope': this, 'name': funcName, 'func': handler.func};
 
-                this._bindHandles[funcName] = [];
+                if (!this._bindHandles[funcName]) {
+                    this._bindHandles[funcName] = [];
+                }
                 this._bindHandles[funcName].push(dojo.connect(element, handler.eventType, context, this._connectHandler));
             }
         }, this);
