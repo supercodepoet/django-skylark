@@ -5,6 +5,7 @@ import filecmp
 import shutil
 import hashlib
 import pickle
+import subprocess
 from urlparse import urljoin
 
 from django.template import Template, TemplateDoesNotExist
@@ -65,7 +66,7 @@ def find_directory_from_loader(page_instructions, asset):
         'template directories: %s' % asset)
 
 
-def process_clevercss(source):
+def process_clevercss(source, filepath):
     """
     This is part of the processing_funcs that Renderer will use to perform any
     special transformations or filtering on the output of a rendered template.
@@ -76,7 +77,7 @@ def process_clevercss(source):
     return clevercss.convert(source)
 
 
-def process_lessjs(source):
+def process_lessjs(source, filepath):
     """
     Less is a CSS processor, that extends the syntax and adds variables,
     arithmetic, and other goodies
@@ -87,6 +88,18 @@ def process_lessjs(source):
     # This is a simple pass through, we don't need to do anything for less.js
     # to work
     return source
+
+
+def process_lessc(source, filepath):
+    """
+    Less is a CSS processor, that extends the syntax and adds variables,
+    arithmetic, and other goodies. This process precompiles the Less source
+    into proper CSS.
+
+    Less.js author: http://cloudhead.io/
+    GitHub repo: http://github.com/cloudhead/less.js
+    """
+    return subprocess.check_output(['lessc', filepath])
 
 
 class BasePlan(object):
@@ -117,7 +130,8 @@ class BasePlan(object):
     """
     processing_funcs = {
         'clevercss': process_clevercss,
-        'lessjs': process_lessjs}
+        'lessjs': process_lessjs,
+        'lessc': process_lessc}
 
     make_css_urls_absolute = False
 
@@ -208,7 +222,7 @@ class BasePlan(object):
             source, filepath = self._get_source_filepath(template_name)
 
             if process_func:
-                source = process_func(source)
+                source = process_func(source, filepath)
 
             cache[mem_args] = source
             is_cached = False

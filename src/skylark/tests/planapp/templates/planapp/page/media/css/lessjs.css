@@ -2,7 +2,7 @@
 
 body {
     color: black;
-    background-color @less;
+    background-color: @less;
 
     * {
         color: red;

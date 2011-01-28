@@ -95,7 +95,7 @@ def test_deploy_reusable():
     assert '.static_uses1' in cssfile
     assert 'url(http://localhost:8000/media/' in cssfile
     assert 'out/planapp/page/media/img/uses1.gif' in cssfile
-    
+
     assert '%s.js' % hash_js1 in content
     assert '%s.js' % hash_js2 in content
     assert 'planapp/page/media/js/static_uses1.js' not in content
@@ -259,7 +259,7 @@ def test_will_not_needlessly_rollup():
     first_time = os.stat(filename).st_mtime
     first_listing = os.listdir(os.path.join(cachedir, 'out'))
 
-    sleep(1.0) 
+    sleep(1.0)
 
     request = get_request_fixture()
     c = RequestContext(request)
@@ -302,4 +302,38 @@ def test_will_rollup_with_lessjs():
     css_file = get_contents(filename)
 
     assert '@less' in css_file
+    assert 'cfcache/out/planapp/page/media/img/header.png' in css_file
+
+
+@with_setup(setup, teardown)
+def test_will_rollup_with_lessc():
+    settings.SKYLARK_PLANS = 'mediadeploy_reusable'
+
+    request = get_request_fixture()
+    c = RequestContext(request)
+    pa = PageAssembly('planapp/page/lessc.yaml', c)
+
+    content = pa.dumps()
+
+    assert 'cfcache/out/planapp/page/media/css/lessjs.css' in content
+    assert '<link rel="stylesheet"' in content
+
+    settings.SKYLARK_PLANS = 'mediadeploy_fewest'
+
+    hash_css = '8015602c1f5583386d62d1478e2a8442'
+    filename = os.path.join(cachedir, 'out', '%s.css' % hash_css)
+
+    request = get_request_fixture()
+    c = RequestContext(request)
+    pa = PageAssembly('planapp/page/lessc.yaml', c)
+
+    content = pa.dumps()
+
+    assert ('<link rel="stylesheet" type="text/css" '
+        'href="http://localhost:8000/media/cfcache/out/'
+        '%s.css" media="screen">' % hash_css in content)
+
+    css_file = get_contents(filename)
+
+    assert '@less' not in css_file
     assert 'cfcache/out/planapp/page/media/img/header.png' in css_file
