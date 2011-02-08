@@ -312,17 +312,17 @@ class BasePlan(object):
             self.prepared_instructions[item_name] = []
 
         for instruction in getattr(page_instructions, item_name):
+            item = copy.copy(instruction)
+
             if 'url' in instruction:
-                self.prepared_instructions[item_name].append(
-                    {'location': instruction['url']})
+                item['location'] = instruction['url']
+
             else:
                 template_name = context = process_func = None
 
                 if 'process' in instruction:
                     process_func = self._get_processing_function(
                         instruction.get('process'))
-
-                item = copy.copy(instruction)
 
                 template_name = instruction.get('static', False) or \
                     instruction.get('inline', False)
@@ -359,7 +359,7 @@ class BasePlan(object):
                             'together')
                     continue
 
-                self.prepared_instructions[item_name].append(item)
+            self.prepared_instructions[item_name].append(item)
 
     def _prepare_assets(self, page_instructions, assets=None):
         """
