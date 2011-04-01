@@ -12,7 +12,6 @@ dojo.js:
 ./../../../../src/skylark/templates/chirp/media/_build/dojo/dojo/_base/Deferred.js
 ./../../../../src/skylark/templates/chirp/media/_build/dojo/dojo/_base/json.js
 ./../../../../src/skylark/templates/chirp/media/_build/dojo/dojo/_base/Color.js
-./../../../../src/skylark/templates/chirp/media/_build/dojo/dojo/_base.js
 ./../../../../src/skylark/templates/chirp/media/_build/dojo/dojo/_base/window.js
 ./../../../../src/skylark/templates/chirp/media/_build/dojo/dojo/_base/event.js
 ./../../../../src/skylark/templates/chirp/media/_build/dojo/dojo/_base/html.js
@@ -21,6 +20,7 @@ dojo.js:
 ./../../../../src/skylark/templates/chirp/media/_build/dojo/dojo/_base/xhr.js
 ./../../../../src/skylark/templates/chirp/media/_build/dojo/dojo/_base/fx.js
 ./../../../../src/skylark/templates/chirp/media/_build/dojo/dojo/_base/browser.js
+./../../../../src/skylark/templates/chirp/media/_build/dojo/dojo/_base.js
 ./jslib/dojoGuardEnd.jsfrag
 
 ../dojox/dtl.js:

@@ -1,6 +1,13 @@
 News
 ====
 
+0.4.3
+-----
+
+*Release date: 01-Apr-2011*
+
+* Added support Django 1.6
+
 0.4.2
 -----
 

@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2004-2010, The Dojo Foundation All Rights Reserved.
+	Copyright (c) 2004-2011, The Dojo Foundation All Rights Reserved.
 	Available via Academic Free License >= 2.1 OR the modified BSD license.
 	see: http://dojotoolkit.org/license for details
 */
@@ -8,18 +8,20 @@
 if(!dojo._hasResource["dojo.date.locale"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojo.date.locale"] = true;
 dojo.provide("dojo.date.locale");
-
-// Localization methods for Date.   Honor local customs using locale-dependent dojo.cldr data.
-
 dojo.require("dojo.date");
 dojo.require("dojo.cldr.supplemental");
 dojo.require("dojo.regexp");
 dojo.require("dojo.string");
 dojo.require("dojo.i18n");
+dojo.requireLocalization("dojo.cldr", "gregorian", null, "ROOT,ar,ca,cs,da,de,el,en,en-au,en-ca,en-gb,es,fi,fr,fr-ch,he,hu,it,ja,ko,nb,nl,pl,pt,pt-pt,ro,ru,sk,sl,sv,th,tr,zh,zh-hant,zh-hk,zh-tw");
+
+dojo.getObject("date.locale", true, dojo);
+
+// Localization methods for Date.   Honor local customs using locale-dependent dojo.cldr data.
+
 
 // Load the bundles containing localization information for
 // names and formats
-dojo.requireLocalization("dojo.cldr", "gregorian", null, "ROOT,ar,ca,cs,da,de,el,en,en-au,en-ca,en-gb,es,fi,fr,he,hu,it,ja,ko,nb,nl,pl,pt,pt-pt,ru,sk,sl,sv,th,tr,zh,zh-tw");
 
 //NOTE: Everything in this module assumes Gregorian calendars.
 // Other calendars will be implemented in separate modules.
@@ -91,7 +93,7 @@ dojo.requireLocalization("dojo.cldr", "gregorian", null, "ROOT,ar,ca,cs,da,de,el
 					break;
 				case 'a':
 					var timePeriod = (dateObject.getHours() < 12) ? 'am' : 'pm';
-					s = bundle['dayPeriods-format-wide-' + timePeriod];
+					s = options[timePeriod] || bundle['dayPeriods-format-wide-' + timePeriod];
 					break;
 				case 'h':
 				case 'H':
@@ -292,20 +294,23 @@ dojo.date.locale.parse = function(/*String*/value, /*dojo.date.locale.__FormatOp
 	//		formatting lengths may be chosen, with "full" used by default.
 	//		Custom patterns may be used or registered with translations using
 	//		the dojo.date.locale.addCustomFormats method.
-	//	
+	//
 	//		Formatting patterns are implemented using [the syntax described at
 	//		unicode.org](http://www.unicode.org/reports/tr35/tr35-4.html#Date_Format_Patterns)
-	//		When two digit years are used, a century is chosen according to a sliding 
+	//		When two digit years are used, a century is chosen according to a sliding
 	//		window of 80 years before and 20 years after present year, for both `yy` and `yyyy` patterns.
 	//		year < 100CE requires strict mode.
 	//
 	// value:
 	//		A string representation of a date
 
-	var info = dojo.date.locale._parseInfo(options),
+	// remove non-printing bidi control chars from input and pattern
+	var controlChars = /[\u200E\u200F\u202A\u202E]/g,
+		info = dojo.date.locale._parseInfo(options),
 		tokens = info.tokens, bundle = info.bundle,
-		re = new RegExp("^" + info.regexp + "$", info.strict ? "" : "i"),
-		match = re.exec(value);
+		re = new RegExp("^" + info.regexp.replace(controlChars, "") + "$",
+			info.strict ? "" : "i"),
+		match = re.exec(value && value.replace(controlChars, ""));
 
 	if(!match){ return null; } // null
 
@@ -444,7 +449,7 @@ dojo.date.locale.parse = function(/*String*/value, /*dojo.date.locale.__FormatOp
 		result[3] = 0; //12am -> 0
 	}
 
-	//TODO: implement a getWeekday() method in order to test 
+	//TODO: implement a getWeekday() method in order to test
 	//validity of input strings containing 'EEE' or 'EEEE'...
 
 	var dateObject = new Date(result[0], result[1], result[2], result[3], result[4], result[5], result[6]); // Date
@@ -484,7 +489,7 @@ function _processPattern(pattern, applyPattern, applyLiteral, applyAll){
 	applyLiteral = applyLiteral || identity;
 	applyAll = applyAll || identity;
 
-	//split on single quotes (which escape literals in date format strings) 
+	//split on single quotes (which escape literals in date format strings)
 	//but preserve escaped single quotes (e.g., o''clock)
 	var chunks = pattern.match(/(''|[^'])+/g),
 		literal = pattern.charAt(0) == "'";

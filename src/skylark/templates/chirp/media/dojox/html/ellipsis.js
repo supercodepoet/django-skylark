@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2004-2010, The Dojo Foundation All Rights Reserved.
+	Copyright (c) 2004-2011, The Dojo Foundation All Rights Reserved.
 	Available via Academic Free License >= 2.1 OR the modified BSD license.
 	see: http://dojotoolkit.org/license for details
 */
@@ -8,6 +8,7 @@
 if(!dojo._hasResource["dojox.html.ellipsis"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource["dojox.html.ellipsis"] = true;
 dojo.provide("dojox.html.ellipsis");
+dojo.deprecated("dojox.html.ellipsis", "Does not work with Firefox>4.  There is no replacement.  Use text-overflow:ellipsis for other browsers.");
 
 /*=====
 dojox.html.ellipsis = {
@@ -21,8 +22,9 @@ dojox.html.ellipsis = {
 =====*/
 
 (function(d){
-	if(d.isMoz){
-		// The delay (in ms) to wait so that we don't keep querying when many 
+    try{
+	if(d.isMoz){ //TODO: feature detect text-overflow in computed style?
+		// The delay (in ms) to wait so that we don't keep querying when many
 		// changes happen at once - set config "dojoxFFEllipsisDelay" if you
 		// want a different value
 		var delay = 1;
@@ -32,8 +34,9 @@ dojox.html.ellipsis = {
 				delay = 1;
 			}
 		}
-		
 		// Create our stub XUL elements for cloning later
+		// NOTE: this no longer works as of FF 4.0:
+		// https://developer.mozilla.org/En/Firefox_4_for_developers#Remote_XUL_support_removed
 		var sNS = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul';
 		var xml = document.createElementNS(sNS, 'window');
 		var label = document.createElementNS(sNS, 'description');
@@ -196,6 +199,9 @@ dojox.html.ellipsis = {
 			connFx();
 		});
 	}
+    }catch(e){
+	console.warn("dojox.html.ellipsis does not work with Firefox >= 4");
+    }
 })(dojo);
 
 }
