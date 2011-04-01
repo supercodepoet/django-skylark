@@ -5,9 +5,16 @@ import string
 from django.conf import settings as django_settings
 from urlparse import urljoin
 
+
 # General settings
-SKYLARK_CACHE_ROOT = os.path.join(django_settings.MEDIA_ROOT, 'cfcache')
-SKYLARK_CACHE_URL = urljoin(django_settings.MEDIA_URL, 'cfcache/')
+if hasattr(django_settings, 'STATIC_ROOT'):
+    SKYLARK_CACHE_ROOT = os.path.join(django_settings.STATIC_ROOT, 'cfcache')
+    SKYLARK_CACHE_URL = urljoin(django_settings.STATIC_URL, 'cfcache/')
+
+else:
+    SKYLARK_CACHE_ROOT = os.path.join(django_settings.MEDIA_ROOT, 'cfcache')
+    SKYLARK_CACHE_URL = urljoin(django_settings.MEDIA_URL, 'cfcache/')
+
 SKYLARK_INIT_CLEAR_CACHE = False
 SKYLARK_PLANS = 'mediadeploy'
 SKYLARK_PLANS_DEFAULT = 'default'

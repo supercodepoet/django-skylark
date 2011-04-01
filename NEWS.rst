@@ -1,6 +1,14 @@
 News
 ====
 
+0.4.2
+-----
+
+*Release date: 01-Apr-2011*
+
+* Added support for STATIC_ROOT and STATIC_URL for destination for copying media
+
+
 0.4.0a3
 -------
 
