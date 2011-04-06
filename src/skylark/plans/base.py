@@ -447,6 +447,12 @@ class BasePlan(object):
 
                 shutil.copytree(sourcedirectory, cachedirectory)
 
+                if settings.FILE_UPLOAD_PERMISSIONS is not None:
+                    for root, dirs, files in os.walk(cachedirectory):
+                        for momo in files:
+                            os.chmod(os.path.join(root, momo),
+                                settings.FILE_UPLOAD_PERMISSIONS)
+
     def _assets_are_stale(self, sourcedirectory, cachedirectory):
         """
         Looks through the given directories, determining if they are different
