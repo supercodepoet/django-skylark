@@ -1,6 +1,14 @@
 News
 ====
 
+0.4.6
+-----
+
+*Release date: 06-Apr-2011*
+
+* Fix to chmod cachedirectory as well
+
+
 0.4.5
 -----
 

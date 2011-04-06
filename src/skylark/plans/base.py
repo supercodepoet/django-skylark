@@ -448,6 +448,8 @@ class BasePlan(object):
                 shutil.copytree(sourcedirectory, cachedirectory)
 
                 if settings.FILE_UPLOAD_PERMISSIONS is not None:
+                    os.chmod(cachedirectory, 02750)
+
                     for root, dirs, files in os.walk(cachedirectory):
                         for momo in files:
                             os.chmod(os.path.join(root, momo),
