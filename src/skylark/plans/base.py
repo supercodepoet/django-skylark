@@ -452,6 +452,8 @@ class BasePlan(object):
                         for momo in files:
                             os.chmod(os.path.join(root, momo),
                                 settings.FILE_UPLOAD_PERMISSIONS)
+                        for momo in dirs:
+                            os.chmod(os.path.join(root, momo), 02750)
 
     def _assets_are_stale(self, sourcedirectory, cachedirectory):
         """

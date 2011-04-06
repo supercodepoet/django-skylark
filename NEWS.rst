@@ -1,6 +1,14 @@
 News
 ====
 
+0.4.5
+-----
+
+*Release date: 06-Apr-2011*
+
+* Setting proper permissions for directories
+
+
 0.4.4
 -----
 
